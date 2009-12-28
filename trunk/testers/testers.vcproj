@@ -132,6 +132,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="..\release\libxl.lib"
 				LinkIncremental="1"
 				GenerateDebugInformation="true"
 				SubSystem="1"
@@ -175,11 +176,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\string.cpp"
+				RelativePath=".\main.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\main.cpp"
+				RelativePath=".\string.cpp"
 				>
 			</File>
 		</Filter>

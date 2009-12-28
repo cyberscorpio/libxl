@@ -1,0 +1,30 @@
+##############################################
+# make all the unit test cases
+# !include <win32.mak>
+# CPPFLAGS = -EHsc "..\release\libxl.lib"
+.SUFFIXES : .obj .cpp 
+
+# rules
+.cpp.obj:
+	cl.exe -c -EHsc $<
+
+.obj.exe:
+	link $< "..\release\libxl.lib"
+
+
+# all targets
+modules = fs.test string.test
+objects = $(modules:test=obj)
+targets = $(modules:test=exe)
+
+$(targets) : $(objects)
+
+all: $(targets)
+
+
+# clean
+clean:
+	del *.obj
+	del *.exe
+
+
