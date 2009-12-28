@@ -33,6 +33,22 @@ static const char *results[] = {
 	"12345",
 };
 
+static const char *trims[] = {
+	"   abc   ",
+	"abc   ",
+	"abc",
+	"     abc",
+	"       ",
+};
+
+static const char *trimresults[] = {
+	"abc",
+	"abc",
+	"abc",
+	"abc",
+	"",
+};
+
 #ifdef IN_IDE
 int test_string(int argc, char **argv) {
 #else
@@ -44,12 +60,23 @@ int main(int argc, char **argv) {
 		s.replace(searches[i], replaces[i], counts[i]);
 		std::cout << "case " << i + 1 << std::endl;
 		if (s != results[i]) {
-			std::cout << "replace (" << searches[i] << ") to ("
+			std::cout << "failed! replace (" << searches[i] << ") to ("
 				<< replaces[i] << ") " << counts[i] << " times"
 				<< std::endl << "get " << s << std::endl
 				<< "but expect: " << results[i] << std::endl;
 		} else {
 			std::cout << "success!" << std::endl;
+		}
+	}
+
+	std::cout << "2. test trim()..." << std::endl;
+	for (int i = 0; i < COUNT_OF(trims); ++ i) {
+		xl::string s = trims[i];
+		s.trim();
+		if (s == trimresults[i]) {
+			std::cout << "trim " << trims[i] << " succeed!" << std::endl;
+		} else {
+			std::cout << "trim " << trims[i] << " failed!" << std::endl;
 		}
 	}
 
