@@ -80,6 +80,47 @@ public:
 		return replaced;
 	}
 
+	void trim (const CharType *charlist = NULL) {
+		size_t start = 0, end = 0;
+		const CharType *s = c_str();
+		const CharType *p = s;
+		if (charlist == NULL) {
+			while (*p == (CharType)' ') {
+				++ p;
+			}
+			start = p - s;
+			if (*p == 0) {
+				end = start;
+			} else {
+				p = s + length() - 1;
+				while (p != s && *p == (CharType)' ') {
+					-- p;
+				}
+				++ p;
+				end = p - s;
+				assert (end >= start);
+			}
+		} else {
+			assert (*charlist != 0);
+			while (*p == (CharType)' ') {
+				++ p;
+			}
+			start = p - s;
+			if (*p == 0) {
+				end = start;
+			} else {
+				p = s + length() - 1;
+				while (p != s && *p == (CharType)' ') {
+					-- p;
+				}
+				++ p;
+				end = p - s;
+				assert (end >= start);
+			}
+		}
+		std::swap(*this, substr(start, end - start));
+	}
+
 	/**
 	 * So we don't need to call c_str() every time.
 	 */
