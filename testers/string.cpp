@@ -49,6 +49,24 @@ static const char *trimresults[] = {
 	"",
 };
 
+static const char *charlist = "\t&* .";
+static const char *multitrims[] = {
+	"\t&*abc***.",
+	"abc \t.&*",
+	"abc",
+	"&***abc",
+	"&****&\t",
+};
+
+static const char *multitrimresults[] = {
+	"abc",
+	"abc",
+	"abc",
+	"abc",
+	"",
+};
+
+
 #ifdef IN_IDE
 int test_string(int argc, char **argv) {
 #else
@@ -77,6 +95,17 @@ int main(int argc, char **argv) {
 			std::cout << "trim " << trims[i] << " succeed!" << std::endl;
 		} else {
 			std::cout << "trim " << trims[i] << " failed!" << std::endl;
+		}
+	}
+
+	std::cout << "3. test multi trim()..." << std::endl;
+	for (int i = 0; i < COUNT_OF(multitrims); ++ i) {
+		xl::string s = multitrims[i];
+		s.trim(charlist);
+		if (s == multitrimresults[i]) {
+			std::cout << "trim " << multitrims[i] << " succeed!" << std::endl;
+		} else {
+			std::cout << "trim " << multitrims[i] << " failed!" << std::endl;
 		}
 	}
 

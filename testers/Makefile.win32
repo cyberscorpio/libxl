@@ -13,11 +13,12 @@
 
 
 # all targets
+headers = "..\libxl\common.h" "..\libxl\fs.h" "..\libxl\string.h"
 modules = fs.test string.test
 objects = $(modules:test=obj)
 targets = $(modules:test=exe)
 
-$(targets) : $(objects)
+$(targets) : $(objects) $(headers)
 
 all: $(targets)
 

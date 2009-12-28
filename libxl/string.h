@@ -11,16 +11,89 @@
 
 namespace xl {
 
-template< class CharType,
+template< class CharT,
           class Traits,
           class Allocator>
           class basic_string
-	: public std::basic_string<CharType, Traits, Allocator>
+	: public std::basic_string<CharT, Traits, Allocator>
 {
-	typedef std::basic_string<CharType, Traits, Allocator> _Base;
+protected:
+	typedef std::basic_string<CharT, Traits, Allocator> _Base;
+
+	void _TrimSingle (CharT c) {
+		const CharT *s = c_str();
+		const CharT *p = s;
+		while (*p == c) {
+			++ p;
+		}
+		size_t start = p - s;
+		size_t end = start;
+		if (*p != 0) { // not reach the end, so we begin from the end.
+			p = s + length() - 1;
+			while (p != s && *p == c) {
+				-- p;
+			}
+			++ p;
+			end = p - s;
+			assert (end >= start);
+		}
+		std::swap(*this, substr(start, end - start));
+	}
+
+	void _TrimMulti (const CharT *charlist) {
+		assert (charlist);
+		const CharT *l = NULL;
+		const CharT *s = c_str();
+		const CharT *p = s;
+		while (*p != NULL) {
+			CharT c = *p;
+			l = charlist;
+			bool matched = false;
+			while (*l != NULL) {
+				if (*l == c) {
+					matched = true;
+					break;
+				}
+				++ l;
+			}
+			if (matched) {
+				++ p;
+			} else {
+				break;
+			}
+		}
+		// now *p is not in [charlist]
+		size_t start = p - s;
+		size_t end = start;
+		if (*p != NULL) { // not reach the end, so we search from the end
+			p = s + length() - 1;
+			while (p != s) {
+				CharT c = *p;
+				l = charlist;
+				bool matched = false;
+				while (*l != NULL) {
+					if (*l == c) {
+						matched = true;
+						break;
+					}
+					++ l;
+				}
+				if (matched) {
+					-- p;
+				} else {
+					break;
+				}
+			}
+			// now *p is not in [charlist]
+			++ p;
+			end = p - s;
+			assert (end > start);
+		}
+		std::swap(*this, substr(start, end - start));
+	}
 
 public:
-	typedef basic_string<CharType, Traits, Allocator>      MyType;
+	typedef basic_string<CharT, Traits, Allocator>      MyType;
 
 	//////////////////////////////////////////////////////////////////////////
 	// constructors
@@ -32,11 +105,11 @@ public:
 		: _Base(_Right, _Roff, _Count) {}
 	basic_string (const _Base &_Right)
 		: _Base(_Right) {}
-	basic_string (const CharType *_Ptr, size_type _Count)
+	basic_string (const CharT *_Ptr, size_type _Count)
 		: _Base(_Ptr, _Count) {}
-	basic_string (const CharType *_Ptr)
+	basic_string (const CharT *_Ptr)
 		: _Base(_Ptr) {}
-	basic_string (size_type _Count, CharType _Ch)
+	basic_string (size_type _Count, CharT _Ch)
 		: _Base(_Count, _Ch) {}
 
 
@@ -80,51 +153,27 @@ public:
 		return replaced;
 	}
 
-	void trim (const CharType *charlist = NULL) {
-		size_t start = 0, end = 0;
-		const CharType *s = c_str();
-		const CharType *p = s;
-		if (charlist == NULL) {
-			while (*p == (CharType)' ') {
-				++ p;
-			}
-			start = p - s;
-			if (*p == 0) {
-				end = start;
-			} else {
-				p = s + length() - 1;
-				while (p != s && *p == (CharType)' ') {
-					-- p;
-				}
-				++ p;
-				end = p - s;
-				assert (end >= start);
-			}
-		} else {
-			assert (*charlist != 0);
-			while (*p == (CharType)' ') {
-				++ p;
-			}
-			start = p - s;
-			if (*p == 0) {
-				end = start;
-			} else {
-				p = s + length() - 1;
-				while (p != s && *p == (CharType)' ') {
-					-- p;
-				}
-				++ p;
-				end = p - s;
-				assert (end >= start);
-			}
+	/**
+	 * @brief Borrowed from PHP also.
+	 * @param charlist 
+	 *  if NULL, trim all ' ' from the begin and the end.
+	 *  else, trim charlist[0], charlist[1]... from the begin and the end.
+	 * @note pass charlist = "" is forbidden because it make no sense.
+	 */
+	void trim (const CharT *charlist = NULL) {
+		assert (!charlist || *charlist != 0);
+		if (charlist == NULL || charlist[1] == 0) { // single
+			CharT c = charlist == NULL ? (CharT)' ' : charlist[0];
+			_TrimSingle(c);
+		} else { // many
+			_TrimMulti(charlist);
 		}
-		std::swap(*this, substr(start, end - start));
 	}
 
 	/**
 	 * So we don't need to call c_str() every time.
 	 */
-	operator const CharType* () const {
+	operator const CharT* () const {
 		return c_str();
 	}
 };
