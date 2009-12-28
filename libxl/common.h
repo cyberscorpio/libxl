@@ -12,7 +12,11 @@
 #error "Implement tchar.h here"
 #endif
 
+namespace xl {
+
 typedef TCHAR tchar;
+
+}
 
 
 
