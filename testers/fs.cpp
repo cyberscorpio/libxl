@@ -46,5 +46,13 @@ int main(int argc, char **argv) {
 		std::cout << "put and get matched, and ALL are OK!" << std::endl;
 	}
 
+	xl::tstring fullname = xl::file_get_absolute_name(filename);
+	std::cout << "fullname of " << filename << " is:" << std::endl
+		<< "\t" << fullname << std::endl;
+
+	xl::tstring directory = xl::file_get_directory(filename);
+	std::cout << "directory of " << filename << " is:" << std::endl
+		<< "\t" << directory << std::endl;
+
 	return 0;
 }

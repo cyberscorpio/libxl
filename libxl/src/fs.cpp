@@ -2,11 +2,22 @@
 #include <stdio.h>
 #include <limits>
 #include <utility>
+#include <windows.h>
+#ifdef max // <windows.h> sucks
+#undef max
+#undef min
+#endif
 #include "../include/fs.h"
 
 #if (_MSC_VER >= 1500)
 #pragma warning (disable:4996)
 #endif
+
+//////////////////////////////////////////////////////////////////////////
+// static variables
+static const char dirsepA = '\\';
+static const wchar_t dirsepW = '\\';
+
 
 //////////////////////////////////////////////////////////////////////////
 // static functions
@@ -60,6 +71,47 @@ bool file_existsW (const wstring &filename) {
 }
 
 
+string file_get_absolute_nameA (const string &filename) {
+	assert (*filename != '.'); // don't support ../ and ./
+	bool relative = true;
+	if (filename.length() >= 2 && filename.at(1) == ':') {
+		relative = false;
+	}
+	string a = filename;
+	if (relative) {
+		char d[MAX_PATH];
+		::GetCurrentDirectoryA(MAX_PATH, d);
+		a = d;
+		a += '\\';
+		a += filename;
+	}
+	return a;
+#ifndef WIN32
+#error implement it!
+#endif
+}
+
+wstring file_get_absolute_nameW (const wstring &filename) {
+	assert (*filename != L'.'); // don't support ../ and ./
+	bool relative = true;
+	if (filename.length() >= 2 && filename.at(1) == L':') {
+		relative = false;
+	}
+	wstring a = filename;
+	if (relative) {
+		wchar_t d[MAX_PATH];
+		::GetCurrentDirectoryW(MAX_PATH, d);
+		a = d;
+		a += L'\\';
+		a += filename;
+	}
+	return a;
+#ifndef WIN32
+#error implement it!
+#endif
+}
+
+
 
 /**
  * @brief return the file length
@@ -96,6 +148,37 @@ __int64 file_get_lengthW (const wstring &filename) {
 	__int64 length = file_get_length(file);
 	fclose(file);
 	return length;
+}
+
+
+string file_get_directoryA (const string &filename, bool mustExist) {
+	assert (!mustExist || file_existsA(filename));
+	string fullname = file_get_absolute_nameA(filename);
+	size_t offset = fullname.find_last_of(dirsepA);
+	if (offset == fullname.npos) {
+		offset = fullname.find_last_of('/');
+	}
+	string d;
+	if (offset != fullname.npos) {
+		d = fullname.substr(0, offset);
+		assert (!mustExist || (GetFileAttributesA(fullname) & FILE_ATTRIBUTE_DIRECTORY));
+	}
+	return d;
+}
+
+wstring file_get_directoryW (const wstring &filename, bool mustExist) {
+	assert (!mustExist || file_existsW(filename));
+	wstring fullname = file_get_absolute_nameW(filename);
+	size_t offset = fullname.find_last_of(dirsepW);
+	if (offset == fullname.npos) {
+		offset = fullname.find_last_of(L'/');
+	}
+	wstring d;
+	if (offset != fullname.npos) {
+		d = fullname.substr(0, offset);
+		assert (!mustExist || (GetFileAttributesW(fullname) & FILE_ATTRIBUTE_DIRECTORY));
+	}
+	return d;
 }
 
 

@@ -18,6 +18,16 @@ inline bool file_exists (const tstring &filename) {
 #endif
 }
 
+string file_get_absolute_nameA (const string &filename);
+wstring file_get_absolute_nameW (const wstring &filename);
+inline tstring file_get_absolute_name (const tstring &filename) {
+#ifdef UNICODE
+	return file_get_absolute_nameW(filename);
+#else
+	return file_get_absolute_nameA(filename);
+#endif
+}
+
 __int64 file_get_length (FILE *);
 __int64 file_get_lengthA (const string &filename);
 __int64 file_get_lengthW (const wstring &filename);
@@ -26,6 +36,16 @@ inline __int64 file_get_length (const tstring &filename) {
 	return file_get_lengthW(filename);
 #else
 	return file_get_lengthA(filename);
+#endif
+}
+
+string file_get_directoryA (const string &filename, bool mustExist = false);
+wstring file_get_directoryW (const wstring &filename, bool mustExist = false);
+inline tstring file_get_directory (const tstring &filename, bool mustExist = false) {
+#ifdef UNICODE
+	return file_get_directoryW(filename, mustExist);
+#else
+	return file_get_directoryA(filename, mustExist);
 #endif
 }
 
