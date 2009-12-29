@@ -149,7 +149,11 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath=".\fs.cpp"
+				RelativePath=".\src\fs.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\placeholder.cpp"
 				>
 			</File>
 		</Filter>
@@ -159,15 +163,15 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath=".\common.h"
+				RelativePath=".\include\common.h"
 				>
 			</File>
 			<File
-				RelativePath=".\fs.h"
+				RelativePath=".\include\fs.h"
 				>
 			</File>
 			<File
-				RelativePath=".\string.h"
+				RelativePath=".\include\string.h"
 				>
 			</File>
 		</Filter>
