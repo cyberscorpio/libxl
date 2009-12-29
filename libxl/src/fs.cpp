@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <limits>
 #include <utility>
-#include "fs.h"
+#include "../include/fs.h"
 
 #if (_MSC_VER >= 1500)
 #pragma warning (disable:4996)
