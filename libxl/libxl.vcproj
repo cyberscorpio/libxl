@@ -171,6 +171,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\include\dp\Observable.h"
+				>
+			</File>
+			<File
 				RelativePath=".\include\string.h"
 				>
 			</File>

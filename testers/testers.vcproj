@@ -180,6 +180,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\observable.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\string.cpp"
 				>
 			</File>
