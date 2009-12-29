@@ -97,6 +97,8 @@ public:
 
 	//////////////////////////////////////////////////////////////////////////
 	// constructors
+	basic_string ()
+		: _Base() {}
 	basic_string (const MyType &_Right, size_type _Roff, size_type _Count = npos)
 		: _Base(_Right, _Roff, _Count) {}
 	basic_string (const MyType &_Right)
