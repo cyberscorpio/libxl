@@ -4,18 +4,63 @@
 #include <atlbase.h>
 #include <atlapp.h>
 
-class CApplication : public CAppModule {
+
+namespace xl {
+	namespace ui {
+
+
+template <class T>
+class CApplicationT : public CAppModule {
+
+protected:
+	CApplicationT () {}
+	~CApplicationT () {}
+
+	CMessageLoop m_msgLoop;
+
+	virtual void preRun (LPCTSTR, int) {
+	}
+
+	virtual void postRun () {
+	}
+
 public:
-	CApplication ();
-	~CApplication ();
+	static T* getInstance () {
+		static T This;
+		return &This;
+	}
 
-	virtual bool initilize ();
-	virtual void preRun ();
-	virtual void postRun ();
+	bool initialize (HINSTANCE hInst) {
+		HRESULT hRes = ::CoInitialize(NULL);
+		ATLASSERT (SUCCEEDED(hRes));
+		::DefWindowProc(NULL, 0, 0, 0L);
+		AtlInitCommonControls(ICC_BAR_CLASSES | ICC_TAB_CLASSES);
+		hRes = Init(NULL, hInst);
+		ATLASSERT (SUCCEEDED(hRes));
+		return true;
+	}
 
-	int run ();
+	void cleanup () {
+		Term();
+		::CoUninitialize();
+	}
+
+	int run (LPCTSTR lpstrCmdLine = NULL, int nCmdShow = SW_SHOWDEFAULT) {
+		AddMessageLoop(&m_msgLoop);
+
+		T *p = (T *)this;
+		p->preRun();
+		int nRet = m_msgLoop.Run();
+		p->postRun();
+
+		RemoveMessageLoop();
+
+		return nRet;
+	}
 };
 
+	} // namespace ui
+} // namespace xl
 
 #endif
 
