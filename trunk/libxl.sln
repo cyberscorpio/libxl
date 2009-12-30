@@ -5,6 +5,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libxl", "libxl\libxl.vcproj
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "testers", "testers\testers.vcproj", "{6BB6669C-494E-4DCB-B5A0-197B2D853F67}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "uitester", "uitester\uitester.vcproj", "{09701064-7432-4587-9D86-943CF5E90262}"
+	ProjectSection(ProjectDependencies) = postProject
+		{709DBE58-BB97-492F-B33E-16D84B356E59} = {709DBE58-BB97-492F-B33E-16D84B356E59}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -19,6 +24,10 @@ Global
 		{6BB6669C-494E-4DCB-B5A0-197B2D853F67}.Debug|Win32.Build.0 = Debug|Win32
 		{6BB6669C-494E-4DCB-B5A0-197B2D853F67}.Release|Win32.ActiveCfg = Release|Win32
 		{6BB6669C-494E-4DCB-B5A0-197B2D853F67}.Release|Win32.Build.0 = Release|Win32
+		{09701064-7432-4587-9D86-943CF5E90262}.Debug|Win32.ActiveCfg = Debug|Win32
+		{09701064-7432-4587-9D86-943CF5E90262}.Debug|Win32.Build.0 = Debug|Win32
+		{09701064-7432-4587-9D86-943CF5E90262}.Release|Win32.ActiveCfg = Release|Win32
+		{09701064-7432-4587-9D86-943CF5E90262}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
