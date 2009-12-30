@@ -16,14 +16,28 @@ namespace xl {
 
 typedef TCHAR tchar;
 
+typedef unsigned int uint;
+
 }
 
 
 
 //////////////////////////////////////////////////////////////////////////
 // macros
+
+// count of an array
 #ifndef COUNT_OF
 #define COUNT_OF(x)    (sizeof(x)/sizeof((x)[0]))
 #endif
 
+// when debugging, it is assert, otherwise, it run the expression.
+#ifndef VERIFY
+	#ifdef NDEBUG
+		#define VERIFY(x) (x)
+	#else
+		#define VERIFY(x) assert(x)
+	#endif
 #endif
+
+#endif
+
