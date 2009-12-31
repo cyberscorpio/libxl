@@ -167,10 +167,6 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath=".\include\ui\Application.h"
-				>
-			</File>
-			<File
 				RelativePath=".\include\common.h"
 				>
 			</File>
@@ -179,17 +175,33 @@
 				>
 			</File>
 			<File
-				RelativePath=".\include\dp\Observable.h"
-				>
-			</File>
-			<File
-				RelativePath=".\include\ui\ResMgr.h"
-				>
-			</File>
-			<File
 				RelativePath=".\include\string.h"
 				>
 			</File>
+			<Filter
+				Name="dp"
+				>
+				<File
+					RelativePath=".\include\dp\Observable.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="ui"
+				>
+				<File
+					RelativePath=".\include\ui\Application.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\ui\MainWindow.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\ui\ResMgr.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Resource Files"

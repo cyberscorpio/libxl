@@ -1,14 +1,28 @@
 #define _WTL_NO_CSTRING
 #include "../libxl/include/ui/Application.h"
+#include "../libxl/include/ui/MainWindow.h"
 
-#pragma comment (linker, "/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 
+class CMyWindow : public xl::ui::CMainWindowT<CMyWindow>
+{
+public:
+	DECLARE_WND_CLASS_EX(_T("CMyWindow"), 0, COLOR_INFOBK)
+};
 
 class CMyApp : public xl::ui::CApplicationT<CMyApp>
 {
+	CMyWindow m_wndMain;
 public:
+	virtual HWND createMainWindow (LPCTSTR, int) {
+		return m_wndMain.Create(NULL, 0, _T("UITester"));
+	}
+
 	virtual void preRun () {
-		::MessageBox (NULL, _T(":)"), _T("HI"), 0);
+
+	}
+
+	virtual void postRun () {
+
 	}
 };
 
