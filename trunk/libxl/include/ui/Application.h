@@ -1,9 +1,10 @@
-#ifndef XL_APPLICATION_H
-#define XL_APPLICATION_H
+#ifndef XL_UI_APPLICATION_H
+#define XL_UI_APPLICATION_H
 // #define _WTL_NO_CSTRING
 #include <atlbase.h>
 #include <atlapp.h>
 
+#pragma comment (linker, "/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 
 namespace xl {
 	namespace ui {
@@ -11,18 +12,33 @@ namespace xl {
 
 template <class T>
 class CApplicationT : public CAppModule {
-
-protected:
-	CApplicationT () {}
-	~CApplicationT () {}
-
 	CMessageLoop m_msgLoop;
 
-	virtual void preRun (LPCTSTR, int) {
+#ifndef NDEBUG
+	bool m_initialized;
+#endif
+
+protected:
+	CApplicationT ()
+#ifndef NDEBUG
+		: m_initialized(false)
+#endif
+	{
+	}
+	~CApplicationT () {
+
+	}
+
+	virtual HWND createMainWindow (LPCTSTR /* lpstrCmdLine */, int /* nCmdShow */) {
+		return NULL;
+	}
+
+	virtual void preRun () {
 	}
 
 	virtual void postRun () {
 	}
+
 
 public:
 	static T* getInstance () {
@@ -37,18 +53,39 @@ public:
 		AtlInitCommonControls(ICC_BAR_CLASSES | ICC_TAB_CLASSES);
 		hRes = Init(NULL, hInst);
 		ATLASSERT (SUCCEEDED(hRes));
+#ifndef NDEBUG
+		m_initialized = true;
+#endif
 		return true;
 	}
 
 	void cleanup () {
-		Term();
-		::CoUninitialize();
+		if (m_initialized) {
+			Term();
+			::CoUninitialize();
+		}
 	}
 
 	int run (LPCTSTR lpstrCmdLine = NULL, int nCmdShow = SW_SHOWDEFAULT) {
+#ifndef NDEBUG
+		if (!m_initialized) {
+			AtlInitCommonControls(ICC_BAR_CLASSES | ICC_TAB_CLASSES);
+			::MessageBox(0, _T("Call CApplication::initialize() before run()"), NULL, 0);
+			return -1;
+		}
+#endif
 		AddMessageLoop(&m_msgLoop);
 
 		T *p = (T *)this;
+		HWND hWnd = p->createMainWindow(lpstrCmdLine, nCmdShow);
+		if (!hWnd) {
+			::MessageBox(0, _T("Create main window failed!"), NULL, 0);
+			::PostQuitMessage(-1);
+		}
+
+		::UpdateWindow(hWnd);
+		::ShowWindow(hWnd, nCmdShow);
+
 		p->preRun();
 		int nRet = m_msgLoop.Run();
 		p->postRun();

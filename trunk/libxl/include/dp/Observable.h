@@ -1,5 +1,5 @@
-#ifndef XL_OBSERVABLE_H
-#define XL_OBSERVABLE_H
+#ifndef XL_DP_OBSERVABLE_H
+#define XL_DP_OBSERVABLE_H
 #include <assert.h>
 #include <vector>
 #include <windows.h>
