@@ -3,6 +3,7 @@
 #include <atlbase.h>
 #include <atlwin.h>
 #include "../common.h"
+#include "UIWinBase.h"
 
 namespace xl {
 	namespace ui {
@@ -15,6 +16,7 @@ typedef CWinTraits<
 template <class T, class Traits = CMainWindowTraits>
 class CMainWindowT
 	: public CWindowImplBaseT<ATL::CWindow, Traits>
+	, public CUIWinBaseT<T>
 	, public CMessageFilter
 	, public CIdleHandler
 {

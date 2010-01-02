@@ -13,16 +13,11 @@ namespace xl {
 template <class T>
 class CApplicationT : public CAppModule {
 	CMessageLoop m_msgLoop;
-
-#ifndef NDEBUG
 	bool m_initialized;
-#endif
 
 protected:
 	CApplicationT ()
-#ifndef NDEBUG
 		: m_initialized(false)
-#endif
 	{
 	}
 	~CApplicationT () {
@@ -53,9 +48,7 @@ public:
 		AtlInitCommonControls(ICC_BAR_CLASSES | ICC_TAB_CLASSES);
 		hRes = Init(NULL, hInst);
 		ATLASSERT (SUCCEEDED(hRes));
-#ifndef NDEBUG
 		m_initialized = true;
-#endif
 		return true;
 	}
 
@@ -67,13 +60,11 @@ public:
 	}
 
 	int run (LPCTSTR lpstrCmdLine = NULL, int nCmdShow = SW_SHOWDEFAULT) {
-#ifndef NDEBUG
 		if (!m_initialized) {
 			AtlInitCommonControls(ICC_BAR_CLASSES | ICC_TAB_CLASSES);
 			::MessageBox(0, _T("Call CApplication::initialize() before run()"), NULL, 0);
 			return -1;
 		}
-#endif
 		AddMessageLoop(&m_msgLoop);
 
 		T *p = (T *)this;

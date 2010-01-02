@@ -178,6 +178,10 @@
 				RelativePath=".\include\string.h"
 				>
 			</File>
+			<File
+				RelativePath=".\include\ui\UIWinBase.h"
+				>
+			</File>
 			<Filter
 				Name="dp"
 				>
@@ -191,6 +195,10 @@
 				>
 				<File
 					RelativePath=".\include\ui\Application.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\ui\gdi.h"
 					>
 				</File>
 				<File
