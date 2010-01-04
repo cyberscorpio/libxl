@@ -164,6 +164,10 @@
 				Name="ui"
 				>
 				<File
+					RelativePath=".\src\ui\CtrlBase.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\src\ui\WinStyle.cpp"
 					>
 				</File>
@@ -199,6 +203,10 @@
 				>
 				<File
 					RelativePath=".\include\ui\Application.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\ui\CtrlBase.h"
 					>
 				</File>
 				<File

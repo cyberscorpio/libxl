@@ -3,7 +3,10 @@
 namespace xl {
 	namespace ui {
 
-WinStyle::WinStyle () {
+WinStyle::WinStyle () 
+	: width (0)
+	, height (0)
+{
 	for (int i = 0; i < 4; ++ i) {
 		margin[i] = padding[i] = 0;
 	}
