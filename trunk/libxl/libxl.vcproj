@@ -160,6 +160,14 @@
 				RelativePath=".\src\ui\ResMgr.cpp"
 				>
 			</File>
+			<Filter
+				Name="ui"
+				>
+				<File
+					RelativePath=".\src\ui\WinStyle.cpp"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -176,10 +184,6 @@
 			</File>
 			<File
 				RelativePath=".\include\string.h"
-				>
-			</File>
-			<File
-				RelativePath=".\include\ui\UIWinBase.h"
 				>
 			</File>
 			<Filter
@@ -207,6 +211,14 @@
 				</File>
 				<File
 					RelativePath=".\include\ui\ResMgr.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\ui\UIWinBase.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\ui\WinStyle.h"
 					>
 				</File>
 			</Filter>
