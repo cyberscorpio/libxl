@@ -11,7 +11,7 @@ namespace xl {
 
 
 template <class T>
-class CUIWinBaseT
+class CUIWinBaseT : public WinStyle
 {
 protected:
 	WinStyle m_style;

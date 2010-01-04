@@ -1,9 +1,12 @@
 #ifndef XL_UI_MAIN_WINDOW_H
 #define XL_UI_MAIN_WINDOW_H
+#include <assert.h>
+#include <vector>
 #include <atlbase.h>
 #include <atlwin.h>
 #include "../common.h"
 #include "UIWinBase.h"
+#include "CtrlBase.h"
 
 namespace xl {
 	namespace ui {
@@ -13,6 +16,7 @@ typedef CWinTraits<
                    WS_EX_APPWINDOW | WS_EX_WINDOWEDGE
                   > CMainWindowTraits; // the default traits
 
+class CCtrlBase;
 template <class T, class Traits = CMainWindowTraits>
 class CMainWindowT
 	: public CWindowImplBaseT<ATL::CWindow, Traits>
@@ -21,13 +25,61 @@ class CMainWindowT
 	, public CIdleHandler
 {
 	typedef ATL::CWindow  _TBase;
+
+protected:
+	typedef std::vector<CCtrlBase *> _Ctrls;
+	typedef _Ctrls::iterator         _CtrlIter;
+	_Ctrls    m_ctrls;
+
+	void _LayoutControls () {
+		using xl::ui::EDGE_TOP;
+		using xl::ui::EDGE_LEFT;
+		using xl::ui::EDGE_BOTTOM;
+		using xl::ui::EDGE_RIGHT;
+		CRect rc = getContentRect();
+		int line_x = rc.left;
+		int line_y = rc.top;
+		int max_line_height = -1;
+		int line_ctrl_count = 0;
+		for (_CtrlIter it = m_ctrls.begin(); it != m_ctrls.end(); ++ it) {
+			CCtrlBase *pCtrl = *it;
+			assert (pCtrl);
+
+			int width = pCtrl->width;
+			int height = pCtrl->height;
+			int line_height = height + pCtrl->margin[EDGE_TOP] + pCtrl->margin[EDGE_BOTTOM];
+			if (line_height > max_line_height) {
+				max_line_height = line_height;
+			}
+			int x = line_x + pCtrl->margin[xl::ui::EDGE_LEFT];
+			int y = line_y + pCtrl->margin[xl::ui::EDGE_TOP];
+			if (x + width > rc.right && line_ctrl_count > 0) {
+				// next line
+				line_x = rc.left;
+				line_y += max_line_height;
+				max_line_height = -1;
+				line_ctrl_count = 0;
+				-- it;
+				continue; // next line
+			}
+			++ line_ctrl_count;
+			CRect rect(x, y, x + width, y + height);
+			line_x = x + width + pCtrl->margin[xl::ui::EDGE_RIGHT];
+
+			(*it)->setRect(rect);
+		}
+	}
+
 public:
-	CMainWindowT(void) {
+	CMainWindowT (void) {
 
 	}
 
-	virtual ~CMainWindowT(void) {
-
+	virtual ~CMainWindowT (void) {
+		for (_CtrlIter it = m_ctrls.begin(); it != m_ctrls.end(); ++ it) {
+			delete *it;
+		}
+		m_ctrls.clear();
 	}
 
 public:

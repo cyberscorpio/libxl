@@ -13,6 +13,10 @@ class CDCPlusT
 	: public WTL::CDCT<t_bManaged>
 {
 public:
+	CDCPlusT (HDC hDC = NULL) : WTL::CDCT<t_bManaged>(hDC)
+	{
+	}
+
 	BOOL drawLine (int x1, int y1, int x2, int y2) {
 		POINT pos;
 		if (MoveTo(x1, y1, &pos)) {
