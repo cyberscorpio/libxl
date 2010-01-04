@@ -4,39 +4,30 @@
 #include <atltypes.h>
 #include <atlapp.h>
 #include <atltypes.h>
+#include "WinStyle.h"
 
 namespace xl {
 	namespace ui {
 
-enum EDGE {
-	TOP,
-	RIGHT,
-	BOTTOM,
-	LEFT
-};
 
 template <class T>
 class CUIWinBaseT
 {
 protected:
-	int margin[4];
-	int padding[4];
+	WinStyle m_style;
 
 public:
 	CUIWinBaseT () {
-		for (int i = 0; i < 4; ++ i) {
-			margin[i] = padding[i] = 0;
-		}
 	}
 
 	CRect getContentRect () {
 		CRect rc;
 		T *p = (T *)this;
 		p->GetClientRect(rc);
-		rc.left += padding[LEFT];
-		rc.right -= padding[RIGHT];
-		rc.top += padding[TOP];
-		rc.bottom -= padding[BOTTOM];
+		rc.left += padding[EDGE_LEFT];
+		rc.right -= padding[EDGE_RIGHT];
+		rc.top += padding[EDGE_TOP];
+		rc.bottom -= padding[EDGE_BOTTOM];
 		return rc;
 	}
 };
