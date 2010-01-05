@@ -13,7 +13,7 @@ LRESULT CMainWindow::OnCreate (UINT msg, WPARAM wParam, LPARAM lParam, BOOL &bHa
 		RGB(0, 0, 0), RGB(127, 255, 127), RGB(255, 127, 127),
 	};
 	for (int i = 0; i < COUNT_OF(colors); ++ i) {
-		xl::ui::CCtrlBase *pCtrl = new xl::ui::CCtrlBase();
+		xl::ui::CCtrlPtr pCtrl(new xl::ui::CCtrlBase());
 		pCtrl->m_clrBackground = colors[i];
 		m_ctrls.push_back(pCtrl);
 	}
