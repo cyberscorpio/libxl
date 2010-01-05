@@ -6,6 +6,9 @@ namespace xl {
 WinStyle::WinStyle () 
 	: width (0)
 	, height (0)
+	, position (WinStyle::PT_NORMAL)
+	, display (WinStyle::DISP_BLOCK)
+	, xfloat (WinStyle::FLOAT_NONE)
 {
 	for (int i = 0; i < 4; ++ i) {
 		margin[i] = padding[i] = 0;
@@ -15,30 +18,28 @@ WinStyle::WinStyle ()
 WinStyle::~WinStyle () {
 }
 
-void WinStyle::setMargin (int margin, EDGE edge) {
-	if (edge == EDGE_COUNT) {
-		for (int i = 0; i < 4; ++ i) {
-			this->margin[i] = margin;
-		}
+void WinStyle::setMargin (int margin, EDGETYPE et) {
+	if (et == ET_ALL) {
+		this->margin.left = this->margin.right = 
+			this->margin.top = this->margin.bottom = margin;
 	} else {
-		this->margin[edge] = margin;
+		this->margin[et] = margin;
 	}
 }
 
-void WinStyle::setPadding (int padding, EDGE edge = EDGE_COUNT) {
-	if (edge == EDGE_COUNT) {
-		for (int i = 0; i < 4; ++ i) {
-			this->padding[i] = padding;
-		}
+void WinStyle::setPadding (int padding, EDGETYPE et) {
+	if (et == ET_ALL) {
+		this->padding.left = this->padding.right =
+			this->padding.top = this->padding.bottom = padding;
 	} else {
-		this->padding[edge] = padding;
+		this->padding[et] = padding;
 	}
 }
 
 SIZE WinStyle::reportSize () {
 	SIZE sz;
-	sz.cx = width == SIZE_AUTO ? SIZE_AUTO : width + margin[EDGE_LEFT] + margin[EDGE_RIGHT];
-	sz.cy = height == SIZE_AUTO ? SIZE_AUTO : height + margin[EDGE_TOP] + margin[EDGE_BOTTOM];
+	sz.cx = width == SIZE_AUTO ? SIZE_AUTO : width + margin.left + margin.right;
+	sz.cy = height == SIZE_AUTO ? SIZE_AUTO : height + margin.top + margin.bottom;
 	return sz;
 }
 

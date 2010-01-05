@@ -11,12 +11,25 @@ struct SIZE {
 	int cy;
 };
 
-enum EDGE {
-	EDGE_TOP,
-	EDGE_RIGHT,
-	EDGE_BOTTOM,
-	EDGE_LEFT,
-	EDGE_COUNT
+struct POINT {
+	int x;
+	int y;
+};
+
+enum EDGETYPE {
+	ET_TOP,
+	ET_RIGHT,
+	ET_BOTTOM,
+	ET_LEFT,
+	ET_ALL,
+	ET_COUNT = ET_ALL
+};
+
+struct EDGE {
+	int top;
+	int right;
+	int bottom;
+	int left;
 };
 
 struct WinStyle {
@@ -25,8 +38,8 @@ protected:
 
 public:
 //	static const int 
-	int margin[4];
-	int padding[4];
+	EDGE margin;
+	EDGE padding;
 
 	int width;
 	int height;
@@ -37,7 +50,6 @@ public:
 		PT_NORMAL,
 		PT_RELATIVE,
 		PT_ABLOLUTE,
-		PT_FIXED,
 		PT_COUNT
 	};
 	POSITION position;
@@ -52,6 +64,16 @@ public:
 	DISPLAY display;
 
 	///////////////////////////////////////////////////////
+	// float
+	enum FLOAT {
+		FLOAT_NONE,
+		FLOAT_LEFT,
+		FLOAT_CENTER,
+		FLOAT_RIGHT,
+		FLOAT_COUNT
+	};
+	FLOAT xfloat; // float is a key word
+
 	///////////////////////////////////////////////////////
 	///////////////////////////////////////////////////////
 	///////////////////////////////////////////////////////
@@ -65,8 +87,8 @@ public:
 	WinStyle ();
 	virtual ~WinStyle ();
 
-	void setMargin (int margin, EDGE edge = EDGE_COUNT);
-	void setPadding (int padding, EDGE edge = EDGE_COUNT);
+	void setMargin (int margin, EDGETYPE et = ET_ALL);
+	void setPadding (int padding, EDGETYPE et = ET_ALL);
 
 	void setWidth (int width) {
 		this->width = width;

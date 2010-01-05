@@ -29,7 +29,9 @@ public:
 	void setRect (CRect rc);
 };
 
-typedef std::tr1::shared_ptr<CCtrlBase>        CCtrlPtr;
+typedef std::tr1::shared_ptr <CCtrlBase>        CCtrlPtr;
+typedef std::vector <CCtrlPtr>                  CCtrlContainer;
+
 
 	} // namespace ui
 } // namespace xl
