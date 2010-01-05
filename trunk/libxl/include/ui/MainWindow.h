@@ -27,23 +27,28 @@ class CMainWindowT
 	typedef ATL::CWindow  _TBase;
 
 protected:
-	typedef std::vector<CCtrlBase *> _Ctrls;
+	typedef std::vector<CCtrlPtr> _Ctrls;
 	typedef _Ctrls::iterator         _CtrlIter;
 	_Ctrls    m_ctrls;
 
-	void _LayoutControls () {
+	/**
+	 * @return the total height it used
+	 */
+	int _LayoutControls () {
 		using xl::ui::EDGE_TOP;
 		using xl::ui::EDGE_LEFT;
 		using xl::ui::EDGE_BOTTOM;
 		using xl::ui::EDGE_RIGHT;
+		int total_height = 0;
 		CRect rc = getContentRect();
 		int line_x = rc.left;
 		int line_y = rc.top;
 		int max_line_height = -1;
 		int line_ctrl_count = 0;
 		for (_CtrlIter it = m_ctrls.begin(); it != m_ctrls.end(); ++ it) {
-			CCtrlBase *pCtrl = *it;
+			CCtrlBase *pCtrl = (*it).get();
 			assert (pCtrl);
+			SIZE sz = pCtrl->reportSize();
 
 			int width = pCtrl->width;
 			int height = pCtrl->height;
@@ -51,8 +56,8 @@ protected:
 			if (line_height > max_line_height) {
 				max_line_height = line_height;
 			}
-			int x = line_x + pCtrl->margin[xl::ui::EDGE_LEFT];
-			int y = line_y + pCtrl->margin[xl::ui::EDGE_TOP];
+			int x = line_x + pCtrl->margin[EDGE_LEFT];
+			int y = line_y + pCtrl->margin[EDGE_TOP];
 			if (x + width > rc.right && line_ctrl_count > 0) {
 				// next line
 				line_x = rc.left;
@@ -64,10 +69,12 @@ protected:
 			}
 			++ line_ctrl_count;
 			CRect rect(x, y, x + width, y + height);
-			line_x = x + width + pCtrl->margin[xl::ui::EDGE_RIGHT];
+			line_x = x + width + pCtrl->margin[EDGE_RIGHT];
 
 			(*it)->setRect(rect);
 		}
+
+		return total_height;
 	}
 
 public:
@@ -76,10 +83,6 @@ public:
 	}
 
 	virtual ~CMainWindowT (void) {
-		for (_CtrlIter it = m_ctrls.begin(); it != m_ctrls.end(); ++ it) {
-			delete *it;
-		}
-		m_ctrls.clear();
 	}
 
 public:

@@ -23,6 +23,7 @@ void CCtrlBase::draw (HDC hdc) {
 	dc.FillSolidRect(m_rc, m_clrBackground);
 }
 
+
 void CCtrlBase::setRect (CRect rc) {
 	m_rc = rc;
 }

@@ -1,5 +1,6 @@
 #ifndef XL_UI_CTRLBASE_H
 #define XL_UI_CTRLBASE_H
+#include <memory>
 #include <atlbase.h>
 #include <atltypes.h>
 #include <atlapp.h>
@@ -9,6 +10,7 @@
 
 namespace xl {
 	namespace ui {
+
 
 class CCtrlBase	: public WinStyle
 {
@@ -22,8 +24,12 @@ public:
 	virtual ~CCtrlBase ();
 
 	virtual void draw (HDC hdc);
+
+
 	void setRect (CRect rc);
 };
+
+typedef std::tr1::shared_ptr<CCtrlBase>        CCtrlPtr;
 
 	} // namespace ui
 } // namespace xl
