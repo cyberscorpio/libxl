@@ -24,10 +24,10 @@ public:
 		CRect rc;
 		T *p = (T *)this;
 		p->GetClientRect(rc);
-		rc.left += padding[EDGE_LEFT];
-		rc.right -= padding[EDGE_RIGHT];
-		rc.top += padding[EDGE_TOP];
-		rc.bottom -= padding[EDGE_BOTTOM];
+		rc.left += padding.left;
+		rc.right -= padding.right;
+		rc.top += padding.top;
+		rc.bottom -= padding.bottom;
 		return rc;
 	}
 };

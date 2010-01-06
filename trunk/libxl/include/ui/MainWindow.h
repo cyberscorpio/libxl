@@ -27,53 +27,116 @@ class CMainWindowT
 	typedef ATL::CWindow  _TBase;
 
 protected:
-	typedef std::vector<CCtrlPtr> _Ctrls;
-	typedef _Ctrls::iterator         _CtrlIter;
+	typedef std::vector<CCtrlPtr>  _Ctrls;
+	typedef _Ctrls::iterator       _CtrlIter;
 	_Ctrls    m_ctrls;
+
+
+	/**
+	 * @return line height, -1 means the last line
+	 */
+	int _LayoutLine (_CtrlIter &it, int start_y) {
+		int line_height = -1;
+		int line_ctrl_count = 0;
+		bool no_block = true;
+		
+		CRect rect = getContentRect();
+		int start_x = rect.left;
+		int max_x = rect.right;
+
+		_CtrlIter end = m_ctrls.end();
+		while (it != end) {
+			CCtrlBase *pCtrl = (*it).get();
+			WinStyle::DISPLAY display = pCtrl->display;
+			EDGE *pMargin = &pCtrl->margin;
+
+			xl::ui::SIZE sz = pCtrl->reportSize();
+			if (sz.cx == SIZE_AUTO) {
+				// TODO
+			} else if (sz.cx == SIZE_FILL) {
+				// TODO
+			}
+			assert (sz.cy >= 0); // TODO: suppport auto / fill height
+
+			if ((line_ctrl_count > 0) && 
+			    ((start_x + sz.cx > max_x) || 
+			     (display == WinStyle::DISP_CLEAR))) {
+				-- it; // it belongs to the next line
+				break;
+			}
+
+			if (!no_block && display == WinStyle::DISP_BLOCK) {
+				-- it;
+				break;
+			}
+			
+			// is clear ?
+			if (display == WinStyle::DISP_CLEAR) {
+				assert (sz.cy >= 0); // clear can't have negative height
+				line_height = sz.cy;
+				break;
+			}
+
+			++ line_ctrl_count;
+			// is block or left ?
+			if (display == WinStyle::DISP_BLOCK || display == WinStyle::DISP_LEFT) {
+				int l = start_x + pMargin->left;
+				int t = start_y + pMargin->top;
+				int r = start_x + sz.cx - pMargin->right;
+				int b = start_y + sz.cy - pMargin->bottom;
+				if (r > max_x) {
+					r = max_x;
+				}
+				start_x += sz.cx;
+				CRect rc(l, t, r, b);
+				pCtrl->setRect(rc);
+				if (line_height < sz.cy) {
+					line_height = sz.cy;
+				}
+
+				if (display == WinStyle::DISP_BLOCK) {
+					no_block = false;
+					++ it;
+					break;
+				}
+			}
+
+			// right ?
+			if (display == WinStyle::DISP_RIGHT) {
+				int l = max_x - sz.cx + pMargin->left;
+				int t = start_y + pMargin->top;
+				int r = max_x - pMargin->right;
+				int b = start_y + sz.cy - pMargin->bottom;
+				if (l < start_x) {
+					l = start_x;
+				}
+				max_x -= sz.cx;
+				CRect rc(l, t, r, b);
+				pCtrl->setRect(rc);
+				if (line_height < sz.cy) {
+					line_height = sz.cy;
+				}
+			}
+			++ it;
+		}
+		
+		return line_height;
+	}
 
 	/**
 	 * @return the total height it used
 	 */
 	int _LayoutControls () {
-		using xl::ui::EDGE_TOP;
-		using xl::ui::EDGE_LEFT;
-		using xl::ui::EDGE_BOTTOM;
-		using xl::ui::EDGE_RIGHT;
 		int total_height = 0;
-		CRect rc = getContentRect();
-		int line_x = rc.left;
-		int line_y = rc.top;
-		int max_line_height = -1;
-		int line_ctrl_count = 0;
-		for (_CtrlIter it = m_ctrls.begin(); it != m_ctrls.end(); ++ it) {
-			CCtrlBase *pCtrl = (*it).get();
-			assert (pCtrl);
-			SIZE sz = pCtrl->reportSize();
-
-			int width = pCtrl->width;
-			int height = pCtrl->height;
-			int line_height = height + pCtrl->margin[EDGE_TOP] + pCtrl->margin[EDGE_BOTTOM];
-			if (line_height > max_line_height) {
-				max_line_height = line_height;
-			}
-			int x = line_x + pCtrl->margin[EDGE_LEFT];
-			int y = line_y + pCtrl->margin[EDGE_TOP];
-			if (x + width > rc.right && line_ctrl_count > 0) {
-				// next line
-				line_x = rc.left;
-				line_y += max_line_height;
-				max_line_height = -1;
-				line_ctrl_count = 0;
-				-- it;
-				continue; // next line
-			}
-			++ line_ctrl_count;
-			CRect rect(x, y, x + width, y + height);
-			line_x = x + width + pCtrl->margin[EDGE_RIGHT];
-
-			(*it)->setRect(rect);
+		CRect rect = getContentRect();
+		_CtrlIter it = m_ctrls.begin();
+		int start_y = rect.top;
+		int line_height = _LayoutLine(it, start_y);
+		while (line_height != -1) {
+			total_height += line_height;
+			start_y += line_height;
+			line_height = _LayoutLine(it, start_y);
 		}
-
 		return total_height;
 	}
 

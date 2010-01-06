@@ -4,8 +4,8 @@
 
 LRESULT CMainWindow::OnCreate (UINT msg, WPARAM wParam, LPARAM lParam, BOOL &bHandled) {
 	bHandled = false;
-	padding[xl::ui::EDGE_LEFT] = 20;
-	padding[xl::ui::EDGE_RIGHT] = 20;
+	padding.left = 20;
+	padding.right = 20;
 
 	COLORREF colors[] = {
 		RGB(255, 0, 0), RGB(0, 255, 0), RGB(0, 0, 255),
@@ -15,6 +15,12 @@ LRESULT CMainWindow::OnCreate (UINT msg, WPARAM wParam, LPARAM lParam, BOOL &bHa
 	for (int i = 0; i < COUNT_OF(colors); ++ i) {
 		xl::ui::CCtrlPtr pCtrl(new xl::ui::CCtrlBase());
 		pCtrl->m_clrBackground = colors[i];
+		pCtrl->display = xl::ui::WinStyle::DISP_LEFT;
+		if ((i % 5) == 0) {
+			pCtrl->display = xl::ui::WinStyle::DISP_RIGHT;
+		} else if ((i % 5) == 1) {
+			pCtrl->display = xl::ui::WinStyle::DISP_BLOCK;
+		}
 		m_ctrls.push_back(pCtrl);
 	}
 	_LayoutControls();

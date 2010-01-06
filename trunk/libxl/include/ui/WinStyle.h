@@ -5,6 +5,7 @@ namespace xl {
 	namespace ui {
 
 static const int SIZE_AUTO = -1;
+static const int SIZE_FILL = -2; // fill the remain space
 
 struct SIZE {
 	int cx;
@@ -30,11 +31,15 @@ struct EDGE {
 	int right;
 	int bottom;
 	int left;
+
+	EDGE (int t = 0, int r = 0, int b = 0, int l = 0)
+		: top (t), right (r), bottom (b), left (l) {
+	}
 };
 
 struct WinStyle {
 protected:
-	void _StyleChanged ();
+	virtual void _StyleChanged ();
 
 public:
 //	static const int 
@@ -58,21 +63,14 @@ public:
 	// display
 	enum DISPLAY {
 		DISP_BLOCK,
-		DISP_INLINE,
+		DISP_LEFT,
+		// DISP_CENTER, // maybe not needed
+		DISP_RIGHT,
+		DISP_CLEAR,
 		DISP_COUNT
 	};
 	DISPLAY display;
 
-	///////////////////////////////////////////////////////
-	// float
-	enum FLOAT {
-		FLOAT_NONE,
-		FLOAT_LEFT,
-		FLOAT_CENTER,
-		FLOAT_RIGHT,
-		FLOAT_COUNT
-	};
-	FLOAT xfloat; // float is a key word
 
 	///////////////////////////////////////////////////////
 	///////////////////////////////////////////////////////
