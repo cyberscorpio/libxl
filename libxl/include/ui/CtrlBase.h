@@ -1,6 +1,7 @@
 #ifndef XL_UI_CTRLBASE_H
 #define XL_UI_CTRLBASE_H
 #include <memory>
+#include <vector>
 #include <atlbase.h>
 #include <atltypes.h>
 #include <atlapp.h>

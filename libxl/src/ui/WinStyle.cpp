@@ -3,16 +3,18 @@
 namespace xl {
 	namespace ui {
 
+
+void WinStyle::_StyleChanged () {
+
+}
+
+
 WinStyle::WinStyle () 
 	: width (0)
 	, height (0)
 	, position (WinStyle::PT_NORMAL)
 	, display (WinStyle::DISP_BLOCK)
-	, xfloat (WinStyle::FLOAT_NONE)
 {
-	for (int i = 0; i < 4; ++ i) {
-		margin[i] = padding[i] = 0;
-	}
 }
 
 WinStyle::~WinStyle () {
@@ -23,7 +25,10 @@ void WinStyle::setMargin (int margin, EDGETYPE et) {
 		this->margin.left = this->margin.right = 
 			this->margin.top = this->margin.bottom = margin;
 	} else {
-		this->margin[et] = margin;
+		et == ET_LEFT ? this->margin.left = margin : 
+			(et == ET_RIGHT ? this->margin.right = margin :
+				(et == ET_TOP ? this->margin.top = margin : 
+					this->margin.bottom = margin));
 	}
 }
 
@@ -32,7 +37,10 @@ void WinStyle::setPadding (int padding, EDGETYPE et) {
 		this->padding.left = this->padding.right =
 			this->padding.top = this->padding.bottom = padding;
 	} else {
-		this->padding[et] = padding;
+		et == ET_LEFT ? this->padding.left = padding : 
+			(et == ET_RIGHT ? this->padding.right = padding :
+				(et == ET_TOP ? this->padding.top = padding : 
+					this->padding.bottom = padding));
 	}
 }
 
