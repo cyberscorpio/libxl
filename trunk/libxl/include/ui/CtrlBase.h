@@ -19,7 +19,6 @@ protected:
 	CRect m_rc; // it real position & size (not include margin, but include padding)
 
 public:
-	COLORREF m_clrBackground;
 
 	CCtrlBase ();
 	virtual ~CCtrlBase ();

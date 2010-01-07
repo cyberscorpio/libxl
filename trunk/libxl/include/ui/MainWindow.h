@@ -45,9 +45,12 @@ protected:
 		int max_x = rect.right;
 
 		_CtrlIter end = m_ctrls.end();
-		while (it != end) {
+		for (; it != end; ++ it) {
 			CCtrlBase *pCtrl = (*it).get();
 			WinStyle::DISPLAY display = pCtrl->display;
+			if (display == WinStyle::DISP_NONE) {
+				continue;
+			}
 			EDGE *pMargin = &pCtrl->margin;
 
 			xl::ui::SIZE sz = pCtrl->reportSize();
@@ -61,12 +64,10 @@ protected:
 			if ((line_ctrl_count > 0) && 
 			    ((start_x + sz.cx > max_x) || 
 			     (display == WinStyle::DISP_CLEAR))) {
-				-- it; // it belongs to the next line
 				break;
 			}
 
 			if (!no_block && display == WinStyle::DISP_BLOCK) {
-				-- it;
 				break;
 			}
 			
@@ -96,7 +97,6 @@ protected:
 
 				if (display == WinStyle::DISP_BLOCK) {
 					no_block = false;
-					++ it;
 					break;
 				}
 			}
@@ -117,7 +117,6 @@ protected:
 					line_height = sz.cy;
 				}
 			}
-			++ it;
 		}
 		
 		return line_height;

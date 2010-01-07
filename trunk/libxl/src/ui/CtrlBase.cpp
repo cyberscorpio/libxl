@@ -19,8 +19,7 @@ CCtrlBase::~CCtrlBase () {
 
 
 void CCtrlBase::draw (HDC hdc) {
-	CDCHandle dc(hdc);
-	dc.FillSolidRect(m_rc, m_clrBackground);
+	// TODO
 }
 
 
