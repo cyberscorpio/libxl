@@ -67,6 +67,7 @@ public:
 		// DISP_CENTER, // maybe not needed
 		DISP_RIGHT,
 		DISP_CLEAR,
+		DISP_NONE,
 		DISP_COUNT
 	};
 	DISPLAY display;
