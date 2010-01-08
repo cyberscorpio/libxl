@@ -163,14 +163,6 @@
 			<Filter
 				Name="ui"
 				>
-				<File
-					RelativePath=".\src\ui\CtrlBase.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\ui\WinStyle.cpp"
-					>
-				</File>
 			</Filter>
 		</Filter>
 		<Filter
@@ -206,10 +198,6 @@
 					>
 				</File>
 				<File
-					RelativePath=".\include\ui\CtrlBase.h"
-					>
-				</File>
-				<File
 					RelativePath=".\include\ui\gdi.h"
 					>
 				</File>
@@ -219,14 +207,6 @@
 				</File>
 				<File
 					RelativePath=".\include\ui\ResMgr.h"
-					>
-				</File>
-				<File
-					RelativePath=".\include\ui\UIWinBase.h"
-					>
-				</File>
-				<File
-					RelativePath=".\include\ui\WinStyle.h"
 					>
 				</File>
 			</Filter>
