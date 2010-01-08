@@ -29,26 +29,10 @@ struct EDGE {
 	int left;
 };
 
-enum POSITION {
-	POS_AUTO,
-	POS_ABSOLUTE,
-	POS_RELATIVE,
-	POS_COUNT
-};
-
-enum DISPLAY {
-	DISP_LEFT,
-	DISP_RIGHT,
-	DISP_CLEAR,
-	DISP_COUNT
-};
 
 
 class CWinStyle {
 public:
-	bool         is_float;
-	POSITION     postion;
-	DISPLAY      display;
 };
 
 
