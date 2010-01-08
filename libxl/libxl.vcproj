@@ -209,6 +209,10 @@
 					RelativePath=".\include\ui\ResMgr.h"
 					>
 				</File>
+				<File
+					RelativePath=".\include\ui\WinStyle.h"
+					>
+				</File>
 			</Filter>
 		</Filter>
 		<Filter

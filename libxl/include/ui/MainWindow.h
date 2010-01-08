@@ -5,8 +5,6 @@
 #include <atlbase.h>
 #include <atlwin.h>
 #include "../common.h"
-#include "UIWinBase.h"
-#include "CtrlBase.h"
 
 namespace xl {
 	namespace ui {
@@ -20,7 +18,6 @@ class CCtrlBase;
 template <class T, class Traits = CMainWindowTraits>
 class CMainWindowT
 	: public CWindowImplBaseT<ATL::CWindow, Traits>
-	, public CUIWinBaseT<T>
 	, public CMessageFilter
 	, public CIdleHandler
 {
