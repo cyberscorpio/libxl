@@ -2,10 +2,14 @@
 #define MAINWINDOW_H
 
 #include "../libxl/include/ui/MainWindow.h"
+#include "../libxl/include/ui/Ctrls.h"
+
 
 
 class CMainWindow : public xl::ui::CMainWindowT<CMainWindow>
 {
+	xl::ui::CControl m_ctrl;
+
 public:
 	DECLARE_WND_CLASS_EX (_T("CMainWindow"), 0, COLOR_INFOBK)
 	BEGIN_MSG_MAP (CMainWindow)

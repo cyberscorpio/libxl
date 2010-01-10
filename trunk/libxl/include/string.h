@@ -9,6 +9,11 @@
 #include <string>
 #include "common.h"
 
+#ifdef max // <windows.h> defines max & min
+#undef max
+#undef min
+#endif
+
 namespace xl {
 
 template< class CharT,

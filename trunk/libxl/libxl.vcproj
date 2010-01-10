@@ -163,6 +163,10 @@
 			<Filter
 				Name="ui"
 				>
+				<File
+					RelativePath=".\src\ui\Ctrls.cpp"
+					>
+				</File>
 			</Filter>
 		</Filter>
 		<Filter
@@ -195,6 +199,10 @@
 				>
 				<File
 					RelativePath=".\include\ui\Application.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\ui\Ctrls.h"
 					>
 				</File>
 				<File
