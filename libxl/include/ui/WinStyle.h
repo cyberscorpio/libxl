@@ -30,9 +30,44 @@ struct EDGE {
 };
 
 
+const int SIZE_FILL = -1;
+
+enum POSITION_X {
+	PX_LEFT,
+	PX_RIGHT,
+	PX_COUNT
+};
+
+enum POSITION_Y {
+	PY_TOP,
+	PY_BOTTOM,
+	PY_COUNT
+};
+
+
 
 class CWinStyle {
+	tstring style;
 public:
+	EDGE margin;
+	EDGE padding;
+
+	POSITION_X px;
+	POSITION_Y py;
+
+	int width;
+	int height;
+
+	CWinStyle () {
+		margin.left = margin.top = margin.right = margin.bottom = 0;
+		padding.left = padding.top = padding.right = padding.bottom = 0;
+		px = PX_LEFT;
+		py = PY_TOP;
+		width = SIZE_FILL;
+		height = SIZE_FILL;
+	}
+
+	void setStyle (const tstring &style = _T(""));
 };
 
 
