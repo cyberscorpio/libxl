@@ -47,7 +47,11 @@ enum POSITION_Y {
 
 
 class CWinStyle {
+protected:
 	tstring style;
+
+	void _ParseProperty(const tstring &key, const tstring &value);
+
 public:
 	EDGE margin;
 	EDGE padding;
@@ -58,15 +62,12 @@ public:
 	int width;
 	int height;
 
-	CWinStyle () {
-		margin.left = margin.top = margin.right = margin.bottom = 0;
-		padding.left = padding.top = padding.right = padding.bottom = 0;
-		px = PX_LEFT;
-		py = PY_TOP;
-		width = SIZE_FILL;
-		height = SIZE_FILL;
-	}
+	int opacity; // alpha = 100 - opacity
 
+	CWinStyle ();
+	virtual ~CWinStyle ();
+
+	void reset ();
 	void setStyle (const tstring &style = _T(""));
 };
 

@@ -7,6 +7,7 @@
 #include <assert.h>
 #include <limits>
 #include <string>
+#include <vector>
 #include "common.h"
 
 #ifdef max // <windows.h> defines max & min
@@ -190,6 +191,55 @@ public:
 typedef basic_string<char, std::char_traits<char>, std::allocator<char> >            string;
 typedef basic_string<wchar_t, std::char_traits<wchar_t>, std::allocator<wchar_t> >   wstring;
 typedef basic_string<tchar, std::char_traits<tchar>, std::allocator<tchar> >         tstring;
+
+//////////////////////////////////////////////////////////////////////////
+// 
+template <class CharT>
+std::vector<basic_string<CharT, std::char_traits<CharT>, std::allocator<CharT> > >
+explode (const basic_string<CharT, std::char_traits<CharT>, std::allocator<CharT> > &delimiter,
+         const basic_string<CharT, std::char_traits<CharT>, std::allocator<CharT> > &str, 
+         int max_parts = -1
+        ) {
+	if (max_parts == -1) {
+		max_parts = std::numeric_limits<int>::max();
+	}
+	-- max_parts;
+	std::vector<basic_string<CharT, std::char_traits<CharT>, std::allocator<CharT> > > ret;
+	basic_string<CharT, std::char_traits<CharT>, std::allocator<CharT> > s = str;
+	int parts = 0;
+	while (parts < max_parts) {
+		size_t offset = s.find(delimiter);
+		if (offset == std::string::npos) {
+			break;
+		}
+		ret.push_back(s.substr(0, offset));
+		s = s.substr(offset + delimiter.length());
+		++ parts;
+	}
+	if (s.length() > 0) {
+		ret.push_back(s);
+	}
+	return ret;
+}
+
+template <class CharT>
+std::vector<basic_string<CharT, std::char_traits<CharT>, std::allocator<CharT> > >
+explode (const CharT *delimiter, const CharT *str, int max_parts = -1) {
+	basic_string<CharT, std::char_traits<CharT>, std::allocator<CharT> > d(delimiter);
+	basic_string<CharT, std::char_traits<CharT>, std::allocator<CharT> > s(str);
+	return explode(d, s, max_parts);
+}
+
+template <class CharT>
+std::vector<basic_string<CharT, std::char_traits<CharT>, std::allocator<CharT> > >
+explode (const CharT *delimiter, 
+         const basic_string<CharT, std::char_traits<CharT>, std::allocator<CharT> > &str,
+         int max_parts = -1
+        ) {
+	basic_string<CharT, std::char_traits<CharT>, std::allocator<CharT> > d(delimiter);
+	return explode(d, str, max_parts);
+}
+
 
 }
 

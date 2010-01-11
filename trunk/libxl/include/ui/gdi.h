@@ -113,9 +113,13 @@ public:
 	RECT m_rcPaint;
 	CBitmap m_bmp;
 	HBITMAP m_hBmpOld;
+	bool m_paintWhenDestroy;
 
 	// Constructor/destructor
-	CMemoryDC(HDC hDC, RECT& rcPaint) : m_hDCOriginal(hDC), m_hBmpOld(NULL)
+	CMemoryDC(HDC hDC, RECT& rcPaint, bool paintWhenDestroy = true)
+		: m_hDCOriginal(hDC)
+		, m_hBmpOld(NULL)
+		, m_paintWhenDestroy(paintWhenDestroy)
 	{
 		m_rcPaint = rcPaint;
 		CreateCompatibleDC(m_hDCOriginal);
@@ -128,7 +132,10 @@ public:
 
 	~CMemoryDC()
 	{
-		::BitBlt(m_hDCOriginal, m_rcPaint.left, m_rcPaint.top, m_rcPaint.right - m_rcPaint.left, m_rcPaint.bottom - m_rcPaint.top, m_hDC, m_rcPaint.left, m_rcPaint.top, SRCCOPY);
+		if (m_paintWhenDestroy)
+		{
+			::BitBlt(m_hDCOriginal, m_rcPaint.left, m_rcPaint.top, m_rcPaint.right - m_rcPaint.left, m_rcPaint.bottom - m_rcPaint.top, m_hDC, m_rcPaint.left, m_rcPaint.top, SRCCOPY);
+		}
 		SelectBitmap(m_hBmpOld);
 	}
 };

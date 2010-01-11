@@ -10,33 +10,43 @@
 namespace xl {
 	namespace ui {
 
+template <class T>
+class CCtrlMgr;
+
 //////////////////////////////////////////////////////////////////////////
 // typedef(s)
 class CControl;
-typedef std::tr1::shared_ptr<CControl>    CControlPtr;
-typedef std::vector<CControlPtr>          CControlContainer;
-typedef CControlContainer::iterator       CControlIter;
+typedef std::tr1::shared_ptr<CControl>       CControlPtr;
 
 //////////////////////////////////////////////////////////////////////////
 // CControl
 class CControl : public CWinStyle
 {
 protected:
-	CControlContainer    m_controls;
-	CRect                m_rect;
+	typedef std::vector<CControlPtr>             CControlContainer;
+	typedef CControlContainer::iterator          CControlIter;
+	typedef CControlContainer::const_iterator    CControlConstIter;
 
-	void _LayoutChildren ();
+	CCtrlMgr            *m_mgr;
+	uint                 m_id;
+	CControlContainer    m_controls;
+	mutable CRect        m_rect;
+
+	void _LayoutChildren () const;
+
 
 public:
-	CControl ();
+	CControl (uint id = 0, CCtrlMgr *mgr = NULL);
 	virtual ~CControl ();
 
-	void insertChild (CControlPtr);
+	uint getID () const { return m_id; }
+
+	bool insertChild (CControlPtr);
 	void draw (HDC hdc);
 
 	//////////////////////////////////////////////////////////////////////////
 	// virtual
-	virtual CRect layout (CRect rc);
+	virtual CRect layout (CRect rc) const;
 	virtual void drawMe (HDC hdc);
 };
 	} // ui
