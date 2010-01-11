@@ -167,6 +167,10 @@
 					RelativePath=".\src\ui\Ctrls.cpp"
 					>
 				</File>
+				<File
+					RelativePath=".\src\ui\WinStyle.cpp"
+					>
+				</File>
 			</Filter>
 		</Filter>
 		<Filter
@@ -199,6 +203,10 @@
 				>
 				<File
 					RelativePath=".\include\ui\Application.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\ui\CtrlMgr.h"
 					>
 				</File>
 				<File

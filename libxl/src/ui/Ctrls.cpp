@@ -1,26 +1,33 @@
 #include <assert.h>
 #include "../../include/common.h"
 #include "../../include/ui/Ctrls.h"
+#include "../../include/ui/CtrlMgr.h"
 #include "../../include/ui/gdi.h"
 
 namespace xl {
 	namespace ui {
 
-void CControl::_LayoutChildren () {
+void CControl::_LayoutChildren () const {
 	CRect rc = m_rect;
 	rc.left += padding.left;
 	rc.top += padding.top;
 	rc.right -= padding.right;
 	rc.bottom -= padding.bottom;
 
-	for (CControlIter it = m_controls.begin(); it != m_controls.end(); ++ it) {
+	for (CControlConstIter it = m_controls.begin(); it != m_controls.end(); ++ it) {
 		rc = (*it)->layout(rc);
 	}
 }
 
 
-CControl::CControl () {
+CControl::CControl (uint id, CCtrlMgr *mgr) : m_id(id), m_mgr(mgr) {
+	if (m_id == 0) {
+		m_id = (uint)this; // this should be unique ?
+	}
 
+	if (m_mgr) {
+		m_mgr->insertControl(CControlPtr(this));
+	}
 }
 
 CControl::~CControl () {
@@ -28,20 +35,41 @@ CControl::~CControl () {
 }
 
 
-void CControl::insertChild (CControlPtr ctrl) {
+bool CControl::insertChild (CControlPtr ctrl) {
+	// TODO: Set the parent, and target
+	assert (m_mgr != NULL);
+	if (!m_mgr->insertControl(ctrl)) {
+		return false;
+	}
+
 	m_controls.push_back(ctrl);
 	_LayoutChildren();
+	return true;
 }
 
 void CControl::draw (HDC hdc) {
-	drawMe(hdc);
 
+	if (m_rect.Width() <= 0 || m_rect.Height() <= 0) {
+		return;
+	}
+
+	CRect rc = m_rect;
+	CMemoryDC mdc(hdc, rc);
+
+	drawMe(mdc.m_hDC);
 	for (CControlIter it = m_controls.begin(); it != m_controls.end(); ++ it) {
-		(*it)->draw(hdc);
+		(*it)->draw(mdc.m_hDC);
+	}
+
+	if (opacity != 100) {
+		mdc.m_paintWhenDestroy = false;
+		CDCHandle dc(hdc);
+		BLENDFUNCTION bf = {AC_SRC_OVER, 0, 255 * opacity / 100, 0};
+		dc.AlphaBlend(rc.left, rc.top, rc.Width(), rc.Height(), mdc, rc.left, rc.top, rc.Width(), rc.Height(), bf);
 	}
 }
 
-CRect CControl::layout (CRect rc) {
+CRect CControl::layout (CRect rc) const {
 	int x, y, width, height;
 	CRect rcRemain = rc;
 

@@ -5,6 +5,7 @@
 #include <atlbase.h>
 #include <atlwin.h>
 #include "../common.h"
+#include "CtrlMgr.h"
 
 namespace xl {
 	namespace ui {
@@ -14,10 +15,10 @@ typedef CWinTraits<
                    WS_EX_APPWINDOW | WS_EX_WINDOWEDGE
                   > CMainWindowTraits; // the default traits
 
-class CCtrlBase;
 template <class T, class Traits = CMainWindowTraits>
 class CMainWindowT
 	: public CWindowImplBaseT<ATL::CWindow, Traits>
+	, public CCtrlMgr<T>
 	, public CMessageFilter
 	, public CIdleHandler
 {
