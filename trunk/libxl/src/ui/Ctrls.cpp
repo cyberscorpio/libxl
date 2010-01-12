@@ -89,8 +89,14 @@ void CControl::draw (HDC hdc) {
 }
 
 CRect CControl::layout (CRect rc) const {
+	CControlPtr parent = m_parent.lock();
 	int x, y, width, height;
 	CRect rcRemain = rc;
+
+	if (isfloat) {
+		assert (parent != NULL);
+		rc = parent->m_rect;
+	}
 
 	// width
 	if (this->width == SIZE_FILL) {
@@ -168,6 +174,10 @@ CRect CControl::layout (CRect rc) const {
 // 			assert (false);
 // 			break;
 // 		}
+	}
+
+	if (isfloat) {
+		rcRemain = rc;
 	}
 
 	return rcRemain;

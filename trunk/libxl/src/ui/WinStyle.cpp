@@ -3,6 +3,15 @@
 #include "../../include/common.h"
 #include "../../include/ui/WinStyle.h"
 #include "../../include/string.h"
+/**
+ * styles
+ * px: left | right
+ * py: top | bottom
+ * float: float | none
+ * width: int | "fill"
+ * height: int | "fill"
+ * opacity: [0-100]
+ */
 
 namespace xl {
 	namespace ui {
@@ -20,6 +29,7 @@ void CWinStyle::reset () {
 	padding.left = padding.top = padding.right = padding.bottom = 0;
 	px = PX_LEFT;
 	py = PY_TOP;
+	isfloat = false;
 	width = SIZE_FILL;
 	height = SIZE_FILL;
 	opacity = 100;
@@ -53,6 +63,14 @@ void CWinStyle::_ParseProperty (const tstring &key, const tstring &value) {
 	} else if (key == _T("opacity")) {
 		opacity = _tstoi(value);
 		assert (opacity <= 100 && opacity >= 0);
+	} else if (key == _T("float")) {
+		if (value == _T("float")) {
+			isfloat = true;
+		} else if (value == _T("none")) {
+			isfloat = false;
+		} else {
+			assert (false);
+		}
 	} else {
 		assert (false);
 	}

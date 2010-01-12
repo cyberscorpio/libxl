@@ -13,7 +13,7 @@ public:
 
 	virtual void drawMe (HDC hdc) {
 		xl::ui::CDCHandle dc (hdc);
-		dc.FillSolidRect(m_rect, RGB(192,255,192));
+		dc.FillSolidRect(m_rect, RGB(255,255,192));
 	}
 };
 
@@ -135,6 +135,14 @@ LRESULT CMainWindow::OnCreate (UINT msg, WPARAM wParam, LPARAM lParam, BOOL &bHa
 
 	ctrl.reset(new CView());
 	client->insertChild(ctrl);
+
+	ctrl.reset(new CToolbar());
+	ctrl->setStyle(_T("float:float; py:bottom; opacity:50; height:120"));
+	ctrl->margin.left = 50;
+	ctrl->margin.right = 50;
+	ctrl->margin.top = 0;
+	ctrl->margin.bottom = 10;
+	m_ctrl->insertChild(ctrl);
 
 	return TRUE;
 }
