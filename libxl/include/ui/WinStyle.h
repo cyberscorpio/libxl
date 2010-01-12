@@ -59,6 +59,8 @@ public:
 	POSITION_X px;
 	POSITION_Y py;
 
+	bool isfloat;
+
 	int width;
 	int height;
 

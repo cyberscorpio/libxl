@@ -38,7 +38,6 @@ protected:
 
 	void _LayoutChildren () const;
 
-
 public:
 	CControl (uint id = 0);
 	virtual ~CControl ();
