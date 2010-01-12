@@ -4,6 +4,10 @@
 #include "../../include/ui/CtrlMgr.h"
 #include "../../include/ui/gdi.h"
 
+#ifndef NDEBUG
+static int s_control_counts = 0;
+#endif
+
 namespace xl {
 	namespace ui {
 
@@ -20,32 +24,47 @@ void CControl::_LayoutChildren () const {
 }
 
 
-CControl::CControl (uint id, CCtrlMgr *mgr) : m_id(id), m_mgr(mgr) {
+CControl::CControl (uint id) : m_id(id), m_mgr(NULL) {
 	if (m_id == 0) {
 		m_id = (uint)this; // this should be unique ?
 	}
 
-	if (m_mgr) {
-		m_mgr->insertControl(CControlPtr(this));
-	}
+#ifndef NDEBUG
+	++ s_control_counts;
+#endif
 }
 
 CControl::~CControl () {
+#ifndef NDEBUG
+	-- s_control_counts;
+	ATLTRACE (_T("%d control(s) remains\n"), s_control_counts);
+#endif
+}
 
+bool CControl::init (CCtrlMgr *mgr) {
+	assert (m_mgr == NULL);
+	m_mgr = mgr;
+	return m_mgr->insertControl(this->shared_from_this());
 }
 
 
-bool CControl::insertChild (CControlPtr ctrl) {
-	// TODO: Set the parent, and target
-	assert (m_mgr != NULL);
-	if (!m_mgr->insertControl(ctrl)) {
-		return false;
-	}
+bool CControl::insertChild (CControlPtr child) {
+	// TODO: Set the target
+	
+	child->setParent(shared_from_this());
 
-	m_controls.push_back(ctrl);
+	assert (m_mgr != NULL);
+	child->init(m_mgr);
+
+	m_controls.push_back(child);
 	_LayoutChildren();
 	return true;
 }
+
+void CControl::setParent (CControlPtr parent) {
+	m_parent = parent;
+}
+
 
 void CControl::draw (HDC hdc) {
 

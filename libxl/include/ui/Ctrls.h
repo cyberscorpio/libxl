@@ -10,25 +10,29 @@
 namespace xl {
 	namespace ui {
 
-template <class T>
 class CCtrlMgr;
 
 //////////////////////////////////////////////////////////////////////////
 // typedef(s)
 class CControl;
 typedef std::tr1::shared_ptr<CControl>       CControlPtr;
+typedef std::tr1::weak_ptr<CControl>         CControlWeakPtr;
 
 //////////////////////////////////////////////////////////////////////////
 // CControl
 class CControl : public CWinStyle
+               , public std::tr1::enable_shared_from_this<CControl>
 {
 protected:
+	friend class CCtrlMgr;
 	typedef std::vector<CControlPtr>             CControlContainer;
 	typedef CControlContainer::iterator          CControlIter;
 	typedef CControlContainer::const_iterator    CControlConstIter;
 
 	CCtrlMgr            *m_mgr;
 	uint                 m_id;
+
+	CControlWeakPtr      m_parent;
 	CControlContainer    m_controls;
 	mutable CRect        m_rect;
 
@@ -36,18 +40,25 @@ protected:
 
 
 public:
-	CControl (uint id = 0, CCtrlMgr *mgr = NULL);
+	CControl (uint id = 0);
 	virtual ~CControl ();
+	bool init (CCtrlMgr *mgr);
 
 	uint getID () const { return m_id; }
 
-	bool insertChild (CControlPtr);
+	bool insertChild (CControlPtr child);
+	void setParent (CControlPtr parent);
+
 	void draw (HDC hdc);
 
 	//////////////////////////////////////////////////////////////////////////
 	// virtual
 	virtual CRect layout (CRect rc) const;
 	virtual void drawMe (HDC hdc);
+
+	virtual void onMouseIn (CPoint pt) {}
+	virtual void onMouseOut (CPoint pt) {}
+	virtual void onMouseMove (CPoint pt) {}
 };
 	} // ui
 } // xl
