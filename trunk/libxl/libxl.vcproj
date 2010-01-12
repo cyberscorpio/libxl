@@ -164,6 +164,10 @@
 				Name="ui"
 				>
 				<File
+					RelativePath=".\src\ui\CtrlMgr.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\src\ui\Ctrls.cpp"
 					>
 				</File>
