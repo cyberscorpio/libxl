@@ -36,16 +36,16 @@ HGDIOBJ CResMgr::_CreateSysFont(int height, uint style) {
 
 	// modify the parameters
 	lf.lfHeight = height;
-	if (style | FS_BOLD) {
+	if (style & FS_BOLD) {
 		lf.lfWeight = FW_BOLD;
 	}
-	if (style | FS_ITALIC) {
+	if (style & FS_ITALIC) {
 		lf.lfItalic = TRUE;
 	}
-	if (style |= FS_UNDERLINE) {
+	if (style & FS_UNDERLINE) {
 		lf.lfUnderline = TRUE;
 	}
-	if (style |= FS_STRIKEOUT) {
+	if (style & FS_STRIKEOUT) {
 		lf.lfStrikeOut = TRUE;
 	}
 

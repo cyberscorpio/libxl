@@ -31,6 +31,13 @@ public:
 	BOOL drawLine (POINT p1, POINT p2) {
 		return drawLine(p1.x, p1.y, p2.x, p2.y);
 	}
+
+	int drawTransparentText(LPCTSTR lpstrText, int cchText, LPRECT lpRect, UINT uFormat) {
+		int oldMode = SetBkMode(TRANSPARENT);
+		int ret = DrawText(lpstrText, cchText, lpRect, uFormat);
+		SetBkMode(oldMode);
+		return ret;
+	}
 };
 
 typedef CDCPlusT<true> CDC;

@@ -38,13 +38,13 @@ CControlPtr CControl::_GetControlByPoint (CPoint pt) {
 	return CControlPtr();
 }
 
-CCtrlMgr* CControl::_GetRoot () {
+CCtrlMain* CControl::_GetMainCtrl () {
 	CControlPtr root = shared_from_this();
 	while (root->m_parent.lock() != NULL) {
 		root = root->m_parent.lock();
 	}
 
-	return (CCtrlMgr *)root.get();
+	return (CCtrlMain *)root.get();
 }
 
 
@@ -65,21 +65,12 @@ CControl::~CControl () {
 #endif
 }
 
-// bool CControl::init (CCtrlMgr *mgr) {
-// 	assert (m_mgr == NULL);
-// 	m_mgr = mgr;
-// 	return m_mgr->insertControl(this->shared_from_this());
-// }
-
 
 bool CControl::insertChild (CControlPtr child) {
 	// TODO: Set the target
 	
 	child->setParent(shared_from_this());
 
-// 	if (child->m_mgr != m_mgr) {
-// 		child->_Attach(m_mgr);
-// 	}
 
 	m_controls.push_back(child);
 	_LayoutChildren();
@@ -108,7 +99,7 @@ void CControl::setParent (CControlPtr parent) {
 
 void CControl::draw (HDC hdc) {
 
-	if (m_rect.Width() <= 0 || m_rect.Height() <= 0) {
+	if (m_rect.Width() <= 0 || m_rect.Height() <= 0 || opacity == 0) {
 		return;
 	}
 
@@ -119,6 +110,11 @@ void CControl::draw (HDC hdc) {
 	std::auto_ptr<CMemoryDC> mdc;
 	if (parent == NULL || opacity != 100) {
 		mdc.reset(new CMemoryDC(hdc, rc));
+		if (opacity != 100) {
+			// copy the source to memory dc, to create the transparent effect
+			// TODO: if no background style, also use it
+			mdc->BitBlt(rc.left, rc.top, rc.Width(), rc.Height(), hdc, m_rect.left, m_rect.top, SRCCOPY);
+		}
 		hdcPaint = mdc->m_hDC;
 	}
 

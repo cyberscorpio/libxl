@@ -10,7 +10,7 @@
 namespace xl {
 	namespace ui {
 
-class CCtrlMgr;
+class CCtrlMain;
 
 //////////////////////////////////////////////////////////////////////////
 // typedef(s)
@@ -24,7 +24,7 @@ class CControl : public CWinStyle
                , public std::tr1::enable_shared_from_this<CControl>
 {
 protected:
-	friend class CCtrlMgr;
+	friend class CCtrlMain;
 	typedef std::vector<CControlPtr>             CControlContainer;
 	typedef CControlContainer::iterator          CControlIter;
 	typedef CControlContainer::const_iterator    CControlConstIter;
@@ -40,15 +40,12 @@ protected:
 	void _LayoutChildren () const;
 	CControlPtr _GetControlByPoint (CPoint pt);
 
-	CCtrlMgr* _GetRoot ();
-
-// 	void _Attach (CCtrlMgr *);
-// 	void _Detach ();
+	CCtrlMain* _GetMainCtrl ();
 
 public:
 	CControl (uint id = 0);
 	virtual ~CControl ();
-	// bool init (CCtrlMgr *mgr);
+	// bool init (CCtrlMain *mgr);
 
 	uint getID () const { return m_id; }
 
