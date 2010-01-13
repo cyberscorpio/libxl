@@ -8,9 +8,14 @@
 #include <limits>
 #include <string>
 #include <vector>
+#include <memory>
+#include <windows.h>
 #include "common.h"
 
 #ifdef max // <windows.h> defines max & min
+#define RESTORE_MIN_MAX
+#pragma push_macro ("min")
+#pragma push_macro ("max")
 #undef max
 #undef min
 #endif
@@ -241,7 +246,35 @@ explode (const CharT *delimiter,
 }
 
 
+//////////////////////////////////////////////////////////////////////////
+// !!!! BELOW HAVE NOT BEEN TESTED !!!!!
+#if 0
+wstring s2ws (const string &s) {
+	const char *p = s.c_str();
+	int wlen = MultiByteToWideChar(CP_ACP, 0, p, s.length(), NULL, 0);
+	std::auto_ptr<wchar_t> wp(new wchar_t[wlen + 1]);
+	MultiByteToWideChar(CP_ACP, 0, p, s.length(), wp.get(), wlen);
+	wstring ws;
+	ws.append(wp.get(), wlen);
+	return ws;
 }
+
+tstring s2ts (const string &s) {
+#ifndef UNICODE
+	return s;
+#else
+	return s2ws(s);
+#endif
+}
+#endif
+
+}
+
+
+#ifdef RESTORE_MIN_MAX
+#pragma pop_macro ("min")
+#pragma pop_macro ("max")
+#endif
 
 
 #endif

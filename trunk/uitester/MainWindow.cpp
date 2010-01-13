@@ -112,7 +112,7 @@ public:
 	CView () : m_hover(false) {
 		margin.left = margin.right = 5;
 		margin.top = margin.bottom = 5;
-		setStyle(_T("px:left; py:top; width:fill; height:fill;opacity:50;"));
+		setStyle(_T("px:left; py:top; width:fill; height:fill;"));
 	}
 
 	virtual void onMouseIn (CPoint pt) {
@@ -187,15 +187,15 @@ LRESULT CMainWindow::OnCreate (UINT msg, WPARAM wParam, LPARAM lParam, BOOL &bHa
 	return TRUE;
 }
 
-LRESULT CMainWindow::OnEraseBkGnd (UINT msg, WPARAM wParam, LPARAM lParam, BOOL &bHandled) {
-	return 1;
-}
-
-LRESULT CMainWindow::OnPaint (UINT msg, WPARAM wParam, LPARAM lParam, BOOL &bHandled) {
-	xl::ui::CPaintDC dc(m_hWnd);
-	m_ctrl->draw(dc.m_hDC);
-	return 0;
-}
+// LRESULT CMainWindow::OnEraseBkGnd (UINT msg, WPARAM wParam, LPARAM lParam, BOOL &bHandled) {
+// 	return 1;
+// }
+// 
+// LRESULT CMainWindow::OnPaint (UINT msg, WPARAM wParam, LPARAM lParam, BOOL &bHandled) {
+// 	xl::ui::CPaintDC dc(m_hWnd);
+// 	m_ctrl->draw(dc.m_hDC);
+// 	return 0;
+// }
 
 LRESULT CMainWindow::OnSize (UINT msg, WPARAM wParam, LPARAM lParam, BOOL &bHandled) {
 	

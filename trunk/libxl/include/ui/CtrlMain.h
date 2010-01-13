@@ -12,14 +12,7 @@ namespace xl {
 class CCtrlMain : public CControl
 {
 protected:
-// 	typedef std::vector<CControlPtr>                    CControlContainer;
-// 	typedef CControlContainer::iterator                 CControlIter;
-// 	typedef CControlContainer::const_iterator           CControlConstIter;
-// 	typedef CControlContainer::reverse_iterator         CControlIterR;
-// 	typedef CControlContainer::const_reverse_iterator   CControlConstIterR;
-
 	ATL::CWindow         *m_pWindow;
-	CControlContainer     m_controls;
 
 	/**
 	 * inner properties
@@ -34,17 +27,14 @@ public:
 	CCtrlMain (ATL::CWindow *);
 	virtual ~CCtrlMain ();
 
-// 	bool insertControl (CControlPtr ctrl);
-// 	bool removeControl (CControlPtr ctrl);
-// 	bool removeControl (uint id);
 	CControlPtr getControlByID (uint id);
 
-	// void draw ();
 	void invalidateControl (CControlPtr ctrl = CControlPtr());
 
 	BEGIN_MSG_MAP(CCtrlMain)
 		MESSAGE_HANDLER(WM_MOUSEMOVE, OnMouseMove)
 		MESSAGE_HANDLER(WM_ERASEBKGND, OnEraseBkGnd)
+		MESSAGE_HANDLER(WM_PAINT, OnPaint)
 		MESSAGE_HANDLER(WM_CAPTURECHANGED, OnCaptureChanged)
 		MESSAGE_HANDLER(WM_CREATE, OnCreate)
 		MESSAGE_HANDLER(WM_DESTROY, OnDestroy)
@@ -55,6 +45,7 @@ public:
 	LRESULT OnMouseMove(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
 	LRESULT OnCaptureChanged(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
 	LRESULT OnEraseBkGnd(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	LRESULT OnPaint(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
 };
 
 

@@ -1,7 +1,7 @@
 #include <assert.h>
 #include "../../include/common.h"
 #include "../../include/ui/Ctrls.h"
-#include "../../include/ui/CtrlMgr.h"
+#include "../../include/ui/CtrlMain.h"
 #include "../../include/ui/gdi.h"
 
 #ifndef NDEBUG
@@ -97,13 +97,23 @@ void CControl::setParent (CControlPtr parent) {
 }
 
 
-void CControl::draw (HDC hdc) {
+void CControl::draw (HDC hdc, CRect rcClip) {
 
-	if (m_rect.Width() <= 0 || m_rect.Height() <= 0 || opacity == 0) {
+	// need paint ?
+	if (m_rect.Width() <= 0 || m_rect.Height() <= 0) {
+		return;
+	}
+
+	if (opacity == 0) {
 		return;
 	}
 
 	CRect rc = m_rect;
+	CRect rcTest = rc;
+	if (!rcTest.IntersectRect(rcTest, rcClip)) {
+		return;
+	}
+
 	HDC hdcPaint = hdc;
 
 	CControlPtr parent = m_parent.lock();
@@ -121,7 +131,7 @@ void CControl::draw (HDC hdc) {
 
 	drawMe(hdcPaint);
 	for (CControlIter it = m_controls.begin(); it != m_controls.end(); ++ it) {
-		(*it)->draw(hdcPaint);
+		(*it)->draw(hdcPaint, rcClip);
 	}
 
 	if (opacity != 100) {

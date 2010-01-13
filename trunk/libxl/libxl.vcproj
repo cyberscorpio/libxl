@@ -164,7 +164,7 @@
 				Name="ui"
 				>
 				<File
-					RelativePath=".\src\ui\CtrlMgr.cpp"
+					RelativePath=".\src\ui\CtrlMain.cpp"
 					>
 				</File>
 				<File
@@ -210,7 +210,7 @@
 					>
 				</File>
 				<File
-					RelativePath=".\include\ui\CtrlMgr.h"
+					RelativePath=".\include\ui\CtrlMain.h"
 					>
 				</File>
 				<File

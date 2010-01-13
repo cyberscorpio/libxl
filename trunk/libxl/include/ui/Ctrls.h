@@ -57,7 +57,7 @@ public:
 	//////////////////////////////////////////////////////////////////////////
 	// virtual
 	virtual CRect layout (CRect rc) const;
-	virtual void draw (HDC hdc);
+	virtual void draw (HDC hdc, CRect rcClip);
 	virtual void drawMe (HDC hdc);
 
 	virtual void onMouseIn (CPoint pt) {}
