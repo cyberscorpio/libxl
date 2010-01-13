@@ -79,17 +79,17 @@ public:
 	virtual void onMouseIn (CPoint pt) {
 		m_hover = true;
 		m_pt = pt;
-		m_mgr->invalidateControl(shared_from_this());
+		_GetRoot()->invalidateControl(shared_from_this());
 	}
 
 	virtual void onMouseOut (CPoint pt) {
 		m_hover = false;
-		m_mgr->invalidateControl(shared_from_this());
+		_GetRoot()->invalidateControl(shared_from_this());
 	}
 
 	virtual void onMouseMove (CPoint pt) {
 		m_pt = pt;
-		m_mgr->invalidateControl(shared_from_this());
+		_GetRoot()->invalidateControl(shared_from_this());
 	}
 
 
@@ -109,8 +109,9 @@ public:
 LRESULT CMainWindow::OnCreate (UINT msg, WPARAM wParam, LPARAM lParam, BOOL &bHandled) {
 	bHandled = false;
 
-	m_ctrl.reset(new xl::ui::CControl(0));
-	m_ctrl->init(this);
+	// m_ctrl.reset(new xl::ui::CCtrlMgr(0));
+	// insertControl(m_ctrl);
+	assert (m_ctrl != NULL);
 
 	m_ctrl->px = xl::ui::PX_LEFT;
 	m_ctrl->py = xl::ui::PY_TOP;

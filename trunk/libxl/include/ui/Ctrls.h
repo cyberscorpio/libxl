@@ -28,8 +28,9 @@ protected:
 	typedef std::vector<CControlPtr>             CControlContainer;
 	typedef CControlContainer::iterator          CControlIter;
 	typedef CControlContainer::const_iterator    CControlConstIter;
+	typedef CControlContainer::reverse_iterator  CControlIterR;
+	// typedef CControlContainer::const_iterator    CControlConstIter;
 
-	CCtrlMgr            *m_mgr;
 	uint                 m_id;
 
 	CControlWeakPtr      m_parent;
@@ -37,22 +38,29 @@ protected:
 	mutable CRect        m_rect;
 
 	void _LayoutChildren () const;
+	CControlPtr _GetControlByPoint (CPoint pt);
+
+	CCtrlMgr* _GetRoot ();
+
+// 	void _Attach (CCtrlMgr *);
+// 	void _Detach ();
 
 public:
 	CControl (uint id = 0);
 	virtual ~CControl ();
-	bool init (CCtrlMgr *mgr);
+	// bool init (CCtrlMgr *mgr);
 
 	uint getID () const { return m_id; }
 
 	bool insertChild (CControlPtr child);
+	CControlPtr getControlByID (uint id);
 	void setParent (CControlPtr parent);
 
-	void draw (HDC hdc);
 
 	//////////////////////////////////////////////////////////////////////////
 	// virtual
 	virtual CRect layout (CRect rc) const;
+	virtual void draw (HDC hdc);
 	virtual void drawMe (HDC hdc);
 
 	virtual void onMouseIn (CPoint pt) {}

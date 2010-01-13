@@ -18,16 +18,17 @@ typedef CWinTraits<
 template <class T, class Traits = CMainWindowTraits>
 class CMainWindowT
 	: public CWindowImplBaseT<ATL::CWindow, Traits>
-	, public CCtrlMgr
+	// , public CCtrlMgr
 	, public CMessageFilter
 	, public CIdleHandler
 {
 	typedef ATL::CWindow  _TBase;
 
 protected:
+	xl::ui::CControlPtr m_ctrl;
 
 public:
-	CMainWindowT (void) : CCtrlMgr(this) {
+	CMainWindowT (void) : m_ctrl(new CCtrlMgr(this)) {
 
 	}
 
@@ -68,7 +69,13 @@ public:
 	}
 
 	BEGIN_MSG_MAP(CMainWindowT)
-		CHAIN_MSG_MAP(CCtrlMgr)
+		{
+			CCtrlMgr *mgr = (CCtrlMgr *)m_ctrl.get();
+			if (mgr) {
+				if(mgr->ProcessWindowMessage(hWnd, uMsg, wParam, lParam, lResult))
+					return TRUE; 
+			}
+		}
 		MESSAGE_HANDLER(WM_CREATE, OnCreate)
 		MESSAGE_HANDLER(WM_DESTROY, OnDestroy)
 	END_MSG_MAP()
