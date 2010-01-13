@@ -38,6 +38,25 @@ CControlPtr CControl::_GetControlByPoint (CPoint pt) {
 	return CControlPtr();
 }
 
+bool CControl::_SetCapture (bool capture) {
+	CCtrlMain *pCtrlMain = _GetMainCtrl();
+	CControlPtr pThis = shared_from_this();
+	assert (pCtrlMain);
+	if (capture) {
+		if (pCtrlMain->_GetCaptureCtrl() != pThis) {
+			return pCtrlMain->_SetCapture(pThis);
+		} else {
+			return true;
+		}
+	} else {
+		if (pCtrlMain->_GetCaptureCtrl() == pThis) {
+			return pCtrlMain->_SetCapture(CControlPtr());
+		} else {
+			return true;
+		}
+	}
+}
+
 CCtrlMain* CControl::_GetMainCtrl () {
 	CControlPtr root = shared_from_this();
 	while (root->m_parent.lock() != NULL) {

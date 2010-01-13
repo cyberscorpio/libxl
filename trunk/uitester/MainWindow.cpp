@@ -131,6 +131,18 @@ public:
 		_GetMainCtrl()->invalidateControl(shared_from_this());
 	}
 
+	virtual void onLButtonDown (CPoint pt) {
+		_SetCapture(true);
+	}
+
+	virtual void onLButtonUp (CPoint pt) {
+		_SetCapture(false);
+	}
+
+	virtual void onLostCapture () {
+		m_hover = false;
+		_GetMainCtrl()->invalidateControl(shared_from_this());
+	}
 
 	virtual void drawMe (HDC hdc) {
 		xl::ui::CDCHandle dc (hdc);
