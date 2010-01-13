@@ -5,7 +5,7 @@
 #include <atlbase.h>
 #include <atlwin.h>
 #include "../common.h"
-#include "CtrlMgr.h"
+#include "CtrlMain.h"
 
 namespace xl {
 	namespace ui {
@@ -18,7 +18,6 @@ typedef CWinTraits<
 template <class T, class Traits = CMainWindowTraits>
 class CMainWindowT
 	: public CWindowImplBaseT<ATL::CWindow, Traits>
-	// , public CCtrlMain
 	, public CMessageFilter
 	, public CIdleHandler
 {
@@ -70,9 +69,9 @@ public:
 
 	BEGIN_MSG_MAP(CMainWindowT)
 		{
-			CCtrlMain *mgr = (CCtrlMain *)m_ctrl.get();
-			if (mgr) {
-				if(mgr->ProcessWindowMessage(hWnd, uMsg, wParam, lParam, lResult))
+			CCtrlMain *ctrlMain = (CCtrlMain *)m_ctrl.get();
+			if (ctrlMain) {
+				if(ctrlMain->ProcessWindowMessage(hWnd, uMsg, wParam, lParam, lResult))
 					return TRUE; 
 			}
 		}

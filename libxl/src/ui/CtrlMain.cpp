@@ -1,5 +1,5 @@
 #include <assert.h>
-#include "../../include/ui/CtrlMgr.h"
+#include "../../include/ui/CtrlMain.h"
 
 namespace xl {
 	namespace ui {
@@ -139,6 +139,12 @@ LRESULT CCtrlMain::OnCaptureChanged(UINT uMsg, WPARAM wParam, LPARAM lParam, BOO
 
 LRESULT CCtrlMain::OnEraseBkGnd(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) {
 	return 1;
+}
+
+LRESULT CCtrlMain::OnPaint(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) {
+	CPaintDC dc(m_pWindow->m_hWnd);
+	draw(dc.m_hDC, dc.m_ps.rcPaint);
+	return 0;
 }
 
 
