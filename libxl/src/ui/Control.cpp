@@ -1,6 +1,6 @@
 #include <assert.h>
 #include "../../include/common.h"
-#include "../../include/ui/Ctrls.h"
+#include "../../include/ui/Control.h"
 #include "../../include/ui/CtrlMain.h"
 #include "../../include/ui/gdi.h"
 
