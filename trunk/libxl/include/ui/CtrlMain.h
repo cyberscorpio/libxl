@@ -3,7 +3,7 @@
 #include <vector>
 #include <atlbase.h>
 #include <atlwin.h>
-#include "Ctrls.h"
+#include "Control.h"
 
 
 namespace xl {
