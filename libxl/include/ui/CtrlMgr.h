@@ -9,14 +9,14 @@
 namespace xl {
 	namespace ui {
 
-class CCtrlMgr
+class CCtrlMgr : public CControl
 {
 protected:
-	typedef std::vector<CControlPtr>                    CControlContainer;
-	typedef CControlContainer::iterator                 CControlIter;
-	typedef CControlContainer::const_iterator           CControlConstIter;
-	typedef CControlContainer::reverse_iterator         CControlIterR;
-	typedef CControlContainer::const_reverse_iterator   CControlConstIterR;
+// 	typedef std::vector<CControlPtr>                    CControlContainer;
+// 	typedef CControlContainer::iterator                 CControlIter;
+// 	typedef CControlContainer::const_iterator           CControlConstIter;
+// 	typedef CControlContainer::reverse_iterator         CControlIterR;
+// 	typedef CControlContainer::const_reverse_iterator   CControlConstIterR;
 
 	ATL::CWindow         *m_pWindow;
 	CControlContainer     m_controls;
@@ -29,15 +29,15 @@ protected:
 
 	//////////////////////////////////////////////////////////////////////////
 	// protected methods
-	CControlPtr _GetControlByPoint (CPoint pt);
 
 public:
 	CCtrlMgr (ATL::CWindow *);
 	virtual ~CCtrlMgr ();
 
-	bool insertControl (CControlPtr ctrl);
-	bool removeControl (CControlPtr ctrl);
-	bool removeControl (uint id);
+// 	bool insertControl (CControlPtr ctrl);
+// 	bool removeControl (CControlPtr ctrl);
+// 	bool removeControl (uint id);
+	CControlPtr getControlByID (uint id);
 
 	// void draw ();
 	void invalidateControl (CControlPtr ctrl = CControlPtr());

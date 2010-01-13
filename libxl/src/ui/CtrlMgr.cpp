@@ -4,21 +4,12 @@
 namespace xl {
 	namespace ui {
 
-CControlPtr CCtrlMgr::_GetControlByPoint (CPoint pt) {
-	for (CControlIterR itr = m_controls.rbegin(); itr != m_controls.rend(); ++ itr) {
-		if ((*itr)->m_rect.PtInRect(pt)) {
-			return *itr;
-		}
-	}
-
-	return CControlPtr();
-}
-
 
 
 
 CCtrlMgr::CCtrlMgr (ATL::CWindow *pWindow) 
-	: m_pWindow(pWindow)
+	: CControl(0)
+	, m_pWindow(pWindow)
 	, m_captured(false) 
 {
 	assert (m_pWindow != NULL);
@@ -28,37 +19,40 @@ CCtrlMgr::~CCtrlMgr () {
 
 }
 
-bool CCtrlMgr::insertControl (CControlPtr ctrl) {
-	for (CControlIter it = m_controls.begin(); it != m_controls.end(); ++ it) {
-		if ((*it)->getID() == ctrl->getID()) {
-			return false;
-		}
-	}
+// bool CCtrlMgr::insertControl (CControlPtr ctrl) {
+// 	for (CControlIter it = m_controls.begin(); it != m_controls.end(); ++ it) {
+// 		if ((*it)->getID() == ctrl->getID()) {
+// 			return false;
+// 		}
+// 	}
+// 
+// 	m_controls.push_back(ctrl);
+// 	ctrl->_Attach(this);
+// 	return true;
+// }
+// 
+// bool CCtrlMgr::removeControl (CControlPtr ctrl) {
+// 	for (CControlIter it = m_controls.begin(); it != m_controls.end(); ++ it) {
+// 		if ((*it) == ctrl) {
+// 			m_controls.erase(it);
+// 			return true;
+// 		}
+// 	}
+// 	ctrl->_Detach();
+// 	return false;
+// }
+// 
+// bool CCtrlMgr::removeControl (uint id) {
+// 	for (CControlIter it = m_controls.begin(); it != m_controls.end(); ++ it) {
+// 		if ((*it)->getID() == id) {
+// 			m_controls.erase(it);
+// 			return true;
+// 		}
+// 	}
+// 
+// 	return false;
+// }
 
-	m_controls.push_back(ctrl);
-	return true;
-}
-
-bool CCtrlMgr::removeControl (CControlPtr ctrl) {
-	for (CControlIter it = m_controls.begin(); it != m_controls.end(); ++ it) {
-		if ((*it) == ctrl) {
-			m_controls.erase(it);
-			return true;
-		}
-	}
-	return false;
-}
-
-bool CCtrlMgr::removeControl (uint id) {
-	for (CControlIter it = m_controls.begin(); it != m_controls.end(); ++ it) {
-		if ((*it)->getID() == id) {
-			m_controls.erase(it);
-			return true;
-		}
-	}
-
-	return false;
-}
 
 // void CCtrlMgr::draw () {
 // 	HDC hdc = m_pWindow->GetDC();

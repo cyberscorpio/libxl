@@ -2,13 +2,11 @@
 #define MAINWINDOW_H
 
 #include "../libxl/include/ui/MainWindow.h"
-#include "../libxl/include/ui/Ctrls.h"
 
 
 
 class CMainWindow : public xl::ui::CMainWindowT<CMainWindow>
 {
-	xl::ui::CControlPtr m_ctrl;
 //	xl::ui::CControl *m_ctrl;
 
 public:

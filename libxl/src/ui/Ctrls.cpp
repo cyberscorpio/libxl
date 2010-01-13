@@ -23,8 +23,32 @@ void CControl::_LayoutChildren () const {
 	}
 }
 
+CControlPtr CControl::_GetControlByPoint (CPoint pt) {
+	for (CControlIterR itr = m_controls.rbegin(); itr != m_controls.rend(); ++ itr) {
+		if ((*itr)->m_rect.PtInRect(pt)) {
+			CControlPtr ctrl = (*itr)->_GetControlByPoint(pt);
+			if (ctrl != NULL) {
+				return ctrl;
+			} else {
+				return *itr;
+			}
+		}
+	}
 
-CControl::CControl (uint id) : m_id(id), m_mgr(NULL) {
+	return CControlPtr();
+}
+
+CCtrlMgr* CControl::_GetRoot () {
+	CControlPtr root = shared_from_this();
+	while (root->m_parent.lock() != NULL) {
+		root = root->m_parent.lock();
+	}
+
+	return (CCtrlMgr *)root.get();
+}
+
+
+CControl::CControl (uint id) : m_id(id) {
 	if (m_id == 0) {
 		m_id = (uint)this; // this should be unique ?
 	}
@@ -41,11 +65,11 @@ CControl::~CControl () {
 #endif
 }
 
-bool CControl::init (CCtrlMgr *mgr) {
-	assert (m_mgr == NULL);
-	m_mgr = mgr;
-	return m_mgr->insertControl(this->shared_from_this());
-}
+// bool CControl::init (CCtrlMgr *mgr) {
+// 	assert (m_mgr == NULL);
+// 	m_mgr = mgr;
+// 	return m_mgr->insertControl(this->shared_from_this());
+// }
 
 
 bool CControl::insertChild (CControlPtr child) {
@@ -53,13 +77,29 @@ bool CControl::insertChild (CControlPtr child) {
 	
 	child->setParent(shared_from_this());
 
-	assert (m_mgr != NULL);
-	child->init(m_mgr);
+// 	if (child->m_mgr != m_mgr) {
+// 		child->_Attach(m_mgr);
+// 	}
 
 	m_controls.push_back(child);
 	_LayoutChildren();
 	return true;
 }
+
+CControlPtr CControl::getControlByID (uint id) {
+	for (CControlIter it = m_controls.begin(); it != m_controls.end(); ++ it) {
+		if ((*it)->getID() == id) {
+			return *it;
+		}
+
+		CControlPtr ctrl = (*it)->getControlByID(id);
+		if (ctrl != NULL) {
+			return ctrl;
+		}
+	}
+	return CControlPtr();
+}
+
 
 void CControl::setParent (CControlPtr parent) {
 	m_parent = parent;
@@ -73,18 +113,26 @@ void CControl::draw (HDC hdc) {
 	}
 
 	CRect rc = m_rect;
-	CMemoryDC mdc(hdc, rc);
+	HDC hdcPaint = hdc;
 
-	drawMe(mdc.m_hDC);
+	CControlPtr parent = m_parent.lock();
+	std::auto_ptr<CMemoryDC> mdc;
+	if (parent == NULL || opacity != 100) {
+		mdc.reset(new CMemoryDC(hdc, rc));
+		hdcPaint = mdc->m_hDC;
+	}
+
+
+	drawMe(hdcPaint);
 	for (CControlIter it = m_controls.begin(); it != m_controls.end(); ++ it) {
-		(*it)->draw(mdc.m_hDC);
+		(*it)->draw(hdcPaint);
 	}
 
 	if (opacity != 100) {
-		mdc.m_paintWhenDestroy = false;
+		mdc->m_paintWhenDestroy = false;
 		CDCHandle dc(hdc);
 		BLENDFUNCTION bf = {AC_SRC_OVER, 0, 255 * opacity / 100, 0};
-		dc.AlphaBlend(rc.left, rc.top, rc.Width(), rc.Height(), mdc, rc.left, rc.top, rc.Width(), rc.Height(), bf);
+		dc.AlphaBlend(rc.left, rc.top, rc.Width(), rc.Height(), *mdc, rc.left, rc.top, rc.Width(), rc.Height(), bf);
 	}
 }
 
