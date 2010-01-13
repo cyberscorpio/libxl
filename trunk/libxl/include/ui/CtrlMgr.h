@@ -9,7 +9,7 @@
 namespace xl {
 	namespace ui {
 
-class CCtrlMgr : public CControl
+class CCtrlMain : public CControl
 {
 protected:
 // 	typedef std::vector<CControlPtr>                    CControlContainer;
@@ -31,8 +31,8 @@ protected:
 	// protected methods
 
 public:
-	CCtrlMgr (ATL::CWindow *);
-	virtual ~CCtrlMgr ();
+	CCtrlMain (ATL::CWindow *);
+	virtual ~CCtrlMain ();
 
 // 	bool insertControl (CControlPtr ctrl);
 // 	bool removeControl (CControlPtr ctrl);
@@ -42,7 +42,7 @@ public:
 	// void draw ();
 	void invalidateControl (CControlPtr ctrl = CControlPtr());
 
-	BEGIN_MSG_MAP(CCtrlMgr)
+	BEGIN_MSG_MAP(CCtrlMain)
 		MESSAGE_HANDLER(WM_MOUSEMOVE, OnMouseMove)
 		MESSAGE_HANDLER(WM_ERASEBKGND, OnEraseBkGnd)
 		MESSAGE_HANDLER(WM_CAPTURECHANGED, OnCaptureChanged)

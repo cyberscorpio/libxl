@@ -7,7 +7,7 @@ namespace xl {
 
 
 
-CCtrlMgr::CCtrlMgr (ATL::CWindow *pWindow) 
+CCtrlMain::CCtrlMain (ATL::CWindow *pWindow) 
 	: CControl(0)
 	, m_pWindow(pWindow)
 	, m_captured(false) 
@@ -15,11 +15,11 @@ CCtrlMgr::CCtrlMgr (ATL::CWindow *pWindow)
 	assert (m_pWindow != NULL);
 }
 
-CCtrlMgr::~CCtrlMgr () {
+CCtrlMain::~CCtrlMain () {
 
 }
 
-// bool CCtrlMgr::insertControl (CControlPtr ctrl) {
+// bool CCtrlMain::insertControl (CControlPtr ctrl) {
 // 	for (CControlIter it = m_controls.begin(); it != m_controls.end(); ++ it) {
 // 		if ((*it)->getID() == ctrl->getID()) {
 // 			return false;
@@ -31,7 +31,7 @@ CCtrlMgr::~CCtrlMgr () {
 // 	return true;
 // }
 // 
-// bool CCtrlMgr::removeControl (CControlPtr ctrl) {
+// bool CCtrlMain::removeControl (CControlPtr ctrl) {
 // 	for (CControlIter it = m_controls.begin(); it != m_controls.end(); ++ it) {
 // 		if ((*it) == ctrl) {
 // 			m_controls.erase(it);
@@ -42,7 +42,7 @@ CCtrlMgr::~CCtrlMgr () {
 // 	return false;
 // }
 // 
-// bool CCtrlMgr::removeControl (uint id) {
+// bool CCtrlMain::removeControl (uint id) {
 // 	for (CControlIter it = m_controls.begin(); it != m_controls.end(); ++ it) {
 // 		if ((*it)->getID() == id) {
 // 			m_controls.erase(it);
@@ -54,7 +54,7 @@ CCtrlMgr::~CCtrlMgr () {
 // }
 
 
-// void CCtrlMgr::draw () {
+// void CCtrlMain::draw () {
 // 	HDC hdc = m_pWindow->GetDC();
 // 
 // 	for (CControlIter it = m_controls.begin(); it != m_controls.end(); ++ it) {
@@ -67,7 +67,7 @@ CCtrlMgr::~CCtrlMgr () {
 // 	m_pWindow->ReleaseDC(hdc);
 // }
 
-void CCtrlMgr::invalidateControl(CControlPtr ctrl) {
+void CCtrlMain::invalidateControl(CControlPtr ctrl) {
 	if (ctrl != NULL) {
 		m_pWindow->InvalidateRect(ctrl->m_rect, FALSE);
 	} else {
@@ -78,17 +78,17 @@ void CCtrlMgr::invalidateControl(CControlPtr ctrl) {
 
 //////////////////////////////////////////////////////////////////////////
 // message handles
-LRESULT CCtrlMgr::OnCreate(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) {
+LRESULT CCtrlMain::OnCreate(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) {
 	bHandled = false;
 	return TRUE;
 }
 
-LRESULT CCtrlMgr::OnDestroy(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) {
+LRESULT CCtrlMain::OnDestroy(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) {
 	bHandled = false;
 	return TRUE;
 }
 
-LRESULT CCtrlMgr::OnMouseMove(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) {
+LRESULT CCtrlMain::OnMouseMove(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) {
 	if (!m_captured) {
 		::SetCapture(m_pWindow->m_hWnd);
 	}
@@ -126,7 +126,7 @@ LRESULT CCtrlMgr::OnMouseMove(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHa
 	return 0;
 }
 
-LRESULT CCtrlMgr::OnCaptureChanged(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) {
+LRESULT CCtrlMain::OnCaptureChanged(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) {
 	HWND hWndCaptured = (HWND)lParam;
 	if (hWndCaptured != m_pWindow->m_hWnd) {
 		if (m_captured) {
@@ -137,7 +137,7 @@ LRESULT CCtrlMgr::OnCaptureChanged(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL
 	return 0;
 }
 
-LRESULT CCtrlMgr::OnEraseBkGnd(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) {
+LRESULT CCtrlMain::OnEraseBkGnd(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) {
 	return 1;
 }
 

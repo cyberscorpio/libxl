@@ -1,4 +1,5 @@
 #include "../libxl/include/ui/gdi.h"
+#include "../libxl/include/ui/ResMgr.h"
 #include "MainWindow.h"
 
 class CToolbar : public xl::ui::CControl
@@ -16,6 +17,44 @@ public:
 		dc.FillSolidRect(m_rect, RGB(255,255,192));
 	}
 };
+
+class CFloat : public xl::ui::CControl
+{
+public:
+	CFloat () {
+		// margin.left = margin.right = 5;
+		margin.top = 0;
+		margin.bottom = 50;
+		margin.left = margin.right = 50;
+		setStyle(_T("px:left;py:bottom;height:120;width:fill;float:float"));
+	}
+
+	virtual void drawMe (HDC hdc) {
+		xl::ui::CDCHandle dc (hdc);
+		xl::ui::CResMgr *pResMgr = xl::ui::CResMgr::getInstance();
+
+		if (opacity == 100) {
+			// dc.FillSolidRect(m_rect, RGB(255,255,255));
+		}
+		HFONT hFont = pResMgr->getSysFont(130);
+		HFONT oldFont = dc.SelectFont(hFont);
+
+		dc.drawTransparentText(_T("xl::ui is COOL!"), -1, m_rect, DT_SINGLELINE | DT_VCENTER | DT_CENTER);
+
+		dc.SelectFont(oldFont);
+	}
+	virtual void onMouseIn (CPoint pt) {
+		setStyle(_T("opacity:100"));
+		_GetMainCtrl()->invalidateControl(shared_from_this());
+	}
+
+	virtual void onMouseOut (CPoint pt) {
+		setStyle(_T("opacity:50"));
+		_GetMainCtrl()->invalidateControl(shared_from_this());
+	}
+};
+
+
 
 class CStatusbar : public xl::ui::CControl
 {
@@ -79,17 +118,17 @@ public:
 	virtual void onMouseIn (CPoint pt) {
 		m_hover = true;
 		m_pt = pt;
-		_GetRoot()->invalidateControl(shared_from_this());
+		_GetMainCtrl()->invalidateControl(shared_from_this());
 	}
 
 	virtual void onMouseOut (CPoint pt) {
 		m_hover = false;
-		_GetRoot()->invalidateControl(shared_from_this());
+		_GetMainCtrl()->invalidateControl(shared_from_this());
 	}
 
 	virtual void onMouseMove (CPoint pt) {
 		m_pt = pt;
-		_GetRoot()->invalidateControl(shared_from_this());
+		_GetMainCtrl()->invalidateControl(shared_from_this());
 	}
 
 
@@ -137,7 +176,7 @@ LRESULT CMainWindow::OnCreate (UINT msg, WPARAM wParam, LPARAM lParam, BOOL &bHa
 	ctrl.reset(new CView());
 	client->insertChild(ctrl);
 
-	ctrl.reset(new CToolbar());
+	ctrl.reset(new CFloat());
 	ctrl->setStyle(_T("float:float; py:bottom; opacity:50; height:120"));
 	ctrl->margin.left = 50;
 	ctrl->margin.right = 50;

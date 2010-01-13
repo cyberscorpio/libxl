@@ -18,7 +18,7 @@ typedef CWinTraits<
 template <class T, class Traits = CMainWindowTraits>
 class CMainWindowT
 	: public CWindowImplBaseT<ATL::CWindow, Traits>
-	// , public CCtrlMgr
+	// , public CCtrlMain
 	, public CMessageFilter
 	, public CIdleHandler
 {
@@ -28,7 +28,7 @@ protected:
 	xl::ui::CControlPtr m_ctrl;
 
 public:
-	CMainWindowT (void) : m_ctrl(new CCtrlMgr(this)) {
+	CMainWindowT (void) : m_ctrl(new CCtrlMain(this)) {
 
 	}
 
@@ -70,7 +70,7 @@ public:
 
 	BEGIN_MSG_MAP(CMainWindowT)
 		{
-			CCtrlMgr *mgr = (CCtrlMgr *)m_ctrl.get();
+			CCtrlMain *mgr = (CCtrlMain *)m_ctrl.get();
 			if (mgr) {
 				if(mgr->ProcessWindowMessage(hWnd, uMsg, wParam, lParam, lResult))
 					return TRUE; 
