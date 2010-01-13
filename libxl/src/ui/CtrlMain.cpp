@@ -4,7 +4,25 @@
 namespace xl {
 	namespace ui {
 
+bool CCtrlMain::_SetCapture(CControlPtr ctrl) {
+	if (m_ctrlCapture == ctrl) {
+		return true;
+	}
 
+	if (ctrl != NULL) {
+		assert (getControlByID(ctrl->m_id) == ctrl);
+	}
+
+	if (m_ctrlCapture != NULL) {
+		m_ctrlCapture->onLostCapture();
+	}
+	m_ctrlCapture = ctrl;
+	if (m_ctrlCapture != NULL) {
+		m_ctrlCapture->onGetCapture();
+	}
+
+	return true;
+}
 
 
 CCtrlMain::CCtrlMain (ATL::CWindow *pWindow) 
@@ -19,53 +37,6 @@ CCtrlMain::~CCtrlMain () {
 
 }
 
-// bool CCtrlMain::insertControl (CControlPtr ctrl) {
-// 	for (CControlIter it = m_controls.begin(); it != m_controls.end(); ++ it) {
-// 		if ((*it)->getID() == ctrl->getID()) {
-// 			return false;
-// 		}
-// 	}
-// 
-// 	m_controls.push_back(ctrl);
-// 	ctrl->_Attach(this);
-// 	return true;
-// }
-// 
-// bool CCtrlMain::removeControl (CControlPtr ctrl) {
-// 	for (CControlIter it = m_controls.begin(); it != m_controls.end(); ++ it) {
-// 		if ((*it) == ctrl) {
-// 			m_controls.erase(it);
-// 			return true;
-// 		}
-// 	}
-// 	ctrl->_Detach();
-// 	return false;
-// }
-// 
-// bool CCtrlMain::removeControl (uint id) {
-// 	for (CControlIter it = m_controls.begin(); it != m_controls.end(); ++ it) {
-// 		if ((*it)->getID() == id) {
-// 			m_controls.erase(it);
-// 			return true;
-// 		}
-// 	}
-// 
-// 	return false;
-// }
-
-
-// void CCtrlMain::draw () {
-// 	HDC hdc = m_pWindow->GetDC();
-// 
-// 	for (CControlIter it = m_controls.begin(); it != m_controls.end(); ++ it) {
-// 		CControlPtr parent = (*it)->m_parent.lock();
-// 		if (parent == NULL) {
-// 			(*it)->draw(hdc);
-// 		}
-// 	}
-// 
-// 	m_pWindow->ReleaseDC(hdc);
-// }
 
 void CCtrlMain::invalidateControl(CControlPtr ctrl) {
 	if (ctrl != NULL) {
@@ -91,6 +62,7 @@ LRESULT CCtrlMain::OnDestroy(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHan
 LRESULT CCtrlMain::OnMouseMove(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) {
 	if (!m_captured) {
 		::SetCapture(m_pWindow->m_hWnd);
+		m_captured = true;
 	}
 
 	CRect rc;
@@ -98,6 +70,11 @@ LRESULT CCtrlMain::OnMouseMove(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bH
 	int x = GET_X_LPARAM(lParam);
 	int y = GET_Y_LPARAM(lParam);
 	CPoint pt(x, y);
+	if (m_ctrlCapture != NULL) {
+		m_ctrlCapture->onMouseMove(pt);
+		return 0;
+	}
+
 	if (rc.PtInRect(pt)) {
 		CControlPtr ctrl = _GetControlByPoint(pt);
 		if (ctrl != m_ctrlHover) {
@@ -131,7 +108,13 @@ LRESULT CCtrlMain::OnCaptureChanged(UINT uMsg, WPARAM wParam, LPARAM lParam, BOO
 	if (hWndCaptured != m_pWindow->m_hWnd) {
 		if (m_captured) {
 			m_captured = false;
-			// TODO
+			if (m_ctrlHover != NULL) {
+				m_ctrlHover.reset();
+			}
+
+			if (m_ctrlCapture != NULL) {
+				_SetCapture(CControlPtr());
+			}
 		}
 	}
 	return 0;
@@ -144,6 +127,30 @@ LRESULT CCtrlMain::OnEraseBkGnd(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& b
 LRESULT CCtrlMain::OnPaint(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) {
 	CPaintDC dc(m_pWindow->m_hWnd);
 	draw(dc.m_hDC, dc.m_ps.rcPaint);
+	return 0;
+}
+
+LRESULT CCtrlMain::OnLButtonDown(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) {
+	int x = GET_X_LPARAM(lParam);
+	int y = GET_Y_LPARAM(lParam);
+	CPoint pt(x, y);
+	if (m_ctrlCapture != NULL) {
+		m_ctrlCapture->onLButtonDown(pt);
+	} else if (m_ctrlHover != NULL) {
+		m_ctrlHover->onLButtonDown(pt);
+	}
+	return 0;
+}
+
+LRESULT CCtrlMain::onLButtonUp(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) {
+	int x = GET_X_LPARAM(lParam);
+	int y = GET_Y_LPARAM(lParam);
+	CPoint pt(x, y);
+	if (m_ctrlCapture != NULL) {
+		m_ctrlCapture->onLButtonUp(pt);
+	} else if (m_ctrlHover != NULL) {
+		m_ctrlHover->onLButtonUp(pt);
+	}
 	return 0;
 }
 

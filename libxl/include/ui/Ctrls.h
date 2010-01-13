@@ -37,15 +37,15 @@ protected:
 	CControlContainer    m_controls;
 	mutable CRect        m_rect;
 
+	CCtrlMain* _GetMainCtrl ();
 	void _LayoutChildren () const;
 	CControlPtr _GetControlByPoint (CPoint pt);
 
-	CCtrlMain* _GetMainCtrl ();
+	bool _SetCapture (bool capture);
 
 public:
 	CControl (uint id = 0);
 	virtual ~CControl ();
-	// bool init (CCtrlMain *mgr);
 
 	uint getID () const { return m_id; }
 
@@ -63,6 +63,10 @@ public:
 	virtual void onMouseIn (CPoint pt) {}
 	virtual void onMouseOut (CPoint pt) {}
 	virtual void onMouseMove (CPoint pt) {}
+	virtual void onLButtonDown (CPoint pt) {}
+	virtual void onLButtonUp (CPoint pt) {}
+	virtual void onGetCapture () {}
+	virtual void onLostCapture () {}
 };
 	} // ui
 } // xl
