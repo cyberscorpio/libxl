@@ -111,6 +111,10 @@ LRESULT CCtrlMain::OnCaptureChanged(UINT uMsg, WPARAM wParam, LPARAM lParam, BOO
 		if (m_captured) {
 			m_captured = false;
 			if (m_ctrlHover != NULL) {
+				CPoint pt;
+				::GetCursorPos(&pt);
+				m_pWindow->ScreenToClient(&pt);
+				m_ctrlHover->onMouseOut(pt);
 				m_ctrlHover.reset();
 			}
 

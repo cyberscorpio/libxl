@@ -61,12 +61,15 @@ class CWinStyle {
 protected:
 	tstring style;
 
-	void _ParseEdge (const tstring &value, EDGE &edge);
+	void _ParseEdge (tstring value, EDGE &edge);
+	COLORREF _ParseColor (tstring value);
 	void _ParseProperty (const tstring &key, const tstring &value);
 
 public:
 	EDGE margin;
 	EDGE padding;
+	int borderWidth;
+	COLORREF borderColor;
 
 	POSITION_X px;
 	POSITION_Y py;

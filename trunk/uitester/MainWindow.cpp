@@ -102,9 +102,11 @@ public:
 	}
 
 	virtual void onAttach () {
-		xl::ui::CControlPtr button (new xl::ui::CCtrlButton(1));
-		button->setStyle(_T("margin:20;width:100;height:40;"));
+		xl::ui::CCtrlButton *pButton = new xl::ui::CCtrlButton(1);
+		xl::ui::CControlPtr button (pButton);
+		button->setStyle(_T("margin:10;width:80;height:28;border-width:1;border-color:#cccccc;opacity:50;"));
 		insertChild(button);
+		pButton->setText(_T("Click me"));
 	}
 
 	virtual void onMouseIn (CPoint pt) {
@@ -141,7 +143,7 @@ public:
 		dc.FillSolidRect(m_rect, RGB(192,255,255));
 		if (m_hover) {
 			TCHAR buf[1024];
-			_stprintf_s(buf, 1024, _T("Mouse: %d - %d"), m_pt.x, m_pt.y);
+			_stprintf_s(buf, 1024, _T("Mouse: %d - %d"), m_pt.x - m_rect.left, m_pt.y - m_rect.top);
 			dc.DrawText(buf, -1, m_rect, DT_SINGLELINE | DT_CENTER | DT_VCENTER);
 		}
 	}
@@ -159,6 +161,7 @@ LRESULT CMainWindow::OnCreate (UINT msg, WPARAM wParam, LPARAM lParam, BOOL &bHa
 	bHandled = false;
 
 	assert (m_ctrl != NULL);
+	m_ctrl->setStyle(_T("px:left;py:top;width:fill;height:fill;"));
 
 	xl::ui::CControlPtr ctrl(new CToolbar());
 	m_ctrl->insertChild(ctrl);

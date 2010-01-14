@@ -14,6 +14,8 @@
  * opacity: [0-100]
  * margin: 0 0 0 0
  * padding: 0 0 0 0
+ * border-width: int
+ * border-color: #000000
  */
 
 namespace xl {
@@ -30,6 +32,8 @@ CWinStyle::~CWinStyle () {
 void CWinStyle::reset () {
 	margin.left = margin.top = margin.right = margin.bottom = 0;
 	padding.left = padding.top = padding.right = padding.bottom = 0;
+	borderWidth = 0;
+	borderColor = RGB(0, 0, 0);
 	px = PX_LEFT;
 	py = PY_TOP;
 	isfloat = false;
@@ -52,11 +56,10 @@ void CWinStyle::setStyle (const tstring &style) {
 	}
 }
 
-void CWinStyle::_ParseEdge (const tstring &value, EDGE &edge) {
-	tstring temp = value;
-	while (temp.replace(_T("  "), _T(" ")) > 0)
+void CWinStyle::_ParseEdge (tstring value, EDGE &edge) {
+	while (value.replace(_T("  "), _T(" ")) > 0)
 		;
-	temp.trim(_T(" "));
+	value.trim(_T(" "));
 	ExplodeT<TCHAR>::ValueT edges = explode(_T(" "), value);
 	assert (edges.size() > 0 && edges.size() <= ET_COUNT);
 	if (edges.size() == 1) {
@@ -75,8 +78,28 @@ void CWinStyle::_ParseEdge (const tstring &value, EDGE &edge) {
 		edge.bottom = _tstoi(edges[ET_BOTTOM]);
 		edge.left = _tstoi(edges[ET_LEFT]);
 	} else {
-		assert (false);
+		assert(false);
 	}
+}
+
+COLORREF CWinStyle::_ParseColor (tstring value) {
+	COLORREF color = RGB(0,0,0);
+	value.trim();
+	assert(value.length() == 7 && value.at(0) == _T('#')); // #ffffff
+	if (value.length() == 7 && value.at(0) == _T('#')) {
+		tchar tmp[5] = {_T('0'), _T('x'), 0, 0, 0};
+		int c[3];
+		const tchar *p = value.c_str();
+		++ p;
+		for (int i = 0; i < 3; ++ i) {
+			tmp[2] = *p ++;
+			tmp[3] = *p ++;
+			tmp[4] = 0;
+			_stscanf(tmp, _T("%i"), &c[i]);
+		}
+		color = RGB(c[0], c[1], c[2]);
+	}
+	return color;
 }
 
 void CWinStyle::_ParseProperty (const tstring &key, const tstring &value) {
@@ -99,7 +122,7 @@ void CWinStyle::_ParseProperty (const tstring &key, const tstring &value) {
 		} else if (value == _T("false") || value == _T("none")) {
 			isfloat = false;
 		} else {
-			assert (false);
+			assert(false);
 		}
 	} else if (key == _T("transparent")) {
 		if (value == _T("true")) {
@@ -107,14 +130,19 @@ void CWinStyle::_ParseProperty (const tstring &key, const tstring &value) {
 		} else if (value == _T("false") || value == _T("none")) {
 			transparent = false;
 		} else {
-			assert (false);
+			assert(false);
 		}
 	} else if (key == _T("margin")) {
 		_ParseEdge(value, margin);
 	} else if (key == _T("padding")) {
 		_ParseEdge(value, padding);
+	} else if (key == _T("border-width")) {
+		borderWidth = _tstoi(value);
+		assert(borderWidth >= 0);
+	} else if (key == _T("border-color")) {
+		borderColor = _ParseColor(value);
 	} else {
-		assert (false);
+		assert(false);
 	}
 }
 

@@ -1,6 +1,7 @@
 #ifndef XL_UI_CTRL_BUTTON_H
 #define XL_UI_CTRL_BUTTON_H
 #include "../common.h"
+#include "../string.h"
 #include "Control.h"
 
 namespace xl {
@@ -11,10 +12,12 @@ class CCtrlButton : public CControl
 protected:
 	bool m_hover;
 	bool m_push;
+	tstring m_text;
 
 public:
 	CCtrlButton (uint id);
 	virtual ~CCtrlButton ();
+	void setText (const tstring &text);
 
 	//////////////////////////////////////////////////////////////////////////
 	// virtual methods

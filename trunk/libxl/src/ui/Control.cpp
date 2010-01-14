@@ -53,6 +53,15 @@ void CControl::_SetTarget (CCtrlTargetRawPtr target) {
 	}
 }
 
+void CControl::_DrawBorder (HDC hdc) {
+	if (borderWidth == 0) {
+		return;
+	}
+
+	CDCHandle dc(hdc);
+	dc.drawRectangle(m_rect, borderWidth, borderColor);
+}
+
 bool CControl::_SetCapture (bool capture) {
 	CCtrlMain *pCtrlMain = _GetMainCtrl();
 	CControlPtr pThis = shared_from_this();
@@ -183,7 +192,7 @@ CRect CControl::layout (CRect rc) const {
 	if (this->width == SIZE_FILL) {
 		width = rc.Width() - margin.left - margin.right;
 	} else {
-		width = this->width + margin.left + margin.right;
+		width = this->width + padding.left + padding.right;
 		if (width > rc.Width()) {
 			width = rc.Width();
 		}
@@ -193,7 +202,7 @@ CRect CControl::layout (CRect rc) const {
 	if (this->height == SIZE_FILL) {
 		height = rc.Height() - margin.top - margin.bottom;
 	} else {
-		height = this->height + margin.top + margin.bottom;
+		height = this->height + padding.top + padding.bottom;
 		if (height > rc.Height()) {
 			height = rc.Height();
 		}

@@ -1,4 +1,5 @@
 #include <assert.h>
+#include "../../include/ui/gdi.h"
 #include "../../include/ui/CtrlTarget.h"
 #include "../../include/ui/CtrlMain.h"
 #include "../../include/ui/CtrlButton.h"
@@ -18,6 +19,14 @@ CCtrlButton::~CCtrlButton () {
 
 }
 
+void CCtrlButton::setText (const tstring &text) {
+	m_text = text;
+	CCtrlMain *pCtrlMain = _GetMainCtrl();
+	if (pCtrlMain) {
+		pCtrlMain->invalidateControl(shared_from_this());
+	}
+}
+
 void CCtrlButton::drawMe (HDC hdc) {
 	if (m_hover && m_push) {
 		drawPush(hdc);
@@ -29,11 +38,13 @@ void CCtrlButton::drawMe (HDC hdc) {
 }
 
 void CCtrlButton::onMouseIn (CPoint pt) {
+	setStyle(_T("border-color:#808080;opacity:100;"));
 	m_hover = true;
 	_GetMainCtrl()->invalidateControl(shared_from_this());
 }
 
 void CCtrlButton::onMouseOut (CPoint pt) {
+	setStyle(_T("border-color:#cccccc;opacity:50;"));
 	m_hover = false;
 	_GetMainCtrl()->invalidateControl(shared_from_this());
 }
@@ -65,21 +76,28 @@ void CCtrlButton::onLButtonUp (CPoint pt) {
 
 void CCtrlButton::drawNormal (HDC hdc) {
 	CDCHandle dc(hdc);
-	// dc.Draw3dRect(m_rect, RGB(192,192,192), RGB(96,96,96));
-	dc.DrawEdge(m_rect, BDR_SUNKENINNER, BF_FLAT | BF_RECT);
+	_DrawBorder(hdc);
+	CRect rc = m_rect;
+	UINT format = DT_SINGLELINE | DT_CENTER | DT_VCENTER;
+	dc.drawTransparentTextWithDefaultFont(m_text, m_text.length(), rc, format);
 }
 
 void CCtrlButton::drawHover (HDC hdc) {
 	CDCHandle dc(hdc);
-	dc.Draw3dRect(m_rect, RGB(192,192,192), RGB(96,96,96));
-// 	CRect rc = m_rect;
-// 	rc.DeflateRect(1,1,1,1);
-// 	dc.FillSolidRect(rc, RGB(220,220,220));
+	_DrawBorder(hdc);
+ 	CRect rc = m_rect;
+	UINT format = DT_SINGLELINE | DT_CENTER | DT_VCENTER;
+	dc.drawTransparentTextWithDefaultFont(m_text, m_text.length(), rc, format);
 }
 
 void CCtrlButton::drawPush (HDC hdc) {
 	CDCHandle dc(hdc);
-	dc.Draw3dRect(m_rect, RGB(96,96,96), RGB(192,192,192));
+	_DrawBorder(hdc);
+	CRect rc = m_rect;
+	rc.left += 2;
+	rc.top += 2;
+	UINT format = DT_SINGLELINE | DT_CENTER | DT_VCENTER;
+	dc.drawTransparentTextWithDefaultFont(m_text, m_text.length(), rc, format);
 }
 
 
