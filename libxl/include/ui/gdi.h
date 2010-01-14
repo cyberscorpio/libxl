@@ -1,9 +1,11 @@
 #ifndef XL_UI_GDI_H
 #define XL_UI_GDI_H
+#include <assert.h>
 #include <atlbase.h>
 #include <atltypes.h>
 #include <atlapp.h>
 #include <atlgdi.h>
+#include "ResMgr.h"
 
 namespace xl {
 	namespace ui {
@@ -32,11 +34,37 @@ public:
 		return drawLine(p1.x, p1.y, p2.x, p2.y);
 	}
 
-	int drawTransparentText(LPCTSTR lpstrText, int cchText, LPRECT lpRect, UINT uFormat) {
+	int drawTransparentText (LPCTSTR lpstrText, int cchText, LPRECT lpRect, UINT uFormat) {
 		int oldMode = SetBkMode(TRANSPARENT);
 		int ret = DrawText(lpstrText, cchText, lpRect, uFormat);
 		SetBkMode(oldMode);
 		return ret;
+	}
+
+	int drawTransparentTextWithDefaultFont (LPCTSTR lpstrText, int cchText, LPRECT lpRect, UINT uFormat) {
+		CResMgr *pResMgr = CResMgr::getInstance();
+		HFONT font = pResMgr->getSysFont();
+		HFONT oldFont = SelectFont(font);
+		int ret = drawTransparentText(lpstrText, cchText, lpRect, uFormat);
+		SelectFont(oldFont);
+		return ret;
+	}
+
+	void drawRectangle (LPRECT lpRect, int width, COLORREF color, int style = PS_SOLID | PS_INSIDEFRAME) {
+		assert(lpRect != NULL && width > 0);
+		HPEN pen = ::CreatePen(style, width, color);
+		HPEN oldPen = SelectPen(pen);
+
+		HBRUSH emptyBrush = (HBRUSH)::GetStockObject(NULL_BRUSH);
+		HBRUSH oldBrush = SelectBrush(emptyBrush);
+
+		Rectangle(lpRect);
+
+		SelectBrush(oldBrush);
+		::DeleteObject(emptyBrush);
+
+		SelectPen(oldPen);
+		::DeleteObject(pen);
 	}
 };
 

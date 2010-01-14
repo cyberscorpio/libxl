@@ -48,6 +48,8 @@ protected:
 	void _SetParent (CControlPtr parent);
 	void _SetTarget (CCtrlTargetRawPtr target);
 
+	void _DrawBorder (HDC hdc);
+
 	bool _SetCapture (bool capture);
 
 	//////////////////////////////////////////////////////////////////////////
