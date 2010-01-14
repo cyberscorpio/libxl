@@ -168,6 +168,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\ui\CtrlButton.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\src\ui\CtrlMain.cpp"
 					>
 				</File>
@@ -211,6 +215,10 @@
 				</File>
 				<File
 					RelativePath=".\include\ui\Control.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\ui\CtrlButton.h"
 					>
 				</File>
 				<File

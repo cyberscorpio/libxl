@@ -1,5 +1,6 @@
 #include "../libxl/include/ui/gdi.h"
 #include "../libxl/include/ui/ResMgr.h"
+#include "../libxl/include/ui/CtrlButton.h"
 #include "MainWindow.h"
 
 class CToolbar : public xl::ui::CControl
@@ -100,6 +101,12 @@ public:
 		setStyle(_T("px:left; py:top; width:fill; height:fill;margin:5"));
 	}
 
+	virtual void onAttach () {
+		xl::ui::CControlPtr button (new xl::ui::CCtrlButton(1));
+		button->setStyle(_T("margin:20;width:100;height:40;"));
+		insertChild(button);
+	}
+
 	virtual void onMouseIn (CPoint pt) {
 		m_hover = true;
 		m_pt = pt;
@@ -140,6 +147,12 @@ public:
 	}
 };
 
+
+void CMainWindow::onCommand (xl::uint id, xl::ui::CControlPtr ctrl) {
+	if (id == 1) {
+		MessageBox(_T("You click button 1"), _T("OK"));
+	}
+}
 
 
 LRESULT CMainWindow::OnCreate (UINT msg, WPARAM wParam, LPARAM lParam, BOOL &bHandled) {
