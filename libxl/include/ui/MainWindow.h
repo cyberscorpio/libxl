@@ -6,6 +6,7 @@
 #include <atlwin.h>
 #include "../common.h"
 #include "CtrlMain.h"
+#include "CtrlTarget.h"
 
 namespace xl {
 	namespace ui {
@@ -20,6 +21,7 @@ class CMainWindowT
 	: public CWindowImplBaseT<ATL::CWindow, Traits>
 	, public CMessageFilter
 	, public CIdleHandler
+	, public CCtrlTarget
 {
 	typedef ATL::CWindow  _TBase;
 
@@ -27,8 +29,7 @@ protected:
 	xl::ui::CControlPtr m_ctrl;
 
 public:
-	CMainWindowT (void) : m_ctrl(new CCtrlMain(this)) {
-
+	CMainWindowT (void) : m_ctrl(new CCtrlMain(this, this)) {
 	}
 
 	virtual ~CMainWindowT (void) {

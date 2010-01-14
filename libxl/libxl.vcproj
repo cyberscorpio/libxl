@@ -164,11 +164,11 @@
 				Name="ui"
 				>
 				<File
-					RelativePath=".\src\ui\CtrlMain.cpp"
+					RelativePath=".\src\ui\Control.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\src\ui\Control.cpp"
+					RelativePath=".\src\ui\CtrlMain.cpp"
 					>
 				</File>
 				<File
@@ -210,11 +210,15 @@
 					>
 				</File>
 				<File
+					RelativePath=".\include\ui\Control.h"
+					>
+				</File>
+				<File
 					RelativePath=".\include\ui\CtrlMain.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\ui\Control.h"
+					RelativePath=".\include\ui\CtrlTarget.h"
 					>
 				</File>
 				<File

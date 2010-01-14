@@ -38,6 +38,17 @@ CControlPtr CControl::_GetControlByPoint (CPoint pt) {
 	return CControlPtr();
 }
 
+void CControl::_SetParent (CControlPtr parent) {
+	m_parent = parent;
+}
+
+void CControl::_SetTarget (CCtrlTargetRawPtr target) {
+	m_target = target;
+	for (CControlIter it = m_controls.begin(); it != m_controls.end(); ++ it) {
+		(*it)->_SetTarget(target);
+	}
+}
+
 bool CControl::_SetCapture (bool capture) {
 	CCtrlMain *pCtrlMain = _GetMainCtrl();
 	CControlPtr pThis = shared_from_this();
@@ -58,16 +69,19 @@ bool CControl::_SetCapture (bool capture) {
 }
 
 CCtrlMain* CControl::_GetMainCtrl () {
-	CControlPtr root = shared_from_this();
-	while (root->m_parent.lock() != NULL) {
-		root = root->m_parent.lock();
+	CControlPtr parent = m_parent.lock();
+	if (parent != NULL) {
+		return parent->_GetMainCtrl();
 	}
 
-	return (CCtrlMain *)root.get();
+	return NULL;
 }
 
 
-CControl::CControl (uint id) : m_id(id) {
+CControl::CControl (uint id)
+	: m_id (id)
+	, m_target (NULL)
+{
 	if (m_id == 0) {
 		m_id = (uint)this; // this should be unique ?
 	}
@@ -86,10 +100,8 @@ CControl::~CControl () {
 
 
 bool CControl::insertChild (CControlPtr child) {
-	// TODO: Set the target
-	
-	child->setParent(shared_from_this());
-
+	child->_SetParent(shared_from_this());
+	child->_SetTarget(m_target);
 
 	m_controls.push_back(child);
 	_LayoutChildren();
@@ -110,15 +122,9 @@ CControlPtr CControl::getControlByID (uint id) {
 	return CControlPtr();
 }
 
-
-void CControl::setParent (CControlPtr parent) {
-	m_parent = parent;
-}
-
-
 void CControl::draw (HDC hdc, CRect rcClip) {
 
-	// need paint ?
+	// check paint condition
 	if (m_rect.Width() <= 0 || m_rect.Height() <= 0) {
 		return;
 	}
@@ -137,11 +143,9 @@ void CControl::draw (HDC hdc, CRect rcClip) {
 
 	CControlPtr parent = m_parent.lock();
 	std::auto_ptr<CMemoryDC> mdc;
-	if (parent == NULL || opacity != 100) {
+	if (parent == NULL || opacity != 100 || transparent) {
 		mdc.reset(new CMemoryDC(hdc, rc));
 		if (opacity != 100) {
-			// copy the source to memory dc, to create the transparent effect
-			// TODO: if no background style, also use it
 			mdc->BitBlt(rc.left, rc.top, rc.Width(), rc.Height(), hdc, m_rect.left, m_rect.top, SRCCOPY);
 		}
 		hdcPaint = mdc->m_hDC;
@@ -157,7 +161,7 @@ void CControl::draw (HDC hdc, CRect rcClip) {
 		mdc->m_paintWhenDestroy = false;
 		CDCHandle dc(hdc);
 		BLENDFUNCTION bf = {AC_SRC_OVER, 0, 255 * opacity / 100, 0};
-		dc.AlphaBlend(rc.left, rc.top, rc.Width(), rc.Height(), *mdc, rc.left, rc.top, rc.Width(), rc.Height(), bf);
+		dc.AlphaBlend(rc.left, rc.top, rc.Width(), rc.Height(), hdcPaint, rc.left, rc.top, rc.Width(), rc.Height(), bf);
 	}
 }
 

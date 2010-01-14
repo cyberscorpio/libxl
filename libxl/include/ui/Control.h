@@ -1,5 +1,5 @@
-#ifndef XL_UI_CTRLS_H
-#define XL_UI_CTRLS_H
+#ifndef XL_UI_CONTROL_H
+#define XL_UI_CONTROL_H
 #include <memory>
 #include <vector>
 #include <atlbase.h>
@@ -11,12 +11,16 @@ namespace xl {
 	namespace ui {
 
 class CCtrlMain;
+class CCtrlTarget;
 
 //////////////////////////////////////////////////////////////////////////
 // typedef(s)
 class CControl;
 typedef std::tr1::shared_ptr<CControl>       CControlPtr;
 typedef std::tr1::weak_ptr<CControl>         CControlWeakPtr;
+
+typedef std::tr1::shared_ptr<CCtrlTarget>    CCtrlTargetPtr;
+typedef CCtrlTarget                          *CCtrlTargetRawPtr;
 
 //////////////////////////////////////////////////////////////////////////
 // CControl
@@ -34,14 +38,21 @@ protected:
 	uint                 m_id;
 
 	CControlWeakPtr      m_parent;
+	CCtrlTargetRawPtr    m_target;
 	CControlContainer    m_controls;
 	mutable CRect        m_rect;
 
-	CCtrlMain* _GetMainCtrl ();
 	void _LayoutChildren () const;
 	CControlPtr _GetControlByPoint (CPoint pt);
 
+	void _SetParent (CControlPtr parent);
+	void _SetTarget (CCtrlTargetRawPtr target);
+
 	bool _SetCapture (bool capture);
+
+	//////////////////////////////////////////////////////////////////////////
+	// virtual protected methods
+	virtual CCtrlMain* _GetMainCtrl ();
 
 public:
 	CControl (uint id = 0);
@@ -51,7 +62,6 @@ public:
 
 	bool insertChild (CControlPtr child);
 	CControlPtr getControlByID (uint id);
-	void setParent (CControlPtr parent);
 
 
 	//////////////////////////////////////////////////////////////////////////
@@ -65,6 +75,8 @@ public:
 	virtual void onMouseMove (CPoint pt) {}
 	virtual void onLButtonDown (CPoint pt) {}
 	virtual void onLButtonUp (CPoint pt) {}
+	virtual void onRButtonDown (CPoint pt) {}
+	virtual void onRButtonUp (CPoint pt) {}
 	virtual void onGetCapture () {}
 	virtual void onLostCapture () {}
 };

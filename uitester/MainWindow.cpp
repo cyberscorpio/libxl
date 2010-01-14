@@ -6,10 +6,7 @@ class CToolbar : public xl::ui::CControl
 {
 public:
 	CToolbar () {
-		// margin.left = margin.right = 5;
-		margin.top = 0;
-		margin.bottom = 5;
-		setStyle(_T("px:left;py:top;height:32;width:fill"));
+		setStyle(_T("px:left;py:top;height:32;width:fill;margin:0 0 5"));
 	}
 
 	virtual void drawMe (HDC hdc) {
@@ -23,10 +20,7 @@ class CFloat : public xl::ui::CControl
 public:
 	CFloat () {
 		// margin.left = margin.right = 5;
-		margin.top = 0;
-		margin.bottom = 50;
-		margin.left = margin.right = 50;
-		setStyle(_T("px:left;py:bottom;height:120;width:fill;float:float"));
+		setStyle(_T("px:left;py:bottom;height:120;width:fill;float:true;margin:0 50 10 50;opacity:50;"));
 	}
 
 	virtual void drawMe (HDC hdc) {
@@ -60,10 +54,7 @@ class CStatusbar : public xl::ui::CControl
 {
 public:
 	CStatusbar () {
-		// margin.left = margin.right = 5;
-		margin.top = 5;
-		margin.bottom = 0;
-		setStyle(_T("px:left;py:bottom;height:32;width:fill;"));
+		setStyle(_T("px:left;py:bottom;height:32;width:fill;margin:5 0 0"));
 	}
 
 	virtual void drawMe (HDC hdc) {
@@ -77,9 +68,7 @@ class CClient : public xl::ui::CControl
 {
 public:
 	CClient () {
-		margin.left = margin.right = 0;
-		margin.top = margin.bottom = 0;
-		setStyle(_T("px:left;py:top;width:fill;height:fill;"));
+		setStyle(_T("px:left;py:top;width:fill;height:fill;margin:0"));
 	}
 
 	virtual void drawMe (HDC hdc) {
@@ -93,9 +82,7 @@ class CExplorer : public xl::ui::CControl
 {
 public:
 	CExplorer () {
-		margin.left = 5;
-		margin.top = margin.bottom = 5;
-		setStyle(_T("width:100; height:fill; px:left; py:top;"));
+		setStyle(_T("width:100; height:fill; px:left; py:top;margin:5 0 5 5"));
 	}
 
 	virtual void drawMe (HDC hdc) {
@@ -110,9 +97,7 @@ class CView : public xl::ui::CControl
 	CPoint m_pt;
 public:
 	CView () : m_hover(false) {
-		margin.left = margin.right = 5;
-		margin.top = margin.bottom = 5;
-		setStyle(_T("px:left; py:top; width:fill; height:fill;"));
+		setStyle(_T("px:left; py:top; width:fill; height:fill;margin:5"));
 	}
 
 	virtual void onMouseIn (CPoint pt) {
@@ -131,11 +116,11 @@ public:
 		_GetMainCtrl()->invalidateControl(shared_from_this());
 	}
 
-	virtual void onLButtonDown (CPoint pt) {
+	virtual void onRButtonDown (CPoint pt) {
 		_SetCapture(true);
 	}
 
-	virtual void onLButtonUp (CPoint pt) {
+	virtual void onRButtonUp (CPoint pt) {
 		_SetCapture(false);
 	}
 
@@ -160,14 +145,7 @@ public:
 LRESULT CMainWindow::OnCreate (UINT msg, WPARAM wParam, LPARAM lParam, BOOL &bHandled) {
 	bHandled = false;
 
-	// m_ctrl.reset(new xl::ui::CCtrlMgr(0));
-	// insertControl(m_ctrl);
 	assert (m_ctrl != NULL);
-
-	m_ctrl->px = xl::ui::PX_LEFT;
-	m_ctrl->py = xl::ui::PY_TOP;
-	m_ctrl->width = xl::ui::SIZE_FILL;
-	m_ctrl->height = xl::ui::SIZE_FILL;
 
 	xl::ui::CControlPtr ctrl(new CToolbar());
 	m_ctrl->insertChild(ctrl);
@@ -189,11 +167,6 @@ LRESULT CMainWindow::OnCreate (UINT msg, WPARAM wParam, LPARAM lParam, BOOL &bHa
 	client->insertChild(ctrl);
 
 	ctrl.reset(new CFloat());
-	ctrl->setStyle(_T("float:float; py:bottom; opacity:50; height:120"));
-	ctrl->margin.left = 50;
-	ctrl->margin.right = 50;
-	ctrl->margin.top = 0;
-	ctrl->margin.bottom = 10;
 	m_ctrl->insertChild(ctrl);
 
 	return TRUE;
