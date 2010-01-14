@@ -200,7 +200,11 @@ typedef basic_string<tchar, std::char_traits<tchar>, std::allocator<tchar> >    
 //////////////////////////////////////////////////////////////////////////
 // 
 template <class CharT>
-std::vector<basic_string<CharT, std::char_traits<CharT>, std::allocator<CharT> > >
+struct ExplodeT {
+	typedef std::vector<basic_string<CharT, std::char_traits<CharT>, std::allocator<CharT> > > ValueT;
+};
+template <class CharT>
+typename ExplodeT<CharT>::ValueT
 explode (const basic_string<CharT, std::char_traits<CharT>, std::allocator<CharT> > &delimiter,
          const basic_string<CharT, std::char_traits<CharT>, std::allocator<CharT> > &str, 
          int max_parts = -1
@@ -228,7 +232,7 @@ explode (const basic_string<CharT, std::char_traits<CharT>, std::allocator<CharT
 }
 
 template <class CharT>
-std::vector<basic_string<CharT, std::char_traits<CharT>, std::allocator<CharT> > >
+typename ExplodeT<CharT>::ValueT
 explode (const CharT *delimiter, const CharT *str, int max_parts = -1) {
 	basic_string<CharT, std::char_traits<CharT>, std::allocator<CharT> > d(delimiter);
 	basic_string<CharT, std::char_traits<CharT>, std::allocator<CharT> > s(str);
@@ -236,7 +240,7 @@ explode (const CharT *delimiter, const CharT *str, int max_parts = -1) {
 }
 
 template <class CharT>
-std::vector<basic_string<CharT, std::char_traits<CharT>, std::allocator<CharT> > >
+typename ExplodeT<CharT>::ValueT
 explode (const CharT *delimiter, 
          const basic_string<CharT, std::char_traits<CharT>, std::allocator<CharT> > &str,
          int max_parts = -1
@@ -274,6 +278,7 @@ tstring s2ts (const string &s) {
 #ifdef RESTORE_MIN_MAX
 #pragma pop_macro ("min")
 #pragma pop_macro ("max")
+#undef RESTORE_MIN_MAX
 #endif
 
 

@@ -25,12 +25,14 @@ bool CCtrlMain::_SetCapture(CControlPtr ctrl) {
 }
 
 
-CCtrlMain::CCtrlMain (ATL::CWindow *pWindow) 
+CCtrlMain::CCtrlMain (ATL::CWindow *pWindow, CCtrlTargetRawPtr target) 
 	: CControl(0)
 	, m_pWindow(pWindow)
 	, m_captured(false) 
 {
 	assert (m_pWindow != NULL);
+	assert (target != NULL);
+	_SetTarget(target);
 }
 
 CCtrlMain::~CCtrlMain () {
@@ -142,7 +144,7 @@ LRESULT CCtrlMain::OnLButtonDown(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& 
 	return 0;
 }
 
-LRESULT CCtrlMain::onLButtonUp(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) {
+LRESULT CCtrlMain::OnLButtonUp(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) {
 	int x = GET_X_LPARAM(lParam);
 	int y = GET_Y_LPARAM(lParam);
 	CPoint pt(x, y);
@@ -154,6 +156,29 @@ LRESULT CCtrlMain::onLButtonUp(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bH
 	return 0;
 }
 
+LRESULT CCtrlMain::OnRButtonDown(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) {
+	int x = GET_X_LPARAM(lParam);
+	int y = GET_Y_LPARAM(lParam);
+	CPoint pt(x, y);
+	if (m_ctrlCapture != NULL) {
+		m_ctrlCapture->onRButtonDown(pt);
+	} else if (m_ctrlHover != NULL) {
+		m_ctrlHover->onRButtonDown(pt);
+	}
+	return 0;
+}
+
+LRESULT CCtrlMain::OnRButtonUp(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) {
+	int x = GET_X_LPARAM(lParam);
+	int y = GET_Y_LPARAM(lParam);
+	CPoint pt(x, y);
+	if (m_ctrlCapture != NULL) {
+		m_ctrlCapture->onRButtonUp(pt);
+	} else if (m_ctrlHover != NULL) {
+		m_ctrlHover->onRButtonUp(pt);
+	}
+	return 0;
+}
 
 
 

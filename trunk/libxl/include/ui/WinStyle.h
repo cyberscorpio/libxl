@@ -1,7 +1,17 @@
 #ifndef XL_UI_WINSTYLE_H
 #define XL_UI_WINSTYLE_H
+#include <limits>
 #include "../common.h"
 #include "../string.h"
+
+#ifdef max // <windows.h> defines max & min
+#define RESTORE_MIN_MAX
+#pragma push_macro ("min")
+#pragma push_macro ("max")
+#undef max
+#undef min
+#endif
+
 
 namespace xl {
 	namespace ui {
@@ -31,6 +41,7 @@ struct EDGE {
 
 
 const int SIZE_FILL = -1;
+const int MARGIN_AUTO = std::numeric_limits<int>::max();
 
 enum POSITION_X {
 	PX_LEFT,
@@ -50,7 +61,8 @@ class CWinStyle {
 protected:
 	tstring style;
 
-	void _ParseProperty(const tstring &key, const tstring &value);
+	void _ParseEdge (const tstring &value, EDGE &edge);
+	void _ParseProperty (const tstring &key, const tstring &value);
 
 public:
 	EDGE margin;
@@ -60,6 +72,7 @@ public:
 	POSITION_Y py;
 
 	bool isfloat;
+	bool transparent;
 
 	int width;
 	int height;
@@ -78,5 +91,11 @@ public:
 
 	} // ui
 } // xl
+
+#ifdef RESTORE_MIN_MAX
+#pragma pop_macro ("min")
+#pragma pop_macro ("max")
+#undef RESTORE_MIN_MAX
+#endif
 
 #endif
