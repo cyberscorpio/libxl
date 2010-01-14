@@ -39,7 +39,11 @@ CControlPtr CControl::_GetControlByPoint (CPoint pt) {
 }
 
 void CControl::_SetParent (CControlPtr parent) {
+	if (m_parent.lock() != NULL) {
+		onDetach();
+	}
 	m_parent = parent;
+	onAttach();
 }
 
 void CControl::_SetTarget (CCtrlTargetRawPtr target) {

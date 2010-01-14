@@ -70,6 +70,9 @@ public:
 	virtual void draw (HDC hdc, CRect rcClip);
 	virtual void drawMe (HDC hdc);
 
+	virtual void onAttach () {}
+	virtual void onDetach () {}
+
 	virtual void onMouseIn (CPoint pt) {}
 	virtual void onMouseOut (CPoint pt) {}
 	virtual void onMouseMove (CPoint pt) {}
