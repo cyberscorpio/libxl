@@ -61,6 +61,7 @@ public:
 	virtual ~CControl ();
 
 	uint getID () const { return m_id; }
+	CRect getClientRect () const; // exclude the border and padding
 
 	bool insertChild (CControlPtr child);
 	CControlPtr getControlByID (uint id);

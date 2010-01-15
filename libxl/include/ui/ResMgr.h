@@ -15,8 +15,10 @@ class CResMgr
 private:
 	CResMgr ();
 	~CResMgr ();
-	typedef std::map<uint, HGDIOBJ>  _MapType;
-	typedef _MapType::iterator       _MapIter;
+	typedef std::map<uint, HGDIOBJ>    _MapType;
+	typedef _MapType::iterator         _MapIter;
+	typedef std::map<uint64, HGDIOBJ>  _BigMapType;
+	typedef _BigMapType::iterator      _BigMapIter;
 	_MapType m_sysFonts;
 
 	void _Lock ();
