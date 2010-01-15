@@ -3,6 +3,7 @@
 #include "../../include/ui/CtrlTarget.h"
 #include "../../include/ui/CtrlMain.h"
 #include "../../include/ui/CtrlButton.h"
+#include "../../include/ui/ResMgr.h"
 
 namespace xl {
 	namespace ui {
@@ -38,13 +39,13 @@ void CCtrlButton::drawMe (HDC hdc) {
 }
 
 void CCtrlButton::onMouseIn (CPoint pt) {
-	setStyle(_T("border:1 #808080;opacity:100;"));
+	// setStyle(_T("border:1 #808080;"));// opacity:100;
 	m_hover = true;
 	_GetMainCtrl()->invalidateControl(shared_from_this());
 }
 
 void CCtrlButton::onMouseOut (CPoint pt) {
-	setStyle(_T("border:1 #cccccc;opacity:50;"));
+	// setStyle(_T("border:1 #cccccc;"));// opacity:50;
 	m_hover = false;
 	_GetMainCtrl()->invalidateControl(shared_from_this());
 }
@@ -94,11 +95,53 @@ void CCtrlButton::drawPush (HDC hdc) {
 	CDCHandle dc(hdc);
 	_DrawBorder(hdc);
 	CRect rc = getClientRect();
-	rc.left += 2;
-	rc.top += 2;
+	rc.OffsetRect(1, 1);
 	UINT format = DT_SINGLELINE | DT_CENTER | DT_VCENTER;
 	dc.drawTransparentTextWithDefaultFont(m_text, m_text.length(), rc, format);
 }
+
+
+//////////////////////////////////////////////////////////////////////////
+
+CCtrlImageButton::CCtrlImageButton (uint id, uint n, uint h, uint p)
+	: CCtrlButton(id)
+	, m_idImageNormal(n), m_idImageHover(h), m_idImagePush(p)
+{
+}
+
+void CCtrlImageButton::drawNormal (HDC hdc) {
+	if (m_idImageNormal == 0) {
+		CCtrlButton::drawNormal(hdc);
+	} else {
+		CResMgr *pResMgr = CResMgr::getInstance();
+		Gdiplus::Bitmap *bitmap = pResMgr->getBitmap(m_idImageNormal, _T("PNG"));
+		Gdiplus::Graphics g(hdc);
+		g.DrawImage(bitmap, m_rect.left, m_rect.top);
+	}
+}
+
+void CCtrlImageButton::drawHover (HDC hdc) {
+	if (m_idImageHover == 0) {
+		CCtrlButton::drawNormal(hdc);
+	} else {
+		CResMgr *pResMgr = CResMgr::getInstance();
+		Gdiplus::Bitmap *bitmap = pResMgr->getBitmap(m_idImageHover, _T("PNG"));
+		Gdiplus::Graphics g(hdc);
+		g.DrawImage(bitmap, m_rect.left, m_rect.top);
+	}
+}
+
+void CCtrlImageButton::drawPush (HDC hdc) {
+	if (m_idImagePush == 0) {
+		CCtrlButton::drawNormal(hdc);
+	} else {
+		CResMgr *pResMgr = CResMgr::getInstance();
+		Gdiplus::Bitmap *bitmap = pResMgr->getBitmap(m_idImagePush, _T("PNG"));
+		Gdiplus::Graphics g(hdc);
+		g.DrawImage(bitmap, m_rect.left, m_rect.top);
+	}
+}
+
 
 
 

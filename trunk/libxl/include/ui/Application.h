@@ -3,7 +3,10 @@
 // #define _WTL_NO_CSTRING
 #include <atlbase.h>
 #include <atlapp.h>
+#include <gdiplus.h>
+#include "ResMgr.h"
 
+#pragma comment (lib, "gdiplus.lib")
 #pragma comment (linker, "/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 
 namespace xl {
@@ -14,6 +17,9 @@ template <class T>
 class CApplicationT : public CAppModule {
 	CMessageLoop m_msgLoop;
 	bool m_initialized;
+	// gdi+
+	Gdiplus::GdiplusStartupInput  gdiplusStartupInput;
+	ULONG_PTR                     gdiplusToken;
 
 protected:
 	CApplicationT ()
@@ -48,12 +54,16 @@ public:
 		AtlInitCommonControls(ICC_BAR_CLASSES | ICC_TAB_CLASSES);
 		hRes = Init(NULL, hInst);
 		ATLASSERT (SUCCEEDED(hRes));
+		Gdiplus::GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
 		m_initialized = true;
 		return true;
 	}
 
 	void cleanup () {
 		if (m_initialized) {
+			CResMgr *pResMgr = CResMgr::getInstance();
+			pResMgr->reset();
+			Gdiplus::GdiplusShutdown(gdiplusToken);
 			Term();
 			::CoUninitialize();
 		}
