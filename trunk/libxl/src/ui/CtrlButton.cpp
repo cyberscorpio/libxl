@@ -38,13 +38,13 @@ void CCtrlButton::drawMe (HDC hdc) {
 }
 
 void CCtrlButton::onMouseIn (CPoint pt) {
-	setStyle(_T("border-color:#808080;opacity:100;"));
+	setStyle(_T("border:1 #808080;opacity:100;"));
 	m_hover = true;
 	_GetMainCtrl()->invalidateControl(shared_from_this());
 }
 
 void CCtrlButton::onMouseOut (CPoint pt) {
-	setStyle(_T("border-color:#cccccc;opacity:50;"));
+	setStyle(_T("border:1 #cccccc;opacity:50;"));
 	m_hover = false;
 	_GetMainCtrl()->invalidateControl(shared_from_this());
 }
@@ -77,7 +77,7 @@ void CCtrlButton::onLButtonUp (CPoint pt) {
 void CCtrlButton::drawNormal (HDC hdc) {
 	CDCHandle dc(hdc);
 	_DrawBorder(hdc);
-	CRect rc = m_rect;
+	CRect rc = getClientRect();
 	UINT format = DT_SINGLELINE | DT_CENTER | DT_VCENTER;
 	dc.drawTransparentTextWithDefaultFont(m_text, m_text.length(), rc, format);
 }
@@ -85,7 +85,7 @@ void CCtrlButton::drawNormal (HDC hdc) {
 void CCtrlButton::drawHover (HDC hdc) {
 	CDCHandle dc(hdc);
 	_DrawBorder(hdc);
- 	CRect rc = m_rect;
+	CRect rc = getClientRect();
 	UINT format = DT_SINGLELINE | DT_CENTER | DT_VCENTER;
 	dc.drawTransparentTextWithDefaultFont(m_text, m_text.length(), rc, format);
 }
@@ -93,7 +93,7 @@ void CCtrlButton::drawHover (HDC hdc) {
 void CCtrlButton::drawPush (HDC hdc) {
 	CDCHandle dc(hdc);
 	_DrawBorder(hdc);
-	CRect rc = m_rect;
+	CRect rc = getClientRect();
 	rc.left += 2;
 	rc.top += 2;
 	UINT format = DT_SINGLELINE | DT_CENTER | DT_VCENTER;

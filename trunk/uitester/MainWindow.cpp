@@ -21,7 +21,7 @@ class CFloat : public xl::ui::CControl
 public:
 	CFloat () {
 		// margin.left = margin.right = 5;
-		setStyle(_T("px:left;py:bottom;height:120;width:fill;float:true;margin:0 50 10 50;opacity:50;"));
+		setStyle(_T("px:left;py:bottom;height:120;width:480;border:2 #ff0000;float:true;margin:0 auto 20;opacity:50;"));
 	}
 
 	virtual void drawMe (HDC hdc) {
@@ -31,12 +31,13 @@ public:
 		if (opacity == 100) {
 			// dc.FillSolidRect(m_rect, RGB(255,255,255));
 		}
-		HFONT hFont = pResMgr->getSysFont(130);
+		HFONT hFont = pResMgr->getSysFont(40);
 		HFONT oldFont = dc.SelectFont(hFont);
 
 		dc.drawTransparentText(_T("xl::ui is COOL!"), -1, m_rect, DT_SINGLELINE | DT_VCENTER | DT_CENTER);
 
 		dc.SelectFont(oldFont);
+		_DrawBorder(hdc);
 	}
 	virtual void onMouseIn (CPoint pt) {
 		setStyle(_T("opacity:100"));
@@ -104,7 +105,7 @@ public:
 	virtual void onAttach () {
 		xl::ui::CCtrlButton *pButton = new xl::ui::CCtrlButton(1);
 		xl::ui::CControlPtr button (pButton);
-		button->setStyle(_T("margin:10;width:80;height:28;border-width:1;border-color:#cccccc;opacity:50;"));
+		button->setStyle(_T("margin:10;width:80;height:28;border:1 #cccccc;opacity:50;"));
 		insertChild(button);
 		pButton->setText(_T("Click me"));
 	}
@@ -144,7 +145,7 @@ public:
 		if (m_hover) {
 			TCHAR buf[1024];
 			_stprintf_s(buf, 1024, _T("Mouse: %d - %d"), m_pt.x - m_rect.left, m_pt.y - m_rect.top);
-			dc.DrawText(buf, -1, m_rect, DT_SINGLELINE | DT_CENTER | DT_VCENTER);
+			dc.DrawText(buf, -1, getClientRect(), DT_SINGLELINE | DT_CENTER | DT_VCENTER);
 		}
 	}
 };

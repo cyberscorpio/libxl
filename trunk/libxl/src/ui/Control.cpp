@@ -54,12 +54,23 @@ void CControl::_SetTarget (CCtrlTargetRawPtr target) {
 }
 
 void CControl::_DrawBorder (HDC hdc) {
-	if (borderWidth == 0) {
-		return;
+	CDCHandle dc(hdc);
+	
+	if (border.top.width > 0) {
+		dc.FillSolidRect(m_rect.left, m_rect.top, m_rect.Width(), border.top.width, border.top.color);
+	}
+	
+	if (border.right.width > 0) {
+		dc.FillSolidRect(m_rect.right - border.right.width, m_rect.top, border.right.width, m_rect.Height(), border.right.color);
 	}
 
-	CDCHandle dc(hdc);
-	dc.drawRectangle(m_rect, borderWidth, borderColor);
+	if (border.bottom.width > 0) {
+		dc.FillSolidRect(m_rect.left, m_rect.bottom - border.bottom.width, m_rect.Width(), border.bottom.width, border.bottom.color);
+	}
+
+	if (border.left.width > 0) {
+		dc.FillSolidRect(m_rect.left, m_rect.top, border.left.width, m_rect.Height(), border.left.color);
+	}
 }
 
 bool CControl::_SetCapture (bool capture) {
@@ -109,6 +120,16 @@ CControl::~CControl () {
 	-- s_control_counts;
 	ATLTRACE (_T("%d control(s) remains\n"), s_control_counts);
 #endif
+}
+
+
+CRect CControl::getClientRect () const {
+	CRect rc = m_rect;
+	rc.top += border.top.width + padding.top;
+	rc.right -= border.right.width + padding.right;
+	rc.bottom -= border.bottom.width + padding.bottom;
+	rc.left += border.left.width + padding.left;
+	return rc;
 }
 
 
@@ -188,11 +209,18 @@ CRect CControl::layout (CRect rc) const {
 		rc = parent->m_rect;
 	}
 
+	if (margin.left == EDGE_AUTO && margin.right == EDGE_AUTO) {
+		assert (this->width != SIZE_FILL);
+	}
+	if (margin.top == EDGE_AUTO && margin.bottom == EDGE_AUTO) {
+		assert (this->height != SIZE_FILL);
+	}
+
 	// width
 	if (this->width == SIZE_FILL) {
-		width = rc.Width() - margin.left - margin.right;
+		width = rc.Width() - margin.width();
 	} else {
-		width = this->width + padding.left + padding.right;
+		width = this->width + padding.width() + border.width();
 		if (width > rc.Width()) {
 			width = rc.Width();
 		}
@@ -200,44 +228,54 @@ CRect CControl::layout (CRect rc) const {
 
 	// height
 	if (this->height == SIZE_FILL) {
-		height = rc.Height() - margin.top - margin.bottom;
+		height = rc.Height() - margin.height();
 	} else {
-		height = this->height + padding.top + padding.bottom;
+		height = this->height + padding.height() + border.height();
 		if (height > rc.Height()) {
 			height = rc.Height();
 		}
 	}
 
 	// x
-	switch (px) {
-	case PX_LEFT:
-		x = rc.left + margin.left;
-		rcRemain.left = x + width + margin.right;
-		break;
-	case PX_RIGHT:
-		x = rc.right - margin.right - width;
-		rcRemain.right = x - margin.left;
-		break;
-	default:
-		assert (false);
+	if (margin.left == EDGE_AUTO || margin.right == EDGE_AUTO) {
+		x = (rc.Width() - width) / 2;
+		rcRemain.left = rcRemain.right; // no space remains
+	} else {
+		switch (px) {
+		case PX_LEFT:
+			x = rc.left + margin.left;
+			rcRemain.left = x + width + margin.right;
+			break;
+		case PX_RIGHT:
+			x = rc.right - margin.right - width;
+			rcRemain.right = x - margin.left;
+			break;
+		default:
+			assert (false);
+		}
 	}
 
 	// y
-	switch (py) {
-	case PY_TOP:
-		y = rc.top + margin.top;
-		if (this->width == SIZE_FILL) {
-			rcRemain.top = y + height + margin.bottom;
+	if (margin.top == EDGE_AUTO || margin.bottom == EDGE_AUTO) {
+		y = (rc.Height() - height) / 2;
+		rcRemain.top = rcRemain.bottom; // nospace remains
+	} else {
+		switch (py) {
+		case PY_TOP:
+			y = rc.top + margin.top;
+			if (this->width == SIZE_FILL) {
+				rcRemain.top = y + height + margin.bottom;
+			}
+			break;
+		case PY_BOTTOM:
+			y = rc.bottom - margin.bottom - height;
+			if (this->width == SIZE_FILL) {
+				rcRemain.bottom = y - margin.top;
+			}
+			break;
+		default:
+			assert (false);
 		}
-		break;
-	case PY_BOTTOM:
-		y = rc.bottom - margin.bottom - height;
-		if (this->width == SIZE_FILL) {
-			rcRemain.bottom = y - margin.top;
-		}
-		break;
-	default:
-		assert (false);
 	}
 
 	m_rect.left = x;
@@ -276,6 +314,7 @@ CRect CControl::layout (CRect rc) const {
 void CControl::drawMe (HDC hdc) {
 	CDCHandle dc(hdc);
 	dc.FillSolidRect(m_rect, ::GetSysColor(COLOR_WINDOW));
+	_DrawBorder(hdc);
 }
 
 

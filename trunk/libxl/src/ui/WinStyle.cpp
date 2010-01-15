@@ -12,14 +12,65 @@
  * width: int | "fill"
  * height: int | "fill"
  * opacity: [0-100]
- * margin: 0 0 0 0
- * padding: 0 0 0 0
- * border-width: int
- * border-color: #000000
+ * margin: int[ int[ int[ int]]]
+ * padding: int[ int[ int[ int]]]
+ * border: int[ #hexhexhexhexhexhex[ style]]
+ */
+/**
+ * The rules of layout the controls:
+ * - Layout is based on "line"
+ * - All float elements MUST be the last child of its parent, otherwise it will be covered by it siblings
+ * - All controls which width is SIZE_FILL must be the last one of the "line".
+ * - All controls which height is SIZE_FILL must after the controls which py = BOTTOM
  */
 
 namespace xl {
 	namespace ui {
+
+
+void BORDER::reset () {
+	top.reset();
+	right.reset();
+	bottom.reset();
+	left.reset();
+}
+
+void BORDER::setWidth (int width, EDGETYPE et) {
+	if (et == ET_ALL) {
+		top.width = right.width = bottom.width = left.width = width;
+	} else if (et == ET_TOP) {
+		top.width = width;
+	} else if (et == ET_RIGHT) {
+		right.width = width;
+	} else if (et == ET_BOTTOM) {
+		bottom.width = width;
+	} else if (et == ET_LEFT) {
+		left.width = width;
+	} else {
+		assert(false);
+	}
+}
+
+void BORDER::setColor (COLORREF color, EDGETYPE et) {
+	if (et == ET_ALL) {
+		top.color = right.color = bottom.color = left.color = color;
+	} else if (et == ET_TOP) {
+		top.color = color;
+	} else if (et == ET_RIGHT) {
+		right.color = color;
+	} else if (et == ET_BOTTOM) {
+		bottom.color = color;
+	} else if (et == ET_LEFT) {
+		left.color = color;
+	} else {
+		assert(false);
+	}
+}
+
+
+
+//////////////////////////////////////////////////////////////////////////
+// WinStyle
 
 CWinStyle::CWinStyle () {
 	reset();
@@ -32,8 +83,7 @@ CWinStyle::~CWinStyle () {
 void CWinStyle::reset () {
 	margin.left = margin.top = margin.right = margin.bottom = 0;
 	padding.left = padding.top = padding.right = padding.bottom = 0;
-	borderWidth = 0;
-	borderColor = RGB(0, 0, 0);
+	border.reset();
 	px = PX_LEFT;
 	py = PY_TOP;
 	isfloat = false;
@@ -60,6 +110,9 @@ void CWinStyle::_ParseEdge (tstring value, EDGE &edge) {
 	while (value.replace(_T("  "), _T(" ")) > 0)
 		;
 	value.trim(_T(" "));
+	tchar tmp[32];
+	_stprintf(tmp, _T("%d"), EDGE_AUTO);
+	value.replace(_T("auto"), tmp);
 	ExplodeT<TCHAR>::ValueT edges = explode(_T(" "), value);
 	assert (edges.size() > 0 && edges.size() <= ET_COUNT);
 	if (edges.size() == 1) {
@@ -102,6 +155,32 @@ COLORREF CWinStyle::_ParseColor (tstring value) {
 	return color;
 }
 
+void CWinStyle::_ParseBorder (tstring key, tstring value) {
+	key.trim();
+	while (value.replace(_T("  "), _T(" ")) > 0)
+		;
+	value.trim(_T(" "));
+	ExplodeT<TCHAR>::ValueT values = explode(_T(" "), value);
+	if (key == _T("border") || key == _T("border-top") || key == _T("border-right")
+	    || key == _T("border-bottom") || key == _T("border-left")) // border[-top|-right|-bottom|-left]: int[ color[ style]]
+	{
+		EDGETYPE et = key == _T("border") ? ET_ALL : 
+			(key == _T("border-top") ? ET_TOP : 
+			(key == _T("border-right") ? ET_RIGHT :
+			(key == _T("border-bottom") ? ET_BOTTOM : ET_LEFT)));
+		assert(values.size() > 0);
+		values[0].trim();
+		border.setWidth(_tstoi(values[0]), et);
+
+		if (values.size() > 1) {
+			values[1].trim();
+			border.setColor(_ParseColor(values[1]), et);
+		}
+	} else {
+		assert(false);
+	}
+}
+
 void CWinStyle::_ParseProperty (const tstring &key, const tstring &value) {
 	if (key == _T("width")) {
 		width = value == _T("fill") ? SIZE_FILL : _tstoi(value);
@@ -136,11 +215,8 @@ void CWinStyle::_ParseProperty (const tstring &key, const tstring &value) {
 		_ParseEdge(value, margin);
 	} else if (key == _T("padding")) {
 		_ParseEdge(value, padding);
-	} else if (key == _T("border-width")) {
-		borderWidth = _tstoi(value);
-		assert(borderWidth >= 0);
-	} else if (key == _T("border-color")) {
-		borderColor = _ParseColor(value);
+	} else if (key.find(_T("border")) == 0) {
+		_ParseBorder(key, value);
 	} else {
 		assert(false);
 	}
