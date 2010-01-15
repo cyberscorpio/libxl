@@ -1,8 +1,12 @@
 #ifndef XL_RESMGR_H
 #define XL_RESMGR_H
+#include <assert.h>
 #include <map>
+#include <memory>
 #include <Windows.h>
+#include <gdiplus.h>
 #include "../common.h"
+#include "../string.h"
 
 namespace xl {
 	namespace ui {
@@ -15,11 +19,18 @@ class CResMgr
 private:
 	CResMgr ();
 	~CResMgr ();
-	typedef std::map<uint, HGDIOBJ>    _MapType;
-	typedef _MapType::iterator         _MapIter;
-	typedef std::map<uint64, HGDIOBJ>  _BigMapType;
-	typedef _BigMapType::iterator      _BigMapIter;
-	_MapType m_sysFonts;
+	typedef std::map<uint, HGDIOBJ>       _GdiObjMapType;
+	typedef _GdiObjMapType::iterator      _GdiObjMapIter;
+	typedef std::map<uint64, HGDIOBJ>     _GdiObjBigMapType;
+	typedef _GdiObjBigMapType::iterator   _GdiObjBigMapIter;
+
+	// typedef std::tr1::shared_ptr<Gdiplus::Bitmap>  _GpBmpPtr;
+	typedef Gdiplus::Bitmap               *_GpBmpPtr;
+	typedef std::map<uint, _GpBmpPtr>              _GpBmpMapType;
+	typedef _GpBmpMapType::iterator                _GpBmpMapIter;
+
+	_GdiObjMapType                        m_sysFonts;
+	_GpBmpMapType                         m_gpBitmaps;
 
 	void _Lock ();
 	void _Unlock ();
@@ -34,10 +45,13 @@ public:
 	static const uint FS_MASK = 0xffff;
 
 	static CResMgr* getInstance ();
+	void reset ();
 	/**
 	 * @param height The height of the font
 	 */
 	HFONT getSysFont (int height = 0, uint style = 0);
+
+	Gdiplus::Bitmap* getBitmap (uint id, const tstring &type);
 };
 
 	} // namespace ui

@@ -36,6 +36,18 @@ public:
 	virtual void drawPush (HDC hdc);
 };
 
+class CCtrlImageButton : public CCtrlButton
+{
+	uint m_idImageNormal;
+	uint m_idImageHover;
+	uint m_idImagePush;
+public:
+	CCtrlImageButton (uint id, uint n = 0, uint h = 0, uint p = 0);
+	virtual void drawNormal (HDC hdc);
+	virtual void drawHover (HDC hdc);
+	virtual void drawPush (HDC hdc);
+};
+
 
 	} // ui
 } // xl
