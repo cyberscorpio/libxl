@@ -93,11 +93,15 @@ enum POSITION_Y {
 	PY_COUNT
 };
 
+enum FONTWEIGHT {
+	FONTW_NORMAL,
+	FONTW_BOLD,
+	FONTW_COUNT
+};
+
 
 class CWinStyle {
 protected:
-	tstring style;
-
 	void _ParseEdge (tstring value, EDGE &edge);
 	COLORREF _ParseColor (tstring value);
 	void _ParseBorder (tstring key, tstring value);
@@ -117,6 +121,8 @@ public:
 	int width;
 	int height;
 
+	FONTWEIGHT fontweight;
+	COLORREF color;
 	int opacity; // alpha = 100 - opacity
 
 	CWinStyle ();

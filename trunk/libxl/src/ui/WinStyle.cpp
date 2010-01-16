@@ -11,10 +11,12 @@
  * transparent: true | false | none
  * width: int | "fill"
  * height: int | "fill"
- * opacity: [0-100]
  * margin: int[ int[ int[ int]]]
  * padding: int[ int[ int[ int]]]
- * border: int[ #hexhexhexhexhexhex[ style]]
+ * border: int[ #hex*6[ style]]
+ * font-weight: normal | bold
+ * color: #hex*6
+ * opacity: [0-100]
  */
 /**
  * The rules of layout the controls:
@@ -90,6 +92,8 @@ void CWinStyle::reset () {
 	transparent = false;
 	width = SIZE_FILL;
 	height = SIZE_FILL;
+	fontweight = FONTW_NORMAL;
+	color = RGB(0,0,0);
 	opacity = 100;
 }
 
@@ -192,9 +196,6 @@ void CWinStyle::_ParseProperty (const tstring &key, const tstring &value) {
 	} else if (key == _T("py")) {
 		py = value == _T("top") ? PY_TOP : (value == _T("bottom")) ? PY_BOTTOM : PY_COUNT;
 		assert (py != PY_COUNT);
-	} else if (key == _T("opacity")) {
-		opacity = _tstoi(value);
-		assert (opacity <= 100 && opacity >= 0);
 	} else if (key == _T("float")) {
 		if (value == _T("true")) {
 			isfloat = true;
@@ -217,6 +218,19 @@ void CWinStyle::_ParseProperty (const tstring &key, const tstring &value) {
 		_ParseEdge(value, padding);
 	} else if (key.find(_T("border")) == 0) {
 		_ParseBorder(key, value);
+	} else if (key == _T("opacity")) {
+		opacity = _tstoi(value);
+		assert(opacity <= 100 && opacity >= 0);
+	} else if (key == _T("font-weight")) {
+		if (value == _T("normal")) {
+			fontweight = FONTW_NORMAL;
+		} else if (value == _T("bold")) {
+			fontweight = FONTW_BOLD;
+		} else {
+			assert(false);
+		}
+	} else if (key == _T("color")) {
+		color = _ParseColor(value);
 	} else {
 		assert(false);
 	}

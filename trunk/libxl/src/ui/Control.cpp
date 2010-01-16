@@ -53,6 +53,15 @@ void CControl::_SetTarget (CCtrlTargetRawPtr target) {
 	}
 }
 
+HFONT CControl::_GetFont () {
+	CResMgr *pResMgr = CResMgr::getInstance();
+	uint style = 0;
+	if (fontweight == FONTW_BOLD) {
+		style = CResMgr::FS_BOLD;
+	}
+	return pResMgr->getSysFont(0, style);
+}
+
 void CControl::_DrawBorder (HDC hdc) {
 	CDCHandle dc(hdc);
 	

@@ -37,6 +37,9 @@ HGDIOBJ CResMgr::_CreateSysFont(int height, uint style) {
 	}
 
 	// modify the parameters
+	if (height == 0) {
+		height = lf.lfHeight;
+	}
 	lf.lfHeight = height;
 	if (style & FS_BOLD) {
 		lf.lfWeight = FW_BOLD;
@@ -73,7 +76,7 @@ void CResMgr::reset () {
 	m_gpBitmaps.clear();
 }
 
-Gdiplus::Bitmap* CResMgr::loadBitmapFromResource (uint id, const tstring &type, HINSTANCE hInst) {
+CResMgr::GpBmpPtr CResMgr::loadBitmapFromResource (uint id, const tstring &type, HINSTANCE hInst) {
 	if (hInst == NULL) {
 		hInst = (HINSTANCE)::GetModuleHandle(NULL);
 	}
@@ -81,19 +84,19 @@ Gdiplus::Bitmap* CResMgr::loadBitmapFromResource (uint id, const tstring &type, 
 	HRSRC hRes = ::FindResource(hInst, MAKEINTRESOURCE(id), type.c_str());
 	assert (hRes != NULL);
 	if (hRes == NULL) {
-		return NULL;
+		return GpBmpPtr();
 	}
 
 	DWORD reslen = ::SizeofResource(hInst, hRes);
 	if (reslen == 0) {
 		assert (false);
-		return NULL;
+		return GpBmpPtr();
 	}
 
 	const void* pResourceData = ::LockResource(::LoadResource(hInst, hRes));
 	if (!pResourceData) {
 		assert (false);
-		return NULL;
+		return GpBmpPtr();
 	}
 
 	Gdiplus::Bitmap *pBitmap = NULL;
@@ -119,14 +122,14 @@ Gdiplus::Bitmap* CResMgr::loadBitmapFromResource (uint id, const tstring &type, 
 
 	if (pBitmap) { 
 		if (pBitmap->GetLastStatus() == Gdiplus::Ok) {
-			return pBitmap;
+			return GpBmpPtr(pBitmap);
 		} else {
 			delete pBitmap;
 			pBitmap = NULL;
 		}
 	}
 
-	return NULL;
+	return GpBmpPtr();
 }
 
 HFONT CResMgr::getSysFont (int height, uint style) {
@@ -161,12 +164,11 @@ CResMgr::GpBmpPtr CResMgr::getBitmap (uint id, const tstring &type) {
 	}
 
 
-	Gdiplus::Bitmap *pBitmap = loadBitmapFromResource(id, type, NULL);
+	GpBmpPtr bitmap = loadBitmapFromResource(id, type, NULL);
 
-	if (pBitmap) { 
-		GpBmpPtr p = GpBmpPtr(pBitmap);
-		m_gpBitmaps[id] = p;
-		return p;
+	if (bitmap != NULL) { 
+		m_gpBitmaps[id] = bitmap;
+		return bitmap;
 	} else {
 		return GpBmpPtr();
 	}
