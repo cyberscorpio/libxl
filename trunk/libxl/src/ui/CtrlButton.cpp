@@ -114,9 +114,9 @@ void CCtrlImageButton::drawNormal (HDC hdc) {
 		CCtrlButton::drawNormal(hdc);
 	} else {
 		CResMgr *pResMgr = CResMgr::getInstance();
-		Gdiplus::Bitmap *bitmap = pResMgr->getBitmap(m_idImageNormal, _T("PNG"));
+		CResMgr::GpBmpPtr bitmap = pResMgr->getBitmap(m_idImageNormal, _T("PNG"));
 		Gdiplus::Graphics g(hdc);
-		g.DrawImage(bitmap, m_rect.left, m_rect.top);
+		g.DrawImage(bitmap.get(), m_rect.left, m_rect.top);
 	}
 }
 
@@ -125,9 +125,9 @@ void CCtrlImageButton::drawHover (HDC hdc) {
 		CCtrlButton::drawNormal(hdc);
 	} else {
 		CResMgr *pResMgr = CResMgr::getInstance();
-		Gdiplus::Bitmap *bitmap = pResMgr->getBitmap(m_idImageHover, _T("PNG"));
+		CResMgr::GpBmpPtr bitmap = pResMgr->getBitmap(m_idImageHover, _T("PNG"));
 		Gdiplus::Graphics g(hdc);
-		g.DrawImage(bitmap, m_rect.left, m_rect.top);
+		g.DrawImage(bitmap.get(), m_rect.left, m_rect.top);
 	}
 }
 
@@ -136,9 +136,9 @@ void CCtrlImageButton::drawPush (HDC hdc) {
 		CCtrlButton::drawNormal(hdc);
 	} else {
 		CResMgr *pResMgr = CResMgr::getInstance();
-		Gdiplus::Bitmap *bitmap = pResMgr->getBitmap(m_idImagePush, _T("PNG"));
+		CResMgr::GpBmpPtr bitmap = pResMgr->getBitmap(m_idImagePush, _T("PNG"));
 		Gdiplus::Graphics g(hdc);
-		g.DrawImage(bitmap, m_rect.left, m_rect.top);
+		g.DrawImage(bitmap.get(), m_rect.left, m_rect.top);
 	}
 }
 

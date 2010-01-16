@@ -2,6 +2,7 @@
 #include "ole2.h"
 #include "../../include/ui/ResMgr.h"
 
+#pragma comment (lib, "gdiplus.lib")
 #pragma comment (lib, "ole32.lib")
 
 namespace xl {
@@ -11,11 +12,12 @@ namespace xl {
 // private
 
 CResMgr::CResMgr() {
-
+	Gdiplus::GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
 }
 
 CResMgr::~CResMgr() {
 	reset();
+	Gdiplus::GdiplusShutdown(gdiplusToken);
 }
 
 void CResMgr::_Lock() {
@@ -68,10 +70,63 @@ void CResMgr::reset () {
 	}
 	m_sysFonts.clear();
 
-	for (_GpBmpMapIter it = m_gpBitmaps.begin(); it != m_gpBitmaps.end(); ++ it) {
-		delete it->second;
-	}
 	m_gpBitmaps.clear();
+}
+
+Gdiplus::Bitmap* CResMgr::loadBitmapFromResource (uint id, const tstring &type, HINSTANCE hInst) {
+	if (hInst == NULL) {
+		hInst = (HINSTANCE)::GetModuleHandle(NULL);
+	}
+
+	HRSRC hRes = ::FindResource(hInst, MAKEINTRESOURCE(id), type.c_str());
+	assert (hRes != NULL);
+	if (hRes == NULL) {
+		return NULL;
+	}
+
+	DWORD reslen = ::SizeofResource(hInst, hRes);
+	if (reslen == 0) {
+		assert (false);
+		return NULL;
+	}
+
+	const void* pResourceData = ::LockResource(::LoadResource(hInst, hRes));
+	if (!pResourceData) {
+		assert (false);
+		return NULL;
+	}
+
+	Gdiplus::Bitmap *pBitmap = NULL;
+	HGLOBAL hBuffer  = ::GlobalAlloc(GMEM_MOVEABLE, reslen);
+	if (hBuffer)
+	{
+		void* pBuffer = ::GlobalLock(hBuffer);
+		if (pBuffer)
+		{
+			CopyMemory(pBuffer, pResourceData, reslen);
+
+			IStream* pStream = NULL;
+			if (::CreateStreamOnHGlobal(hBuffer, FALSE, &pStream) == S_OK)
+			{
+				pBitmap = Gdiplus::Bitmap::FromStream(pStream);
+				pStream->Release();
+			}
+			::GlobalUnlock(hBuffer);
+		}
+		::GlobalFree(hBuffer);
+		hBuffer = NULL;
+	}
+
+	if (pBitmap) { 
+		if (pBitmap->GetLastStatus() == Gdiplus::Ok) {
+			return pBitmap;
+		} else {
+			delete pBitmap;
+			pBitmap = NULL;
+		}
+	}
+
+	return NULL;
 }
 
 HFONT CResMgr::getSysFont (int height, uint style) {
@@ -97,60 +152,24 @@ HFONT CResMgr::getSysFont (int height, uint style) {
 	return (HFONT)font;
 }
 
-Gdiplus::Bitmap* CResMgr::getBitmap (uint id, const tstring &type) {
+CResMgr::GpBmpPtr CResMgr::getBitmap (uint id, const tstring &type) {
 	assert (id != NULL);
 
 	_GpBmpMapIter it = m_gpBitmaps.find(id);
 	if (it != m_gpBitmaps.end()) {
-		return it->second;//.get();
+		return it->second;
 	}
 
-	HINSTANCE hInst = (HINSTANCE)::GetModuleHandle(NULL);
-	HRSRC hRes = ::FindResource(hInst, MAKEINTRESOURCE(id), type.c_str());
-	assert (hRes != NULL);
-	DWORD imageSize = ::SizeofResource(hInst, hRes);
-	if (!imageSize) {
-		assert (false);
-		return NULL;
-	}
 
-	const void* pResourceData = ::LockResource(::LoadResource(hInst, hRes));
-	if (!pResourceData) {
-		assert (false);
-		return NULL;
-	}
-
-	Gdiplus::Bitmap *pBitmap = NULL;
-	HGLOBAL hBuffer  = ::GlobalAlloc(GMEM_MOVEABLE, imageSize);
-	if (hBuffer)
-	{
-		void* pBuffer = ::GlobalLock(hBuffer);
-		if (pBuffer)
-		{
-			CopyMemory(pBuffer, pResourceData, imageSize);
-
-			IStream* pStream = NULL;
-			if (::CreateStreamOnHGlobal(hBuffer, FALSE, &pStream) == S_OK)
-			{
-				pBitmap = Gdiplus::Bitmap::FromStream(pStream);
-				pStream->Release();
-			}
-			::GlobalUnlock(hBuffer);
-		}
-		::GlobalFree(hBuffer);
-		hBuffer = NULL;
-	}
+	Gdiplus::Bitmap *pBitmap = loadBitmapFromResource(id, type, NULL);
 
 	if (pBitmap) { 
-		if (pBitmap->GetLastStatus() == Gdiplus::Ok) {
-			m_gpBitmaps[id] = _GpBmpPtr(pBitmap);
-		} else {
-			delete pBitmap;
-			pBitmap = NULL;
-		}
+		GpBmpPtr p = GpBmpPtr(pBitmap);
+		m_gpBitmaps[id] = p;
+		return p;
+	} else {
+		return GpBmpPtr();
 	}
-
-	return pBitmap;
 }
 
 
