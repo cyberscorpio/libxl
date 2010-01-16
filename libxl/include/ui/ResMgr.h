@@ -16,7 +16,16 @@ namespace xl {
  */
 class CResMgr
 {
+public:
+	//////////////////////////////////////////////////////////////////////////
+	// public typedefs
+	typedef std::tr1::shared_ptr<Gdiplus::Bitmap>  GpBmpPtr;
+
 private:
+	// gdi+
+	Gdiplus::GdiplusStartupInput  gdiplusStartupInput;
+	ULONG_PTR                     gdiplusToken;
+
 	CResMgr ();
 	~CResMgr ();
 	typedef std::map<uint, HGDIOBJ>       _GdiObjMapType;
@@ -24,10 +33,9 @@ private:
 	typedef std::map<uint64, HGDIOBJ>     _GdiObjBigMapType;
 	typedef _GdiObjBigMapType::iterator   _GdiObjBigMapIter;
 
-	// typedef std::tr1::shared_ptr<Gdiplus::Bitmap>  _GpBmpPtr;
-	typedef Gdiplus::Bitmap               *_GpBmpPtr;
-	typedef std::map<uint, _GpBmpPtr>              _GpBmpMapType;
-	typedef _GpBmpMapType::iterator                _GpBmpMapIter;
+	// typedef Gdiplus::Bitmap              *_GpBmpPtr;
+	typedef std::map<uint, GpBmpPtr>      _GpBmpMapType;
+	typedef _GpBmpMapType::iterator       _GpBmpMapIter;
 
 	_GdiObjMapType                        m_sysFonts;
 	_GpBmpMapType                         m_gpBitmaps;
@@ -46,12 +54,26 @@ public:
 
 	static CResMgr* getInstance ();
 	void reset ();
+
+
+	/**
+	 * Load an image (bitmap) from the resource of hInst
+	 * @note CResMgr doesn't manager the return bitmap, you should use delete after use it.
+	 *    If you want CResMgr manager the bitmap, use getBitmap() instead.
+	 */
+	Gdiplus::Bitmap* loadBitmapFromResource (uint id, const tstring &type, HINSTANCE hInst = NULL);
+
+
 	/**
 	 * @param height The height of the font
 	 */
 	HFONT getSysFont (int height = 0, uint style = 0);
 
-	Gdiplus::Bitmap* getBitmap (uint id, const tstring &type);
+	/**
+	 * get Gdiplus::Bitmap* from process resource (not DLL)
+	 */
+	GpBmpPtr getBitmap (uint id, const tstring &type);
+
 };
 
 	} // namespace ui
