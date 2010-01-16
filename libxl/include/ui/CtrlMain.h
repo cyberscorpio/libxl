@@ -27,6 +27,7 @@ protected:
 	// protected methods
 	bool _SetCapture (CControlPtr ctrl);
 	CControlPtr _GetCaptureCtrl () { return m_ctrlCapture; }
+	void _SetHoverCtrl (CControlPtr ctrlHover, CPoint pt);
 
 	//////////////////////////////////////////////////////////////////////////
 	// virtual protected methods

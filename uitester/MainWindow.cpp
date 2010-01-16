@@ -29,13 +29,14 @@ public:
 		xl::ui::CDCHandle dc (hdc);
 		xl::ui::CResMgr *pResMgr = xl::ui::CResMgr::getInstance();
 
-		if (opacity == 100) {
+		// if (opacity == 100)
+		{
 			// dc.FillSolidRect(m_rect, RGB(255,255,255));
 		}
 		HFONT hFont = pResMgr->getSysFont(40);
 		HFONT oldFont = dc.SelectFont(hFont);
 
-		dc.drawTransparentText(_T("xl::ui is COOL!"), -1, m_rect, DT_SINGLELINE | DT_VCENTER | DT_CENTER);
+		dc.drawTransparentText(_T("xl::ui is COOL!"), -1, getClientRect(), DT_SINGLELINE | DT_VCENTER | DT_CENTER);
 
 		dc.SelectFont(oldFont);
 		_DrawBorder(hdc);
@@ -106,12 +107,12 @@ public:
 	virtual void onAttach () {
 		xl::ui::CCtrlButton *pButton = new xl::ui::CCtrlImageButton(1, IDB_PNG1, IDB_PNG2, IDB_PNG3);
 		xl::ui::CControlPtr button (pButton);
-		button->setStyle(_T("margin:10;width:100;height:40;border:1 #cccccc;"));// opacity:50;
+		button->setStyle(_T("margin:10;width:100;height:40;border:0;"));// opacity:50;
 		insertChild(button);
 		pButton->setText(_T("Click me"));
 		pButton = new xl::ui::CCtrlImageButton(2, IDB_PNG4, IDB_PNG4, IDB_PNG4);
 		button.reset(pButton);
-		button->setStyle(_T("margin:10;width:40;height:40;border:1 #cccccc;opacity:50;")); 
+		button->setStyle(_T("margin:10;width:40;height:40;border:0;")); 
 		insertChild(button);
 	}
 

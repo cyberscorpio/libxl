@@ -70,6 +70,7 @@ public:
 	//////////////////////////////////////////////////////////////////////////
 	// virtual
 	virtual CRect layout (CRect rc) const;
+	virtual bool isPointIn (CPoint pt) const;
 	virtual void draw (HDC hdc, CRect rcClip);
 	virtual void drawMe (HDC hdc);
 
@@ -77,7 +78,9 @@ public:
 	virtual void onDetach () {}
 
 	virtual void onMouseIn (CPoint pt) {}
+	virtual void onMouseInChild (CPoint pt) {}
 	virtual void onMouseOut (CPoint pt) {}
+	virtual void onMouseOutChild (CPoint pt) {}
 	virtual void onMouseMove (CPoint pt) {}
 	virtual void onLButtonDown (CPoint pt) {}
 	virtual void onLButtonUp (CPoint pt) {}
