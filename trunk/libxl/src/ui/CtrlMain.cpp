@@ -24,6 +24,35 @@ bool CCtrlMain::_SetCapture(CControlPtr ctrl) {
 	return true;
 }
 
+void CCtrlMain::_SetHoverCtrl (CControlPtr ctrlHover, CPoint pt) {
+	if (m_ctrlHover == ctrlHover) {
+		return;
+	}
+
+	if (m_ctrlHover != NULL) {
+		CControlPtr ctrl = m_ctrlHover;
+		ctrl->onMouseOut(pt);
+		ctrl = ctrl->m_parent.lock();
+		while (ctrl != NULL) {
+			ctrl->onMouseOutChild(pt);
+			ctrl = ctrl->m_parent.lock();
+		}
+	}
+
+	m_ctrlHover = ctrlHover;
+
+	if (m_ctrlHover != NULL) {
+		CControlPtr ctrl = m_ctrlHover;
+		ctrl->onMouseIn(pt);
+		ctrl = ctrl->m_parent.lock();
+		while (ctrl != NULL) {
+			ctrl->onMouseInChild(pt);
+			ctrl = ctrl->m_parent.lock();
+		}
+	}
+}
+
+
 
 CCtrlMain::CCtrlMain (ATL::CWindow *pWindow, CCtrlTargetRawPtr target) 
 	: CControl(0)
@@ -80,13 +109,7 @@ LRESULT CCtrlMain::OnMouseMove(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bH
 	if (rc.PtInRect(pt)) {
 		CControlPtr ctrl = _GetControlByPoint(pt);
 		if (ctrl != m_ctrlHover) {
-			if (m_ctrlHover != NULL) {
-				m_ctrlHover->onMouseOut(pt);
-			}
-			m_ctrlHover = ctrl;
-			if (m_ctrlHover != NULL) {
-				m_ctrlHover->onMouseIn(pt);
-			}
+			_SetHoverCtrl(ctrl, pt);
 		}
 
 		if (ctrl != NULL) {
@@ -96,8 +119,7 @@ LRESULT CCtrlMain::OnMouseMove(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bH
 	} else {
 		::ReleaseCapture();
 		if (m_ctrlHover != NULL) {
-			m_ctrlHover->onMouseOut(pt);
-			m_ctrlHover.reset();
+			_SetHoverCtrl(CControlPtr(), pt);
 		}
 		m_captured = false;
 	}
@@ -114,8 +136,7 @@ LRESULT CCtrlMain::OnCaptureChanged(UINT uMsg, WPARAM wParam, LPARAM lParam, BOO
 				CPoint pt;
 				::GetCursorPos(&pt);
 				m_pWindow->ScreenToClient(&pt);
-				m_ctrlHover->onMouseOut(pt);
-				m_ctrlHover.reset();
+				_SetHoverCtrl(CControlPtr(), pt);
 			}
 
 			if (m_ctrlCapture != NULL) {

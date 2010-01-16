@@ -25,7 +25,7 @@ void CControl::_LayoutChildren () const {
 
 CControlPtr CControl::_GetControlByPoint (CPoint pt) {
 	for (CControlIterR itr = m_controls.rbegin(); itr != m_controls.rend(); ++ itr) {
-		if ((*itr)->m_rect.PtInRect(pt)) {
+		if ((*itr)->isPointIn(pt)) {
 			CControlPtr ctrl = (*itr)->_GetControlByPoint(pt);
 			if (ctrl != NULL) {
 				return ctrl;
@@ -177,9 +177,9 @@ void CControl::draw (HDC hdc, CRect rcClip) {
 
 	CControlPtr parent = m_parent.lock();
 	std::auto_ptr<CMemoryDC> mdc;
-	if (parent == NULL || opacity != 100 || transparent) {
+	if (parent == NULL || opacity != 100/* || transparent*/) {
 		mdc.reset(new CMemoryDC(hdc, rc));
-		if (opacity != 100) {
+		if (opacity != 100/* || transparent*/) {
 			mdc->BitBlt(rc.left, rc.top, rc.Width(), rc.Height(), hdc, m_rect.left, m_rect.top, SRCCOPY);
 		}
 		hdcPaint = mdc->m_hDC;
@@ -309,6 +309,10 @@ CRect CControl::layout (CRect rc) const {
 	}
 
 	return rcRemain;
+}
+
+bool CControl::isPointIn (CPoint pt) const {
+	return m_rect.PtInRect(pt) ? true : false;
 }
 
 void CControl::drawMe (HDC hdc) {
