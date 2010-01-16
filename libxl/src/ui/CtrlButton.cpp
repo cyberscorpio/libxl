@@ -8,6 +8,25 @@
 namespace xl {
 	namespace ui {
 
+void CCtrlButton::_DrawText (HDC hdc) {
+	if (m_text.length() == 0) {
+		return;
+	}
+
+	CDCHandle dc(hdc);
+	CRect rc = getClientRect();
+	if (m_push) {
+		rc.OffsetRect(1, 1);
+	}
+	UINT format = DT_CENTER | DT_VCENTER | DT_SINGLELINE;
+	COLORREF rgbOld = dc.SetTextColor(color);
+	HFONT font = _GetFont();
+	HFONT oldFont = dc.SelectFont(font);
+	dc.drawTransparentText(m_text, m_text.length(), rc, format);
+	dc.SelectFont(oldFont);
+	dc.SetTextColor(rgbOld);
+}
+
 CCtrlButton::CCtrlButton (uint id)
 	: CControl (id)
 	, m_hover (false)
@@ -39,13 +58,11 @@ void CCtrlButton::drawMe (HDC hdc) {
 }
 
 void CCtrlButton::onMouseIn (CPoint pt) {
-	// setStyle(_T("border:1 #808080;"));// opacity:100;
 	m_hover = true;
 	_GetMainCtrl()->invalidateControl(shared_from_this());
 }
 
 void CCtrlButton::onMouseOut (CPoint pt) {
-	// setStyle(_T("border:1 #cccccc;"));// opacity:50;
 	m_hover = false;
 	_GetMainCtrl()->invalidateControl(shared_from_this());
 }
@@ -78,26 +95,19 @@ void CCtrlButton::onLButtonUp (CPoint pt) {
 void CCtrlButton::drawNormal (HDC hdc) {
 	CDCHandle dc(hdc);
 	_DrawBorder(hdc);
-	CRect rc = getClientRect();
-	UINT format = DT_SINGLELINE | DT_CENTER | DT_VCENTER;
-	dc.drawTransparentTextWithDefaultFont(m_text, m_text.length(), rc, format);
+	_DrawText(hdc);
 }
 
 void CCtrlButton::drawHover (HDC hdc) {
 	CDCHandle dc(hdc);
 	_DrawBorder(hdc);
-	CRect rc = getClientRect();
-	UINT format = DT_SINGLELINE | DT_CENTER | DT_VCENTER;
-	dc.drawTransparentTextWithDefaultFont(m_text, m_text.length(), rc, format);
+	_DrawText(hdc);
 }
 
 void CCtrlButton::drawPush (HDC hdc) {
 	CDCHandle dc(hdc);
 	_DrawBorder(hdc);
-	CRect rc = getClientRect();
-	rc.OffsetRect(1, 1);
-	UINT format = DT_SINGLELINE | DT_CENTER | DT_VCENTER;
-	dc.drawTransparentTextWithDefaultFont(m_text, m_text.length(), rc, format);
+	_DrawText(hdc);
 }
 
 
@@ -118,6 +128,7 @@ void CCtrlImageButton::drawNormal (HDC hdc) {
 		Gdiplus::Graphics g(hdc);
 		g.DrawImage(bitmap.get(), m_rect.left, m_rect.top);
 	}
+	_DrawText(hdc);
 }
 
 void CCtrlImageButton::drawHover (HDC hdc) {
@@ -129,6 +140,7 @@ void CCtrlImageButton::drawHover (HDC hdc) {
 		Gdiplus::Graphics g(hdc);
 		g.DrawImage(bitmap.get(), m_rect.left, m_rect.top);
 	}
+	_DrawText(hdc);
 }
 
 void CCtrlImageButton::drawPush (HDC hdc) {
@@ -140,6 +152,7 @@ void CCtrlImageButton::drawPush (HDC hdc) {
 		Gdiplus::Graphics g(hdc);
 		g.DrawImage(bitmap.get(), m_rect.left, m_rect.top);
 	}
+	_DrawText(hdc);
 }
 
 

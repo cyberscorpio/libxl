@@ -58,10 +58,10 @@ public:
 
 	/**
 	 * Load an image (bitmap) from the resource of hInst
-	 * @note CResMgr doesn't manager the return bitmap, you should use delete after use it.
-	 *    If you want CResMgr manager the bitmap, use getBitmap() instead.
+	 * @note CResMgr doesn't manager the return bitmap, if you want CResMgr cache it,
+	 *   use getBitmap() instead.
 	 */
-	Gdiplus::Bitmap* loadBitmapFromResource (uint id, const tstring &type, HINSTANCE hInst = NULL);
+	GpBmpPtr loadBitmapFromResource (uint id, const tstring &type, HINSTANCE hInst = NULL);
 
 
 	/**

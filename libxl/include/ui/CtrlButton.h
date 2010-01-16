@@ -14,6 +14,8 @@ protected:
 	bool m_push;
 	tstring m_text;
 
+	void _DrawText (HDC);
+
 public:
 	CCtrlButton (uint id);
 	virtual ~CCtrlButton ();
