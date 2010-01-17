@@ -56,6 +56,7 @@ IDB_PNG1                PNG                     "resource\\button1.png"
 IDB_PNG2                PNG                     "resource\\button2.png"
 IDB_PNG3                PNG                     "resource\\button3.png"
 IDB_PNG4                PNG                     "resource\\button4.png"
+IDB_PNG5                PNG                     "resource\\buttonimg.png"
 #endif    // Chinese (P.R.C.) resources
 /////////////////////////////////////////////////////////////////////////////
 

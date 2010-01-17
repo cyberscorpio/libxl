@@ -26,7 +26,6 @@ protected:
 	//////////////////////////////////////////////////////////////////////////
 	// protected methods
 	bool _SetCapture (CControlPtr ctrl);
-	CControlPtr _GetCaptureCtrl () { return m_ctrlCapture; }
 	void _SetHoverCtrl (CControlPtr ctrlHover, CPoint pt);
 
 	//////////////////////////////////////////////////////////////////////////
@@ -37,6 +36,8 @@ public:
 	CCtrlMain (ATL::CWindow *, CCtrlTargetRawPtr target);
 	virtual ~CCtrlMain ();
 	void invalidateControl (CControlPtr ctrl = CControlPtr());
+	CControlPtr getHoverCtrl () { return m_ctrlHover; }
+	CControlPtr getCaptureCtrl () { return m_ctrlCapture; }
 
 	BEGIN_MSG_MAP(CCtrlMain)
 		MESSAGE_HANDLER(WM_MOUSEMOVE, OnMouseMove)

@@ -17,6 +17,7 @@
  * font-weight: normal | bold
  * color: #hex*6
  * opacity: [0-100]
+ * disable: true | false
  */
 /**
  * The rules of layout the controls:
@@ -88,6 +89,7 @@ void CWinStyle::reset () {
 	border.reset();
 	px = PX_LEFT;
 	py = PY_TOP;
+	disabled = false;
 	isfloat = false;
 	transparent = false;
 	width = SIZE_FILL;
@@ -231,6 +233,14 @@ void CWinStyle::_ParseProperty (const tstring &key, const tstring &value) {
 		}
 	} else if (key == _T("color")) {
 		color = _ParseColor(value);
+	} else if (key == _T("disable")) {
+		if (value == _T("true")) {
+			disabled = true;
+		} else if (value == _T("false")) {
+			disabled = false;
+		} else {
+			assert(false);
+		}
 	} else {
 		assert(false);
 	}

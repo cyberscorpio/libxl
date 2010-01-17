@@ -24,15 +24,17 @@ void CControl::_LayoutChildren () const {
 }
 
 CControlPtr CControl::_GetControlByPoint (CPoint pt) {
-	for (CControlIterR itr = m_controls.rbegin(); itr != m_controls.rend(); ++ itr) {
-		if ((*itr)->isPointIn(pt)) {
-			CControlPtr ctrl = (*itr)->_GetControlByPoint(pt);
-			if (ctrl != NULL) {
-				return ctrl;
-			} else {
-				return *itr;
+	if (!disabled && isPointIn(pt)) {
+		for (CControlIterR itr = m_controls.rbegin(); itr != m_controls.rend(); ++ itr) {
+			if ((*itr)->isPointIn(pt)) {
+				CControlPtr ctrl = (*itr)->_GetControlByPoint(pt);
+				if (ctrl != NULL) {
+					return ctrl;
+				}
 			}
 		}
+
+		return shared_from_this();
 	}
 
 	return CControlPtr();
@@ -53,11 +55,15 @@ void CControl::_SetTarget (CCtrlTargetRawPtr target) {
 	}
 }
 
+COLORREF CControl::_GetColor () {
+	return disabled ? ::GetSysColor(COLOR_GRAYTEXT) : color;
+}
+
 HFONT CControl::_GetFont () {
 	CResMgr *pResMgr = CResMgr::getInstance();
 	uint style = 0;
 	if (fontweight == FONTW_BOLD) {
-		style = CResMgr::FS_BOLD;
+		style |= CResMgr::FS_BOLD;
 	}
 	return pResMgr->getSysFont(0, style);
 }
@@ -87,13 +93,13 @@ bool CControl::_SetCapture (bool capture) {
 	CControlPtr pThis = shared_from_this();
 	assert (pCtrlMain);
 	if (capture) {
-		if (pCtrlMain->_GetCaptureCtrl() != pThis) {
+		if (pCtrlMain->getCaptureCtrl() != pThis) {
 			return pCtrlMain->_SetCapture(pThis);
 		} else {
 			return true;
 		}
 	} else {
-		if (pCtrlMain->_GetCaptureCtrl() == pThis) {
+		if (pCtrlMain->getCaptureCtrl() == pThis) {
 			return pCtrlMain->_SetCapture(CControlPtr());
 		} else {
 			return true;

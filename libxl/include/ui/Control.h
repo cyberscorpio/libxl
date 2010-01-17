@@ -48,6 +48,7 @@ protected:
 	void _SetParent (CControlPtr parent);
 	void _SetTarget (CCtrlTargetRawPtr target);
 
+	COLORREF _GetColor ();
 	HFONT _GetFont ();
 	void _DrawBorder (HDC hdc);
 
