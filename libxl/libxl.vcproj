@@ -230,7 +230,7 @@
 					>
 				</File>
 				<File
-					RelativePath=".\include\ui\gdi.h"
+					RelativePath=".\include\ui\Gdi.h"
 					>
 				</File>
 				<File
