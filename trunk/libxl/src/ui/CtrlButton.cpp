@@ -8,7 +8,7 @@
 namespace xl {
 	namespace ui {
 
-void CCtrlButton::_DrawText (HDC hdc) {
+void CCtrlButton::_DrawImageAndText (HDC hdc) {
 	if (m_text.length() == 0) {
 		return;
 	}
@@ -19,18 +19,38 @@ void CCtrlButton::_DrawText (HDC hdc) {
 		rc.OffsetRect(1, 1);
 	}
 	UINT format = DT_CENTER | DT_VCENTER | DT_SINGLELINE;
-	COLORREF rgbOld = dc.SetTextColor(color);
+	COLORREF rgbOld = dc.SetTextColor(_GetColor());
 	HFONT font = _GetFont();
 	HFONT oldFont = dc.SelectFont(font);
-	dc.drawTransparentText(m_text, m_text.length(), rc, format);
+	if (m_idImg == 0) {
+		dc.drawTransparentText(m_text, m_text.length(), rc, format);
+	} else {
+		CRect rcTmp = rc;
+		int textHeight = dc.drawTransparentText(m_text, m_text.length(), rcTmp, format | DT_CALCRECT);
+		int textWidth = rcTmp.Width();
+		CResMgr *pResMgr = CResMgr::getInstance();
+		CResMgr::GpBmpPtr img = pResMgr->getBitmap(m_idImg, m_imgType);
+		int imgWidth = img->GetWidth(), imgHeight = img->GetHeight();
+		int imgX = rc.left + (rc.Width() - imgWidth - textWidth - m_text_image_pading) / 2;
+		int imgY = rc.top + (rc.Height() - imgHeight) / 2;
+		Gdiplus::Graphics g(hdc);
+		g.DrawImage(img.get(), imgX, imgY, imgWidth, imgHeight);
+		rcTmp = rc;
+		rcTmp.left = imgX + imgWidth + m_text_image_pading;
+		rcTmp.right = rcTmp.left + textWidth;
+		dc.drawTransparentText(m_text, m_text.length(), rcTmp, format);
+	}
 	dc.SelectFont(oldFont);
 	dc.SetTextColor(rgbOld);
 }
 
-CCtrlButton::CCtrlButton (uint id)
-	: CControl (id)
-	, m_hover (false)
-	, m_push (false)
+CCtrlButton::CCtrlButton (uint id, const tstring &text, uint idImg, const tstring &imgType)
+	: CControl(id)
+	, m_push(false)
+	, m_text(text)
+	, m_text_image_pading(2)
+	, m_idImg(idImg)
+	, m_imgType(imgType)
 {
 	assert (id != 0);
 }
@@ -39,18 +59,45 @@ CCtrlButton::~CCtrlButton () {
 
 }
 
+void CCtrlButton::setImg (uint idImg, const tstring &imgType) {
+	if (m_idImg != idImg) {
+		m_idImg = idImg;
+		m_imgType = imgType;
+		CCtrlMain *pCtrlMain = _GetMainCtrl();
+		if (pCtrlMain) {
+			pCtrlMain->invalidateControl(shared_from_this());
+		}
+	}
+}
+
 void CCtrlButton::setText (const tstring &text) {
-	m_text = text;
-	CCtrlMain *pCtrlMain = _GetMainCtrl();
-	if (pCtrlMain) {
-		pCtrlMain->invalidateControl(shared_from_this());
+	if (m_text != text) {
+		m_text = text;
+		CCtrlMain *pCtrlMain = _GetMainCtrl();
+		if (pCtrlMain) {
+			pCtrlMain->invalidateControl(shared_from_this());
+		}
+	}
+}
+
+void CCtrlButton::setTextImagePadding (int padding) {
+	if (padding != m_text_image_pading) {
+		m_text_image_pading = padding;
+		CCtrlMain *pCtrlMain = _GetMainCtrl();
+		if (pCtrlMain) {
+			pCtrlMain->invalidateControl(shared_from_this());
+		}
 	}
 }
 
 void CCtrlButton::drawMe (HDC hdc) {
-	if (m_hover && m_push) {
+	// ATLTRACE(_T("id=%d hover:%d push:%d\n"), m_id, m_hover ? 1 : 0, m_push ? 1 : 0);
+	CCtrlMain *pCtrlMain = _GetMainCtrl();
+	assert (pCtrlMain);
+	bool hover = pCtrlMain->getHoverCtrl().get() == (CControl *)this;
+	if (hover && m_push) {
 		drawPush(hdc);
-	} else if (m_hover) {
+	} else if (hover) {
 		drawHover(hdc);
 	} else {
 		drawNormal(hdc);
@@ -58,17 +105,14 @@ void CCtrlButton::drawMe (HDC hdc) {
 }
 
 void CCtrlButton::onMouseIn (CPoint pt) {
-	m_hover = true;
 	_GetMainCtrl()->invalidateControl(shared_from_this());
 }
 
 void CCtrlButton::onMouseOut (CPoint pt) {
-	m_hover = false;
 	_GetMainCtrl()->invalidateControl(shared_from_this());
 }
 
 void CCtrlButton::onLostCapture () {
-	m_hover = false;
 	m_push = false;
 	_GetMainCtrl()->invalidateControl(shared_from_this());
 }
@@ -85,37 +129,36 @@ void CCtrlButton::onLButtonUp (CPoint pt) {
 	_GetMainCtrl()->invalidateControl(shared_from_this());
 
 	assert (m_target != NULL);
-	if (m_rect.PtInRect(pt)) {
+	if (isPointIn(pt)) {
 		m_target->onCommand(m_id, shared_from_this());
-	} else {
-		m_hover = false;
 	}
 }
 
 void CCtrlButton::drawNormal (HDC hdc) {
 	CDCHandle dc(hdc);
 	_DrawBorder(hdc);
-	_DrawText(hdc);
+	_DrawImageAndText(hdc);
 }
 
 void CCtrlButton::drawHover (HDC hdc) {
 	CDCHandle dc(hdc);
 	_DrawBorder(hdc);
-	_DrawText(hdc);
+	_DrawImageAndText(hdc);
 }
 
 void CCtrlButton::drawPush (HDC hdc) {
 	CDCHandle dc(hdc);
 	_DrawBorder(hdc);
-	_DrawText(hdc);
+	_DrawImageAndText(hdc);
 }
 
 
 //////////////////////////////////////////////////////////////////////////
 
-CCtrlImageButton::CCtrlImageButton (uint id, uint n, uint h, uint p)
+CCtrlImageButton::CCtrlImageButton (uint id, uint n, uint h, uint p, const tstring &imgType)
 	: CCtrlButton(id)
 	, m_idImageNormal(n), m_idImageHover(h), m_idImagePush(p)
+	, m_imgType(imgType)
 {
 }
 
@@ -124,11 +167,11 @@ void CCtrlImageButton::drawNormal (HDC hdc) {
 		CCtrlButton::drawNormal(hdc);
 	} else {
 		CResMgr *pResMgr = CResMgr::getInstance();
-		CResMgr::GpBmpPtr bitmap = pResMgr->getBitmap(m_idImageNormal, _T("PNG"));
+		CResMgr::GpBmpPtr bitmap = pResMgr->getBitmap(m_idImageNormal, m_imgType);
 		Gdiplus::Graphics g(hdc);
 		g.DrawImage(bitmap.get(), m_rect.left, m_rect.top);
 	}
-	_DrawText(hdc);
+	_DrawImageAndText(hdc);
 }
 
 void CCtrlImageButton::drawHover (HDC hdc) {
@@ -136,11 +179,11 @@ void CCtrlImageButton::drawHover (HDC hdc) {
 		CCtrlButton::drawNormal(hdc);
 	} else {
 		CResMgr *pResMgr = CResMgr::getInstance();
-		CResMgr::GpBmpPtr bitmap = pResMgr->getBitmap(m_idImageHover, _T("PNG"));
+		CResMgr::GpBmpPtr bitmap = pResMgr->getBitmap(m_idImageHover, m_imgType);
 		Gdiplus::Graphics g(hdc);
 		g.DrawImage(bitmap.get(), m_rect.left, m_rect.top);
 	}
-	_DrawText(hdc);
+	_DrawImageAndText(hdc);
 }
 
 void CCtrlImageButton::drawPush (HDC hdc) {
@@ -148,11 +191,11 @@ void CCtrlImageButton::drawPush (HDC hdc) {
 		CCtrlButton::drawNormal(hdc);
 	} else {
 		CResMgr *pResMgr = CResMgr::getInstance();
-		CResMgr::GpBmpPtr bitmap = pResMgr->getBitmap(m_idImagePush, _T("PNG"));
+		CResMgr::GpBmpPtr bitmap = pResMgr->getBitmap(m_idImagePush, m_imgType);
 		Gdiplus::Graphics g(hdc);
 		g.DrawImage(bitmap.get(), m_rect.left, m_rect.top);
 	}
-	_DrawText(hdc);
+	_DrawImageAndText(hdc);
 }
 
 

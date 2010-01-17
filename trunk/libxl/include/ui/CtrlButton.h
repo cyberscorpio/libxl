@@ -10,16 +10,20 @@ namespace xl {
 class CCtrlButton : public CControl 
 {
 protected:
-	bool m_hover;
 	bool m_push;
 	tstring m_text;
+	int m_text_image_pading;
+	uint m_idImg;
+	tstring m_imgType;
 
-	void _DrawText (HDC);
+	void _DrawImageAndText (HDC);
 
 public:
-	CCtrlButton (uint id);
+	CCtrlButton (uint id, const tstring &text = _T(""), uint idImg = 0, const tstring &imgType = _T("PNG"));
 	virtual ~CCtrlButton ();
+	void setImg (uint idImg, const tstring &imgType = _T("PNG"));
 	void setText (const tstring &text);
+	void setTextImagePadding (int padding);
 
 	//////////////////////////////////////////////////////////////////////////
 	// virtual methods
@@ -43,8 +47,9 @@ class CCtrlImageButton : public CCtrlButton
 	uint m_idImageNormal;
 	uint m_idImageHover;
 	uint m_idImagePush;
+	tstring m_imgType;
 public:
-	CCtrlImageButton (uint id, uint n = 0, uint h = 0, uint p = 0);
+	CCtrlImageButton (uint id, uint n = 0, uint h = 0, uint p = 0, const tstring &imgType = _T("PNG"));
 	virtual void drawNormal (HDC hdc);
 	virtual void drawHover (HDC hdc);
 	virtual void drawPush (HDC hdc);

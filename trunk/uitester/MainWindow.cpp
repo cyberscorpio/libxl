@@ -106,13 +106,15 @@ public:
 
 	virtual void onAttach () {
 		xl::ui::CCtrlButton *pButton = new xl::ui::CCtrlImageButton(1, IDB_PNG1, IDB_PNG2, IDB_PNG3);
+		pButton->setImg(IDB_PNG5);
+		pButton->setTextImagePadding(6);
 		xl::ui::CControlPtr button (pButton);
-		button->setStyle(_T("margin:10;width:100;height:40;border:0;color:#ff0000;font-weight:bold;"));// opacity:50;
+		button->setStyle(_T("margin:10;width:100;height:40;border:0;font-weight:bold;"));// opacity:50;
 		insertChild(button);
 		pButton->setText(_T("请点我"));
 		pButton = new xl::ui::CCtrlImageButton(2, IDB_PNG1, IDB_PNG2, IDB_PNG3);
 		button.reset(pButton);
-		button->setStyle(_T("margin:10;width:100;height:40;border:0;color:#ff0000;")); 
+		button->setStyle(_T("margin:10;width:100;height:40;border:0;")); 
 		pButton->setText(_T("别点我"));
 		insertChild(button);
 		pButton = new xl::ui::CCtrlImageButton(3, IDB_PNG4, IDB_PNG4, IDB_PNG4);
@@ -165,6 +167,18 @@ public:
 void CMainWindow::onCommand (xl::uint id, xl::ui::CControlPtr ctrl) {
 	if (id == 1) {
 		MessageBox(_T("You click button 1"), _T("OK"));
+	} else if (id == 2) {
+		static bool disable_1 = false;
+		disable_1 = !disable_1;
+		xl::ui::CControlPtr ctrl = m_ctrl->getControlByID(1);
+		if (disable_1) {
+			ctrl->setStyle(_T("disable:true"));
+		} else {
+			ctrl->setStyle(_T("disable:false"));
+		}
+		
+		xl::ui::CCtrlMain *pMain = (xl::ui::CCtrlMain *)m_ctrl.get();
+		pMain->invalidateControl(ctrl);
 	}
 }
 

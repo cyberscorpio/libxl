@@ -110,6 +110,7 @@ LRESULT CCtrlMain::OnMouseMove(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bH
 	m_pWindow->ClientToScreen(&ptScreen);
 	if (rc.PtInRect(pt) && ::WindowFromPoint(ptScreen) == m_pWindow->m_hWnd) {
 		CControlPtr ctrl = _GetControlByPoint(pt);
+		assert (ctrl == NULL || ctrl->disabled == false);
 		if (ctrl != m_ctrlHover) {
 			_SetHoverCtrl(ctrl, pt);
 		}
