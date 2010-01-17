@@ -17,6 +17,7 @@
  * font-weight: normal | bold
  * color: #hex*6
  * opacity: [0-100]
+ * display: true | false | none
  * disable: true | false
  */
 /**
@@ -89,7 +90,8 @@ void CWinStyle::reset () {
 	border.reset();
 	px = PX_LEFT;
 	py = PY_TOP;
-	disabled = false;
+	display = true;
+	disable = false;
 	isfloat = false;
 	transparent = false;
 	width = SIZE_FILL;
@@ -233,11 +235,19 @@ void CWinStyle::_ParseProperty (const tstring &key, const tstring &value) {
 		}
 	} else if (key == _T("color")) {
 		color = _ParseColor(value);
+	} else if (key == _T("display")) {
+		if (value == _T("true")) {
+			display = true;
+		} else if (value == _T("false") || value == _T("none")) {
+			display = false;
+		} else {
+			assert(false);
+		}
 	} else if (key == _T("disable")) {
 		if (value == _T("true")) {
-			disabled = true;
+			disable = true;
 		} else if (value == _T("false")) {
-			disabled = false;
+			disable = false;
 		} else {
 			assert(false);
 		}

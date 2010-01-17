@@ -173,6 +173,61 @@ public:
 		}
 		SelectBitmap(m_hBmpOld);
 	}
+
+	void grayscale () {
+		HBITMAP hBitmap = m_bmp.m_hBitmap;
+		ATLASSERT(hBitmap);
+		BITMAP bm;
+		::GetObject(hBitmap, sizeof(bm), &bm);
+		LONG w = bm.bmWidth;
+		LONG h = bm.bmHeight;
+		if (h < 0) {
+			h = -h;
+		}
+		if (w == 0 || h == 0) {
+			return;
+		}
+
+		VERIFY(SelectBitmap(m_hBmpOld) == hBitmap);
+
+		LONG len = w * h;
+		unsigned char *bits = new unsigned char[len * 4]; 
+		BITMAPINFO bmi;
+		memset(&bmi, 0, sizeof(BITMAPINFO)); 
+		bmi.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+		bmi.bmiHeader.biWidth = w;
+		bmi.bmiHeader.biHeight = -h;
+		bmi.bmiHeader.biBitCount = 32;
+		bmi.bmiHeader.biPlanes = 1;
+		bmi.bmiHeader.biCompression = BI_RGB;
+		bmi.bmiHeader.biSizeImage     = 0;
+		bmi.bmiHeader.biXPelsPerMeter = 0;
+		bmi.bmiHeader.biYPelsPerMeter = 0;
+		bmi.bmiHeader.biClrUsed       = 0;
+		bmi.bmiHeader.biClrImportant  = 0;
+		int rv = ::GetDIBits(m_hDC, hBitmap, 0, h, bits, &bmi, DIB_RGB_COLORS);
+		if (rv != h) {
+			delete []bits;
+			bits = NULL;
+			VERIFY(SelectBitmap(m_bmp) == m_hBmpOld);
+			ATLASSERT(false);
+			return;
+		}
+
+		unsigned char *p = bits;
+		for (long i = 0; i < len; ++ i) {
+			int value = p[0];
+			value += p[1];
+			value += p[2];
+			value /= 3;
+			p[0] = p[1] = p[2] = value;
+			p += 4;
+		}
+		::SetDIBits(m_hDC, hBitmap, 0, h, bits, &bmi, DIB_RGB_COLORS);
+		delete []bits;
+		bits = NULL;
+		VERIFY(SelectBitmap(hBitmap) == m_hBmpOld);
+	}
 };
 // copy end
 //////////////////////////////////////////////////////////////////////////

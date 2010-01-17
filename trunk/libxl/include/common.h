@@ -17,6 +17,7 @@ namespace xl {
 typedef TCHAR tchar;
 
 typedef unsigned int        uint;
+typedef unsigned short      ushort;
 typedef __int64             int64;
 typedef unsigned __int64    uint64;
 

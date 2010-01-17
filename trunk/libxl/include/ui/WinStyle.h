@@ -115,7 +115,8 @@ public:
 	POSITION_X px;
 	POSITION_Y py;
 
-	bool disabled;
+	bool display;
+	bool disable;
 	bool isfloat;
 	bool transparent;
 

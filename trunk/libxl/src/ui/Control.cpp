@@ -24,7 +24,7 @@ void CControl::_LayoutChildren () const {
 }
 
 CControlPtr CControl::_GetControlByPoint (CPoint pt) {
-	if (!disabled && isPointIn(pt)) {
+	if (display && isPointIn(pt)) {
 		for (CControlIterR itr = m_controls.rbegin(); itr != m_controls.rend(); ++ itr) {
 			if ((*itr)->isPointIn(pt)) {
 				CControlPtr ctrl = (*itr)->_GetControlByPoint(pt);
@@ -56,7 +56,7 @@ void CControl::_SetTarget (CCtrlTargetRawPtr target) {
 }
 
 COLORREF CControl::_GetColor () {
-	return disabled ? ::GetSysColor(COLOR_GRAYTEXT) : color;
+	return disable ? ::GetSysColor(COLOR_GRAYTEXT) : color;
 }
 
 HFONT CControl::_GetFont () {
@@ -178,7 +178,7 @@ void CControl::draw (HDC hdc, CRect rcClip) {
 		return;
 	}
 
-	if (opacity == 0) {
+	if (opacity == 0 || !display) {
 		return;
 	}
 
@@ -194,7 +194,7 @@ void CControl::draw (HDC hdc, CRect rcClip) {
 	std::auto_ptr<CMemoryDC> mdc;
 	if (parent == NULL || opacity != 100/* || transparent*/) {
 		mdc.reset(new CMemoryDC(hdc, rc));
-		if (opacity != 100/* || transparent*/) {
+		if (parent != NULL) {
 			mdc->BitBlt(rc.left, rc.top, rc.Width(), rc.Height(), hdc, m_rect.left, m_rect.top, SRCCOPY);
 		}
 		hdcPaint = mdc->m_hDC;
