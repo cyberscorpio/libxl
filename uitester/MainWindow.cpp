@@ -115,9 +115,14 @@ public:
 		pButton = new xl::ui::CCtrlImageButton(2, IDB_PNG1, IDB_PNG2, IDB_PNG3);
 		button.reset(pButton);
 		button->setStyle(_T("margin:10;width:100;height:40;border:0;")); 
-		pButton->setText(_T("±ğµãÎÒ"));
+		pButton->setText(_T("Òş²Ø"));
 		insertChild(button);
-		pButton = new xl::ui::CCtrlImageButton(3, IDB_PNG4, IDB_PNG4, IDB_PNG4);
+		pButton = new xl::ui::CCtrlImageButton(3, IDB_PNG1, IDB_PNG2, IDB_PNG3);
+		button.reset(pButton);
+		button->setStyle(_T("margin:10;width:100;height:40;border:0;")); 
+		pButton->setText(_T("½ûÖ¹"));
+		insertChild(button);
+		pButton = new xl::ui::CCtrlImageButton(4, IDB_PNG4, IDB_PNG4, IDB_PNG4);
 		button.reset(pButton);
 		button->setStyle(_T("margin:10;width:40;height:40;border:0;")); 
 		insertChild(button);
@@ -154,7 +159,7 @@ public:
 
 	virtual void drawMe (HDC hdc) {
 		xl::ui::CDCHandle dc (hdc);
-		dc.FillSolidRect(m_rect, RGB(192,255,255));
+		dc.FillSolidRect(m_rect, RGB(0,192,255));
 		if (m_hover) {
 			TCHAR buf[1024];
 			_stprintf_s(buf, 1024, _T("Mouse: %d - %d"), m_pt.x - m_rect.left, m_pt.y - m_rect.top);
@@ -168,15 +173,39 @@ void CMainWindow::onCommand (xl::uint id, xl::ui::CControlPtr ctrl) {
 	if (id == 1) {
 		MessageBox(_T("You click button 1"), _T("OK"));
 	} else if (id == 2) {
+		static bool display_1 = true;
+		display_1 = !display_1;
+		xl::ui::CControlPtr ctrl = m_ctrl->getControlByID(1);
+		if (display_1) {
+			ctrl->setStyle(_T("display:true"));
+			ctrl = m_ctrl->getControlByID(2);
+			xl::ui::CCtrlButton *button = (xl::ui::CCtrlButton *)ctrl.get();
+			button->setText(_T("ÏÔÊ¾"));
+		} else {
+			ctrl->setStyle(_T("display:false"));
+			ctrl = m_ctrl->getControlByID(2);
+			xl::ui::CCtrlButton *button = (xl::ui::CCtrlButton *)ctrl.get();
+			button->setText(_T("Òş²Ø"));
+		}
+		
+		xl::ui::CCtrlMain *pMain = (xl::ui::CCtrlMain *)m_ctrl.get();
+		pMain->invalidateControl(ctrl);
+	} else if (id == 3) {
 		static bool disable_1 = false;
 		disable_1 = !disable_1;
 		xl::ui::CControlPtr ctrl = m_ctrl->getControlByID(1);
 		if (disable_1) {
 			ctrl->setStyle(_T("disable:true"));
+			ctrl = m_ctrl->getControlByID(3);
+			xl::ui::CCtrlButton *button = (xl::ui::CCtrlButton *)ctrl.get();
+			button->setText(_T("»Ö¸´"));
 		} else {
 			ctrl->setStyle(_T("disable:false"));
+			ctrl = m_ctrl->getControlByID(3);
+			xl::ui::CCtrlButton *button = (xl::ui::CCtrlButton *)ctrl.get();
+			button->setText(_T("½ûÖ¹"));
 		}
-		
+
 		xl::ui::CCtrlMain *pMain = (xl::ui::CCtrlMain *)m_ctrl.get();
 		pMain->invalidateControl(ctrl);
 	}

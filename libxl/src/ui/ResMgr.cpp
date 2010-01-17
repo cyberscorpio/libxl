@@ -58,6 +58,40 @@ HGDIOBJ CResMgr::_CreateSysFont(int height, uint style) {
 	return font;
 }
 
+void CResMgr::_MakeBitmaGray (GpBmpPtr bitmap) {
+	assert (bitmap != NULL);
+	Gdiplus::Bitmap *pBitmap = bitmap.get();
+	UINT w = pBitmap->GetWidth();
+	UINT h = pBitmap->GetHeight();
+	Gdiplus::PixelFormat pf = pBitmap->GetPixelFormat();
+
+	Gdiplus::BitmapData bd;
+	Gdiplus::Rect rc(0, 0, w, h);
+	Gdiplus::Status res = pBitmap->LockBits(&rc,
+		Gdiplus::ImageLockMode::ImageLockModeWrite,
+		PixelFormat32bppARGB,
+		&bd);
+	assert (res == Gdiplus::Ok);
+	if (res != Gdiplus::Ok) {
+		return;
+	}
+
+	UINT len = w * h;
+	for (UINT y = 0; y < h; ++ y) {
+		unsigned char *pixels = (unsigned char *)bd.Scan0 + y * bd.Stride;
+		for (UINT x = 0; x < w; ++ x) {
+			UINT v = pixels[0];
+			v += pixels[1];
+			v += pixels[2];
+			v /= 3;
+			pixels[0] = pixels[1] = pixels[2] = v;
+			pixels += 4;
+		}
+	}
+
+	pBitmap->UnlockBits(&bd);
+}
+
 
 ///////////////////////////////////////////////////////////
 // public
@@ -155,23 +189,29 @@ HFONT CResMgr::getSysFont (int height, uint style) {
 	return (HFONT)font;
 }
 
-CResMgr::GpBmpPtr CResMgr::getBitmap (uint id, const tstring &type) {
+CResMgr::GpBmpPtr CResMgr::getBitmap (ushort id, const tstring &type, bool grayscale)
+{
 	assert (id != NULL);
 
-	_GpBmpMapIter it = m_gpBitmaps.find(id);
+	uint realid = id;
+	if (grayscale) {
+		realid = (1 << (sizeof(id) * 8)) | id;
+	}
+
+	_GpBmpMapIter it = m_gpBitmaps.find(realid);
 	if (it != m_gpBitmaps.end()) {
 		return it->second;
 	}
 
-
 	GpBmpPtr bitmap = loadBitmapFromResource(id, type, NULL);
-
-	if (bitmap != NULL) { 
-		m_gpBitmaps[id] = bitmap;
+	if (bitmap != NULL) {
+		if (grayscale) {
+			_MakeBitmaGray(bitmap);
+		}
+		m_gpBitmaps[realid] = bitmap;
 		return bitmap;
-	} else {
-		return GpBmpPtr();
 	}
+	return GpBmpPtr();
 }
 
 

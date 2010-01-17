@@ -29,12 +29,14 @@ void CCtrlButton::_DrawImageAndText (HDC hdc) {
 		int textHeight = dc.drawTransparentText(m_text, m_text.length(), rcTmp, format | DT_CALCRECT);
 		int textWidth = rcTmp.Width();
 		CResMgr *pResMgr = CResMgr::getInstance();
-		CResMgr::GpBmpPtr img = pResMgr->getBitmap(m_idImg, m_imgType);
+		CResMgr::GpBmpPtr img = pResMgr->getBitmap(m_idImg, m_imgType, disable);
 		int imgWidth = img->GetWidth(), imgHeight = img->GetHeight();
 		int imgX = rc.left + (rc.Width() - imgWidth - textWidth - m_text_image_pading) / 2;
 		int imgY = rc.top + (rc.Height() - imgHeight) / 2;
-		Gdiplus::Graphics g(hdc);
-		g.DrawImage(img.get(), imgX, imgY, imgWidth, imgHeight);
+		{
+			Gdiplus::Graphics g(hdc);
+			g.DrawImage(img.get(), imgX, imgY, imgWidth, imgHeight);
+		}
 		rcTmp = rc;
 		rcTmp.left = imgX + imgWidth + m_text_image_pading;
 		rcTmp.right = rcTmp.left + textWidth;
@@ -167,7 +169,7 @@ void CCtrlImageButton::drawNormal (HDC hdc) {
 		CCtrlButton::drawNormal(hdc);
 	} else {
 		CResMgr *pResMgr = CResMgr::getInstance();
-		CResMgr::GpBmpPtr bitmap = pResMgr->getBitmap(m_idImageNormal, m_imgType);
+		CResMgr::GpBmpPtr bitmap = pResMgr->getBitmap(m_idImageNormal, m_imgType, disable);
 		Gdiplus::Graphics g(hdc);
 		g.DrawImage(bitmap.get(), m_rect.left, m_rect.top);
 	}
@@ -179,7 +181,7 @@ void CCtrlImageButton::drawHover (HDC hdc) {
 		CCtrlButton::drawNormal(hdc);
 	} else {
 		CResMgr *pResMgr = CResMgr::getInstance();
-		CResMgr::GpBmpPtr bitmap = pResMgr->getBitmap(m_idImageHover, m_imgType);
+		CResMgr::GpBmpPtr bitmap = pResMgr->getBitmap(m_idImageHover, m_imgType, disable);
 		Gdiplus::Graphics g(hdc);
 		g.DrawImage(bitmap.get(), m_rect.left, m_rect.top);
 	}
@@ -191,7 +193,7 @@ void CCtrlImageButton::drawPush (HDC hdc) {
 		CCtrlButton::drawNormal(hdc);
 	} else {
 		CResMgr *pResMgr = CResMgr::getInstance();
-		CResMgr::GpBmpPtr bitmap = pResMgr->getBitmap(m_idImagePush, m_imgType);
+		CResMgr::GpBmpPtr bitmap = pResMgr->getBitmap(m_idImagePush, m_imgType, disable);
 		Gdiplus::Graphics g(hdc);
 		g.DrawImage(bitmap.get(), m_rect.left, m_rect.top);
 	}

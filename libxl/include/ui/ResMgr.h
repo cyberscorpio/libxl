@@ -44,6 +44,7 @@ private:
 	void _Unlock ();
 
 	HGDIOBJ _CreateSysFont(int height, uint style);
+	void _MakeBitmaGray (GpBmpPtr bitmap);
 
 public:
 	static const uint FS_BOLD = 0x01;
@@ -72,7 +73,7 @@ public:
 	/**
 	 * get Gdiplus::Bitmap* from process resource (not DLL)
 	 */
-	GpBmpPtr getBitmap (uint id, const tstring &type);
+	GpBmpPtr getBitmap (ushort id, const tstring &type, bool grayscale = false);
 
 };
 
