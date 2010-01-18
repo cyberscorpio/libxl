@@ -65,30 +65,21 @@ void CCtrlButton::setImg (uint idImg, const tstring &imgType) {
 	if (m_idImg != idImg) {
 		m_idImg = idImg;
 		m_imgType = imgType;
-		CCtrlMain *pCtrlMain = _GetMainCtrl();
-		if (pCtrlMain) {
-			pCtrlMain->invalidateControl(shared_from_this());
-		}
+		invalidate();
 	}
 }
 
 void CCtrlButton::setText (const tstring &text) {
 	if (m_text != text) {
 		m_text = text;
-		CCtrlMain *pCtrlMain = _GetMainCtrl();
-		if (pCtrlMain) {
-			pCtrlMain->invalidateControl(shared_from_this());
-		}
+		invalidate();
 	}
 }
 
 void CCtrlButton::setTextImagePadding (int padding) {
 	if (padding != m_text_image_pading) {
 		m_text_image_pading = padding;
-		CCtrlMain *pCtrlMain = _GetMainCtrl();
-		if (pCtrlMain) {
-			pCtrlMain->invalidateControl(shared_from_this());
-		}
+		invalidate();
 	}
 }
 
@@ -111,12 +102,12 @@ void CCtrlButton::onMouseIn (CPoint pt) {
 }
 
 void CCtrlButton::onMouseOut (CPoint pt) {
-	_GetMainCtrl()->invalidateControl(shared_from_this());
+	invalidate();
 }
 
 void CCtrlButton::onLostCapture () {
 	m_push = false;
-	_GetMainCtrl()->invalidateControl(shared_from_this());
+	invalidate();
 }
 
 void CCtrlButton::onLButtonDown (CPoint pt) {
@@ -125,7 +116,7 @@ void CCtrlButton::onLButtonDown (CPoint pt) {
 	}
 	_SetCapture(true);
 	m_push = true;
-	_GetMainCtrl()->invalidateControl(shared_from_this());
+	invalidate();
 }
 
 void CCtrlButton::onLButtonUp (CPoint pt) {
@@ -137,7 +128,7 @@ void CCtrlButton::onLButtonUp (CPoint pt) {
 	}
 	_SetCapture(false);
 	m_push = false;
-	_GetMainCtrl()->invalidateControl(shared_from_this());
+	invalidate();
 
 	assert (m_target != NULL);
 	if (isPointIn(pt)) {
@@ -192,7 +183,7 @@ void CCtrlImageButton::drawNormal (HDC hdc) {
 
 void CCtrlImageButton::drawHover (HDC hdc) {
 	if (m_idImageHover == 0) {
-		CCtrlButton::drawNormal(hdc);
+		CCtrlButton::drawHover(hdc);
 	} else {
 		CResMgr *pResMgr = CResMgr::getInstance();
 		CResMgr::GpBmpPtr bitmap = pResMgr->getBitmap(m_idImageHover, m_imgType, disable);
@@ -209,7 +200,7 @@ void CCtrlImageButton::drawHover (HDC hdc) {
 
 void CCtrlImageButton::drawPush (HDC hdc) {
 	if (m_idImagePush == 0) {
-		CCtrlButton::drawNormal(hdc);
+		CCtrlButton::drawPush(hdc);
 	} else {
 		CResMgr *pResMgr = CResMgr::getInstance();
 		CResMgr::GpBmpPtr bitmap = pResMgr->getBitmap(m_idImagePush, m_imgType, disable);
