@@ -22,6 +22,7 @@ protected:
 	bool m_captured;
 	CControlPtr m_ctrlHover;
 	CControlPtr m_ctrlCapture;
+	mutable CRect m_rcLayout; // save the rect passed by this->layout(rc), used by reLayout()
 
 	//////////////////////////////////////////////////////////////////////////
 	// protected methods
@@ -35,9 +36,12 @@ protected:
 public:
 	CCtrlMain (ATL::CWindow *, CCtrlTargetRawPtr target);
 	virtual ~CCtrlMain ();
-	void invalidateControl (CControlPtr ctrl = CControlPtr());
+	void invalidateControl (CControlPtr ctrl = CControlPtr()) const;
+	void reLayout () const;
 	CControlPtr getHoverCtrl () { return m_ctrlHover; }
 	CControlPtr getCaptureCtrl () { return m_ctrlCapture; }
+
+	virtual CRect layout (CRect rc) const;
 
 	BEGIN_MSG_MAP(CCtrlMain)
 		MESSAGE_HANDLER(WM_MOUSEMOVE, OnMouseMove)

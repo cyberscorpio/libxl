@@ -97,9 +97,9 @@ void CCtrlButton::drawMe (HDC hdc) {
 	CCtrlMain *pCtrlMain = _GetMainCtrl();
 	assert (pCtrlMain);
 	bool hover = pCtrlMain->getHoverCtrl().get() == (CControl *)this;
-	if (hover && m_push) {
+	if (hover && m_push && !disable) {
 		drawPush(hdc);
-	} else if (hover) {
+	} else if (hover && !disable) {
 		drawHover(hdc);
 	} else {
 		drawNormal(hdc);
@@ -120,12 +120,21 @@ void CCtrlButton::onLostCapture () {
 }
 
 void CCtrlButton::onLButtonDown (CPoint pt) {
+	if (disable) {
+		return;
+	}
 	_SetCapture(true);
 	m_push = true;
 	_GetMainCtrl()->invalidateControl(shared_from_this());
 }
 
 void CCtrlButton::onLButtonUp (CPoint pt) {
+	if (disable) {
+		if (_GetMainCtrl()->getCaptureCtrl() == shared_from_this()) {
+			_SetCapture(false);
+		}
+		return;
+	}
 	_SetCapture(false);
 	m_push = false;
 	_GetMainCtrl()->invalidateControl(shared_from_this());
@@ -171,7 +180,12 @@ void CCtrlImageButton::drawNormal (HDC hdc) {
 		CResMgr *pResMgr = CResMgr::getInstance();
 		CResMgr::GpBmpPtr bitmap = pResMgr->getBitmap(m_idImageNormal, m_imgType, disable);
 		Gdiplus::Graphics g(hdc);
-		g.DrawImage(bitmap.get(), m_rect.left, m_rect.top);
+		if (m_rect.Height() == bitmap->GetHeight() && m_rect.Width() == bitmap->GetWidth()) {
+			g.DrawImage(bitmap.get(), m_rect.left, m_rect.top);
+		} else {
+			Gdiplus::RectF dst((float)m_rect.left, (float)m_rect.top, (float)m_rect.Width(), (float)m_rect.Height());
+			g.DrawImage(bitmap.get(), dst, 0, 0, (float)bitmap->GetWidth(), (float)bitmap->GetHeight(), Gdiplus::UnitPixel);
+		}
 	}
 	_DrawImageAndText(hdc);
 }
@@ -183,7 +197,12 @@ void CCtrlImageButton::drawHover (HDC hdc) {
 		CResMgr *pResMgr = CResMgr::getInstance();
 		CResMgr::GpBmpPtr bitmap = pResMgr->getBitmap(m_idImageHover, m_imgType, disable);
 		Gdiplus::Graphics g(hdc);
-		g.DrawImage(bitmap.get(), m_rect.left, m_rect.top);
+		if (m_rect.Height() == bitmap->GetHeight() && m_rect.Width() == bitmap->GetWidth()) {
+			g.DrawImage(bitmap.get(), m_rect.left, m_rect.top);
+		} else {
+			Gdiplus::RectF dst((float)m_rect.left, (float)m_rect.top, (float)m_rect.Width(), (float)m_rect.Height());
+			g.DrawImage(bitmap.get(), dst, 0, 0, (float)bitmap->GetWidth(), (float)bitmap->GetHeight(), Gdiplus::UnitPixel);
+		}
 	}
 	_DrawImageAndText(hdc);
 }
@@ -195,7 +214,12 @@ void CCtrlImageButton::drawPush (HDC hdc) {
 		CResMgr *pResMgr = CResMgr::getInstance();
 		CResMgr::GpBmpPtr bitmap = pResMgr->getBitmap(m_idImagePush, m_imgType, disable);
 		Gdiplus::Graphics g(hdc);
-		g.DrawImage(bitmap.get(), m_rect.left, m_rect.top);
+		if (m_rect.Height() == bitmap->GetHeight() && m_rect.Width() == bitmap->GetWidth()) {
+			g.DrawImage(bitmap.get(), m_rect.left, m_rect.top);
+		} else {
+			Gdiplus::RectF dst((float)m_rect.left, (float)m_rect.top, (float)m_rect.Width(), (float)m_rect.Height());
+			g.DrawImage(bitmap.get(), dst, 0, 0, (float)bitmap->GetWidth(), (float)bitmap->GetHeight(), Gdiplus::UnitPixel);
+		}
 	}
 	_DrawImageAndText(hdc);
 }
