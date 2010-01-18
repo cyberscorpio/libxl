@@ -1,6 +1,7 @@
 #include "../libxl/include/ui/gdi.h"
 #include "../libxl/include/ui/ResMgr.h"
 #include "../libxl/include/ui/CtrlButton.h"
+#include "../libxl/include/ui/CtrlSlider.h"
 #include "MainWindow.h"
 #include "resource.h"
 
@@ -17,30 +18,30 @@ public:
 	}
 };
 
-class CFloat : public xl::ui::CControl
+class CFloat : public xl::ui::CCtrlSlider
 {
 public:
-	CFloat () {
-		// margin.left = margin.right = 5;
-		setStyle(_T("px:left;py:bottom;height:120;width:480;border:2 #ff0000;float:true;margin:0 auto 20;opacity:25;"));
+	CFloat () : xl::ui::CCtrlSlider(0, 100, 50) {
+		setStyle(_T("px:left;py:bottom;height:40;width:480;float:true;margin:0 auto 20;opacity:25;"));
 	}
 
-	virtual void drawMe (HDC hdc) {
-		xl::ui::CDCHandle dc (hdc);
-		xl::ui::CResMgr *pResMgr = xl::ui::CResMgr::getInstance();
+// 	virtual void drawMe (HDC hdc) {
+// 		xl::ui::CDCHandle dc (hdc);
+// 		xl::ui::CResMgr *pResMgr = xl::ui::CResMgr::getInstance();
+// 
+// 		if (opacity != 100)
+// 		{
+// 			dc.FillSolidRect(m_rect, RGB(127,127,127));
+// 		}
+// 		HFONT hFont = pResMgr->getSysFont(40);
+// 		HFONT oldFont = dc.SelectFont(hFont);
+// 
+// 		dc.drawTransparentText(_T("xl::ui is COOL!"), -1, getClientRect(), DT_SINGLELINE | DT_VCENTER | DT_CENTER);
+// 
+// 		dc.SelectFont(oldFont);
+// 		_DrawBorder(hdc);
+// 	}
 
-		if (opacity != 100)
-		{
-			dc.FillSolidRect(m_rect, RGB(127,127,127));
-		}
-		HFONT hFont = pResMgr->getSysFont(40);
-		HFONT oldFont = dc.SelectFont(hFont);
-
-		dc.drawTransparentText(_T("xl::ui is COOL!"), -1, getClientRect(), DT_SINGLELINE | DT_VCENTER | DT_CENTER);
-
-		dc.SelectFont(oldFont);
-		_DrawBorder(hdc);
-	}
 	virtual void onMouseIn (CPoint pt) {
 		setStyle(_T("opacity:100"));
 		_GetMainCtrl()->invalidateControl(shared_from_this());
