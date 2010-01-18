@@ -176,6 +176,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\ui\CtrlSlider.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\src\ui\WinStyle.cpp"
 					>
 				</File>
@@ -223,6 +227,10 @@
 				</File>
 				<File
 					RelativePath=".\include\ui\CtrlMain.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\ui\CtrlSlider.h"
 					>
 				</File>
 				<File
