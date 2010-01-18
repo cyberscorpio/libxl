@@ -171,6 +171,28 @@ CControlPtr CControl::getControlByID (uint id) {
 	return CControlPtr();
 }
 
+void CControl::resetStyle () {
+	CWinStyle::_Reset();
+	CCtrlMain *pCtrlMain = _GetMainCtrl();
+	if (pCtrlMain) {
+		pCtrlMain->reLayout();
+	}
+}
+
+void CControl::setStyle (const tstring &style) {
+	bool relayout = false, redraw = false;
+	CWinStyle::_SetStyle(style, relayout, redraw);
+	CCtrlMain *pCtrlMain = _GetMainCtrl();
+	if (pCtrlMain) {
+		if (relayout) {
+			pCtrlMain->reLayout();
+		} else if (redraw) {
+			pCtrlMain->invalidateControl(shared_from_this());
+		}
+	}
+}
+
+
 void CControl::draw (HDC hdc, CRect rcClip) {
 
 	// check paint condition
@@ -199,7 +221,6 @@ void CControl::draw (HDC hdc, CRect rcClip) {
 		}
 		hdcPaint = mdc->m_hDC;
 	}
-
 
 	drawMe(hdcPaint);
 	for (CControlIter it = m_controls.begin(); it != m_controls.end(); ++ it) {

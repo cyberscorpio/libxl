@@ -69,12 +69,22 @@ CCtrlMain::~CCtrlMain () {
 }
 
 
-void CCtrlMain::invalidateControl(CControlPtr ctrl) {
+void CCtrlMain::invalidateControl(CControlPtr ctrl) const {
 	if (ctrl != NULL) {
 		m_pWindow->InvalidateRect(ctrl->m_rect, FALSE);
 	} else {
 		m_pWindow->InvalidateRect(NULL);
 	}
+}
+
+void CCtrlMain::reLayout () const {
+	layout(m_rcLayout);
+	invalidateControl();
+}
+
+CRect CCtrlMain::layout (CRect rc) const {
+	m_rcLayout = rc;
+	return CControl::layout(rc);
 }
 
 

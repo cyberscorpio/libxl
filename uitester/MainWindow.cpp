@@ -22,16 +22,16 @@ class CFloat : public xl::ui::CControl
 public:
 	CFloat () {
 		// margin.left = margin.right = 5;
-		setStyle(_T("px:left;py:bottom;height:120;width:480;border:2 #ff0000;float:true;margin:0 auto 20;opacity:50;"));
+		setStyle(_T("px:left;py:bottom;height:120;width:480;border:2 #ff0000;float:true;margin:0 auto 20;opacity:25;"));
 	}
 
 	virtual void drawMe (HDC hdc) {
 		xl::ui::CDCHandle dc (hdc);
 		xl::ui::CResMgr *pResMgr = xl::ui::CResMgr::getInstance();
 
-		// if (opacity == 100)
+		if (opacity != 100)
 		{
-			// dc.FillSolidRect(m_rect, RGB(255,255,255));
+			dc.FillSolidRect(m_rect, RGB(127,127,127));
 		}
 		HFONT hFont = pResMgr->getSysFont(40);
 		HFONT oldFont = dc.SelectFont(hFont);
@@ -47,7 +47,7 @@ public:
 	}
 
 	virtual void onMouseOut (CPoint pt) {
-		setStyle(_T("opacity:50"));
+		setStyle(_T("opacity:25"));
 		_GetMainCtrl()->invalidateControl(shared_from_this());
 	}
 };
@@ -111,18 +111,27 @@ public:
 		xl::ui::CControlPtr button (pButton);
 		button->setStyle(_T("margin:10;width:100;height:40;border:0;font-weight:bold;"));// opacity:50;
 		insertChild(button);
-		pButton->setText(_T("ÇëµãÎÒ"));
+		
+		pButton->setText(_T("Prompt"));
 		pButton = new xl::ui::CCtrlImageButton(2, IDB_PNG1, IDB_PNG2, IDB_PNG3);
 		button.reset(pButton);
 		button->setStyle(_T("margin:10;width:100;height:40;border:0;")); 
-		pButton->setText(_T("Òþ²Ø"));
+		pButton->setText(_T("Hide"));
 		insertChild(button);
+
 		pButton = new xl::ui::CCtrlImageButton(3, IDB_PNG1, IDB_PNG2, IDB_PNG3);
 		button.reset(pButton);
 		button->setStyle(_T("margin:10;width:100;height:40;border:0;")); 
-		pButton->setText(_T("½ûÖ¹"));
+		pButton->setText(_T("Disable"));
 		insertChild(button);
-		pButton = new xl::ui::CCtrlImageButton(4, IDB_PNG4, IDB_PNG4, IDB_PNG4);
+
+		pButton = new xl::ui::CCtrlImageButton(4, IDB_PNG1, IDB_PNG2, IDB_PNG3);
+		button.reset(pButton);
+		button->setStyle(_T("margin:10;width:100;height:40;border:0;")); 
+		pButton->setText(_T("Enlarge"));
+		insertChild(button);
+
+		pButton = new xl::ui::CCtrlImageButton(5, IDB_PNG4, IDB_PNG4, IDB_PNG4);
 		button.reset(pButton);
 		button->setStyle(_T("margin:10;width:40;height:40;border:0;")); 
 		insertChild(button);
@@ -170,44 +179,44 @@ public:
 
 
 void CMainWindow::onCommand (xl::uint id, xl::ui::CControlPtr ctrl) {
+	xl::ui::CCtrlButton *button = (xl::ui::CCtrlButton *)ctrl.get();
 	if (id == 1) {
 		MessageBox(_T("You click button 1"), _T("OK"));
 	} else if (id == 2) {
-		static bool display_1 = true;
-		display_1 = !display_1;
-		xl::ui::CControlPtr ctrl = m_ctrl->getControlByID(1);
-		if (display_1) {
-			ctrl->setStyle(_T("display:true"));
-			ctrl = m_ctrl->getControlByID(2);
-			xl::ui::CCtrlButton *button = (xl::ui::CCtrlButton *)ctrl.get();
-			button->setText(_T("ÏÔÊ¾"));
+		xl::ui::CControlPtr button_1 = m_ctrl->getControlByID(1);
+		if (!button_1->display) {
+			button_1->setStyle(_T("display:true"));
+			button_1 = m_ctrl->getControlByID(2);
+			button->setText(_T("Display"));
 		} else {
-			ctrl->setStyle(_T("display:false"));
-			ctrl = m_ctrl->getControlByID(2);
-			xl::ui::CCtrlButton *button = (xl::ui::CCtrlButton *)ctrl.get();
-			button->setText(_T("Òþ²Ø"));
+			button_1->setStyle(_T("display:false"));
+			button_1 = m_ctrl->getControlByID(2);
+			button->setText(_T("Hide"));
 		}
-		
-		xl::ui::CCtrlMain *pMain = (xl::ui::CCtrlMain *)m_ctrl.get();
-		pMain->invalidateControl(ctrl);
 	} else if (id == 3) {
-		static bool disable_1 = false;
-		disable_1 = !disable_1;
 		xl::ui::CControlPtr ctrl = m_ctrl->getControlByID(1);
-		if (disable_1) {
+		if (!ctrl->disable) {
 			ctrl->setStyle(_T("disable:true"));
 			ctrl = m_ctrl->getControlByID(3);
-			xl::ui::CCtrlButton *button = (xl::ui::CCtrlButton *)ctrl.get();
-			button->setText(_T("»Ö¸´"));
+			button->setText(_T("Enable"));
 		} else {
 			ctrl->setStyle(_T("disable:false"));
 			ctrl = m_ctrl->getControlByID(3);
-			xl::ui::CCtrlButton *button = (xl::ui::CCtrlButton *)ctrl.get();
-			button->setText(_T("½ûÖ¹"));
+			button->setText(_T("Disable"));
 		}
-
-		xl::ui::CCtrlMain *pMain = (xl::ui::CCtrlMain *)m_ctrl.get();
-		pMain->invalidateControl(ctrl);
+	} else if (id == 4) {
+		static bool larged = true;
+		larged = !larged;
+		xl::ui::CControlPtr ctrl = m_ctrl->getControlByID(1);
+		if (!larged) {
+			ctrl->setStyle(_T("width:120"));
+			ctrl = m_ctrl->getControlByID(4);
+			button->setText(_T("Shrink"));
+		} else {
+			ctrl->setStyle(_T("width:80"));
+			ctrl = m_ctrl->getControlByID(4);
+			button->setText(_T("Enlarge"));
+		}
 	}
 }
 

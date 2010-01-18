@@ -105,20 +105,25 @@ protected:
 	void _ParseEdge (tstring value, EDGE &edge);
 	COLORREF _ParseColor (tstring value);
 	void _ParseBorder (tstring key, tstring value);
-	void _ParseProperty (const tstring &key, const tstring &value);
+	void _Reset ();
+	void _SetStyle (const tstring &style, bool &relayout, bool &redraw);
+
+	/**
+	 * the derived class can have its own _ParseProperty()
+	 */
+	virtual void _ParseProperty (const tstring &key, const tstring &value, bool &relayout, bool &redraw);
 
 public:
+	bool display;
+	bool disable;
+	bool isfloat;
+
 	EDGE margin;
 	EDGE padding;
 	BORDER border;
 
 	POSITION_X px;
 	POSITION_Y py;
-
-	bool display;
-	bool disable;
-	bool isfloat;
-	bool transparent;
 
 	int width;
 	int height;
@@ -129,9 +134,6 @@ public:
 
 	CWinStyle ();
 	virtual ~CWinStyle ();
-
-	void reset ();
-	void setStyle (const tstring &style = _T(""));
 };
 
 

@@ -68,6 +68,9 @@ public:
 	bool insertChild (CControlPtr child);
 	CControlPtr getControlByID (uint id);
 
+	void resetStyle ();
+	void setStyle (const tstring &style);
+
 
 	//////////////////////////////////////////////////////////////////////////
 	// virtual

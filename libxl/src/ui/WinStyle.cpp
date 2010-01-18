@@ -8,7 +8,6 @@
  * px: left | right
  * py: top | bottom
  * float: true | false | none
- * transparent: true | false | none
  * width: int | "fill"
  * height: int | "fill"
  * margin: int[ int[ int[ int]]]
@@ -27,6 +26,8 @@
  * - All controls which width is SIZE_FILL must be the last one of the "line".
  * - All controls which height is SIZE_FILL must after the controls which py = BOTTOM
  */
+
+#pragma warning (disable : 4996)
 
 namespace xl {
 	namespace ui {
@@ -77,14 +78,14 @@ void BORDER::setColor (COLORREF color, EDGETYPE et) {
 // WinStyle
 
 CWinStyle::CWinStyle () {
-	reset();
+	_Reset();
 }
 
 CWinStyle::~CWinStyle () {
 
 }
 
-void CWinStyle::reset () {
+void CWinStyle::_Reset () {
 	margin.left = margin.top = margin.right = margin.bottom = 0;
 	padding.left = padding.top = padding.right = padding.bottom = 0;
 	border.reset();
@@ -93,7 +94,6 @@ void CWinStyle::reset () {
 	display = true;
 	disable = false;
 	isfloat = false;
-	transparent = false;
 	width = SIZE_FILL;
 	height = SIZE_FILL;
 	fontweight = FONTW_NORMAL;
@@ -101,7 +101,8 @@ void CWinStyle::reset () {
 	opacity = 100;
 }
 
-void CWinStyle::setStyle (const tstring &style) {
+void CWinStyle::_SetStyle (const tstring &style, bool &relayout, bool &redraw) {
+	relayout = redraw = false;
 	ExplodeT<TCHAR>::ValueT styles = explode(_T(";"), style);
 
 	for (size_t i = 0; i < styles.size(); ++ i) {
@@ -110,7 +111,7 @@ void CWinStyle::setStyle (const tstring &style) {
 		assert (kv.size() == 2);
 		kv[0].trim();
 		kv[1].trim();
-		_ParseProperty(kv[0], kv[1]);
+		_ParseProperty(kv[0], kv[1], relayout, redraw);
 	}
 }
 
@@ -189,42 +190,67 @@ void CWinStyle::_ParseBorder (tstring key, tstring value) {
 	}
 }
 
-void CWinStyle::_ParseProperty (const tstring &key, const tstring &value) {
+void CWinStyle::_ParseProperty (const tstring &key, const tstring &value, bool &relayout, bool &redraw) {
 	if (key == _T("width")) {
-		width = value == _T("fill") ? SIZE_FILL : _tstoi(value);
+		int w = value == _T("fill") ? SIZE_FILL : _tstoi(value);
+		if (w != width) {
+			width = w;
+			relayout = true;
+			redraw = true;
+		}
 	} else if (key == _T("height")) {
-		height = value == _T("fill") ? SIZE_FILL : _tstoi(value);
+		int h = value == _T("fill") ? SIZE_FILL : _tstoi(value);
+		if (h != height) {
+			height = h;
+			relayout = true;
+			redraw = true;
+		}
 	} else if (key == _T("px")) {
-		px = value == _T("left") ? PX_LEFT : (value == _T("right") ? PX_RIGHT : PX_COUNT);
-		assert (px != PX_COUNT);
+		POSITION_X _px = value == _T("left") ? PX_LEFT : (value == _T("right") ? PX_RIGHT : PX_COUNT);
+		assert (_px != PX_COUNT);
+		if (_px != px) {
+			px = _px;
+			relayout = true;
+			redraw = true;
+		}
 	} else if (key == _T("py")) {
-		py = value == _T("top") ? PY_TOP : (value == _T("bottom")) ? PY_BOTTOM : PY_COUNT;
-		assert (py != PY_COUNT);
+		POSITION_Y _py = value == _T("top") ? PY_TOP : (value == _T("bottom")) ? PY_BOTTOM : PY_COUNT;
+		assert (_py != PY_COUNT);
+		if (_py != py) {
+			py = _py;
+			relayout = true;
+			redraw = true;
+		}
 	} else if (key == _T("float")) {
+		bool _isfloat = isfloat;
 		if (value == _T("true")) {
-			isfloat = true;
+			_isfloat = true;
 		} else if (value == _T("false") || value == _T("none")) {
-			isfloat = false;
+			_isfloat = false;
 		} else {
 			assert(false);
 		}
-	} else if (key == _T("transparent")) {
-		if (value == _T("true")) {
-			transparent = true;
-		} else if (value == _T("false") || value == _T("none")) {
-			transparent = false;
-		} else {
-			assert(false);
+		if (_isfloat != isfloat) {
+			isfloat = _isfloat;
+			relayout = true;
+			redraw = true;
 		}
 	} else if (key == _T("margin")) {
 		_ParseEdge(value, margin);
+		relayout = true;
+		redraw = true;
 	} else if (key == _T("padding")) {
 		_ParseEdge(value, padding);
+		relayout = true;
+		redraw = true;
 	} else if (key.find(_T("border")) == 0) {
 		_ParseBorder(key, value);
+		relayout = true;
+		redraw = true;
 	} else if (key == _T("opacity")) {
 		opacity = _tstoi(value);
 		assert(opacity <= 100 && opacity >= 0);
+		redraw = true;
 	} else if (key == _T("font-weight")) {
 		if (value == _T("normal")) {
 			fontweight = FONTW_NORMAL;
@@ -233,8 +259,10 @@ void CWinStyle::_ParseProperty (const tstring &key, const tstring &value) {
 		} else {
 			assert(false);
 		}
+		redraw = true;
 	} else if (key == _T("color")) {
 		color = _ParseColor(value);
+		redraw = true;
 	} else if (key == _T("display")) {
 		if (value == _T("true")) {
 			display = true;
@@ -243,6 +271,7 @@ void CWinStyle::_ParseProperty (const tstring &key, const tstring &value) {
 		} else {
 			assert(false);
 		}
+		redraw = true;
 	} else if (key == _T("disable")) {
 		if (value == _T("true")) {
 			disable = true;
@@ -251,6 +280,7 @@ void CWinStyle::_ParseProperty (const tstring &key, const tstring &value) {
 		} else {
 			assert(false);
 		}
+		redraw = true;
 	} else {
 		assert(false);
 	}
