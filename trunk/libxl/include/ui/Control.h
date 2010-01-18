@@ -67,6 +67,7 @@ public:
 
 	bool insertChild (CControlPtr child);
 	CControlPtr getControlByID (uint id);
+	void invalidate ();
 
 	void resetStyle ();
 	void setStyle (const tstring &style);

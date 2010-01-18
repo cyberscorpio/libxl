@@ -171,6 +171,14 @@ CControlPtr CControl::getControlByID (uint id) {
 	return CControlPtr();
 }
 
+void CControl::invalidate () {
+	CCtrlMain *pCtrlMain = _GetMainCtrl();
+	if (pCtrlMain) {
+		pCtrlMain->invalidateControl(shared_from_this());
+	}
+}
+
+
 void CControl::resetStyle () {
 	CWinStyle::_Reset();
 	CCtrlMain *pCtrlMain = _GetMainCtrl();
