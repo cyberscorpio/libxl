@@ -5,6 +5,8 @@
 #include "MainWindow.h"
 #include "resource.h"
 
+#define ID_VIEW 99
+
 class CToolbar : public xl::ui::CControl
 {
 public:
@@ -21,8 +23,8 @@ public:
 class CFloat : public xl::ui::CCtrlSlider
 {
 public:
-	CFloat () : xl::ui::CCtrlSlider(0, 100, 50) {
-		setStyle(_T("px:left;py:bottom;height:40;width:480;float:true;margin:0 auto 20;opacity:25;"));
+	CFloat () : xl::ui::CCtrlSlider(0, 255, 50) {
+		setStyle(_T("px:left; py:bottom; padding:0; height:32; width:600; float:true; margin:0 auto 20;opacity:25;"));
 	}
 
 // 	virtual void drawMe (HDC hdc) {
@@ -101,7 +103,10 @@ class CView : public xl::ui::CControl
 	bool m_hover;
 	CPoint m_pt;
 public:
-	CView () : m_hover(false) {
+	COLORREF m_rgb;
+
+	CView () : m_hover(false), m_rgb(RGB(50,50,50)) {
+		m_id = ID_VIEW;
 		setStyle(_T("px:left; py:top; width:fill; height:fill;margin:5"));
 	}
 
@@ -112,7 +117,7 @@ public:
 		xl::ui::CControlPtr button (pButton);
 		button->setStyle(_T("margin:10;width:100;height:40;border:0;font-weight:bold;"));// opacity:50;
 		insertChild(button);
-		
+
 		pButton->setText(_T("Prompt"));
 		pButton = new xl::ui::CCtrlImageButton(2, IDB_PNG1, IDB_PNG2, IDB_PNG3);
 		button.reset(pButton);
@@ -169,7 +174,7 @@ public:
 
 	virtual void drawMe (HDC hdc) {
 		xl::ui::CDCHandle dc (hdc);
-		dc.FillSolidRect(m_rect, RGB(0,192,255));
+		dc.FillSolidRect(m_rect, m_rgb);
 		if (m_hover) {
 			TCHAR buf[1024];
 			_stprintf_s(buf, 1024, _T("Mouse: %d - %d"), m_pt.x - m_rect.left, m_pt.y - m_rect.top);
@@ -219,6 +224,20 @@ void CMainWindow::onCommand (xl::uint id, xl::ui::CControlPtr ctrl) {
 			button->setText(_T("Enlarge"));
 		}
 	}
+}
+
+void CMainWindow::onSlider (xl::uint id, int _min, int _max, int _curr, bool tracking, xl::ui::CControlPtr ctrl) {
+	xl::ui::CCtrlMain *pCtrlMain = (xl::ui::CCtrlMain *)m_ctrl.get();
+	xl::ui::CControlPtr view = pCtrlMain->getControlByID(ID_VIEW);
+	CView *pView = (CView *)view.get();
+	if (_curr == 255) {
+		pView->m_rgb = RGB(255,255,0);
+	} else if (_curr == 0) {
+		pView->m_rgb = RGB(0,255,255);
+	} else {
+		pView->m_rgb = RGB(_curr, _curr, _curr);
+	}
+	pView->invalidate();
 }
 
 

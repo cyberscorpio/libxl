@@ -81,6 +81,20 @@ struct BORDER {
 	int height () const { return top.width + bottom.width; }
 };
 
+enum BACKGROUNDTYPE {
+	BGT_NONE,
+	BGT_RGB,
+	BGT_IMAGE_ID,
+	BGT_IMAGE_URL,
+	BGT_COUNT
+};
+
+struct BACKGROUND {
+	BACKGROUNDTYPE type;
+	
+};
+
+
 enum POSITION_X {
 	PX_LEFT,
 	PX_RIGHT,

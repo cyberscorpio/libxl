@@ -16,10 +16,12 @@ protected:
 
 	bool m_hover;
 	bool m_push;
+	int m_barHeight;
 	int m_thumbWidth;
+	int m_mouseOffset;
 
 	CRect _GetThumbRect (int thumbWidth) const;
-	int _ValueByPoint (CPoint pt) const;
+	int _ValueByPoint (CPoint pt, int thumbWidth) const;
 
 // 	virtual void _DrawThumb (HDC);
 // 	virtual void _DrawThumbHover (HDC);
