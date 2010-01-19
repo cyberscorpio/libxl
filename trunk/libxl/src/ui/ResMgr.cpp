@@ -108,6 +108,8 @@ void CResMgr::reset () {
 	m_sysFonts.clear();
 
 	m_gpBmpsById.clear();
+	m_gpBmpsByFile.clear();
+	m_gpGrayBmpsByFile.clear();
 }
 
 CResMgr::GpBmpPtr CResMgr::loadBitmapFromResource (uint id, const tstring &type, HINSTANCE hInst) {
