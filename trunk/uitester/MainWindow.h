@@ -10,6 +10,7 @@ class CMainWindow : public xl::ui::CMainWindowT<CMainWindow>
 //	xl::ui::CControl *m_ctrl;
 public:
 	virtual void onCommand (xl::uint id, xl::ui::CControlPtr ctrl);
+	virtual void onSlider (xl::uint id, int _min, int _max, int _curr, bool tracking, xl::ui::CControlPtr ctrl);
 
 public:
 	DECLARE_WND_CLASS_EX (_T("CMainWindow"), 0, COLOR_INFOBK)
