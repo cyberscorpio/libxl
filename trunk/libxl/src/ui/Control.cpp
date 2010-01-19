@@ -70,22 +70,95 @@ HFONT CControl::_GetFont () {
 
 void CControl::_DrawBorder (HDC hdc) {
 	CDCHandle dc(hdc);
+	COLORREF gray = RGB(127,127,127);
 	
 	if (border.top.width > 0) {
-		dc.FillSolidRect(m_rect.left, m_rect.top, m_rect.Width(), border.top.width, border.top.color);
+		dc.FillSolidRect(m_rect.left, m_rect.top, m_rect.Width(), border.top.width, 
+			disable ? gray : border.top.color);
 	}
 	
 	if (border.right.width > 0) {
-		dc.FillSolidRect(m_rect.right - border.right.width, m_rect.top, border.right.width, m_rect.Height(), border.right.color);
+		dc.FillSolidRect(m_rect.right - border.right.width, m_rect.top, border.right.width, m_rect.Height(),
+			disable ? gray : border.right.color);
 	}
 
 	if (border.bottom.width > 0) {
-		dc.FillSolidRect(m_rect.left, m_rect.bottom - border.bottom.width, m_rect.Width(), border.bottom.width, border.bottom.color);
+		dc.FillSolidRect(m_rect.left, m_rect.bottom - border.bottom.width, m_rect.Width(), border.bottom.width, 
+			disable ? gray : border.bottom.color);
 	}
 
 	if (border.left.width > 0) {
-		dc.FillSolidRect(m_rect.left, m_rect.top, border.left.width, m_rect.Height(), border.left.color);
+		dc.FillSolidRect(m_rect.left, m_rect.top, border.left.width, m_rect.Height(), 
+			disable ? gray : border.left.color);
 	}
+}
+
+void CControl::_DrawBackground (HDC hdc) {
+	if (background.type == BGT_NONE) {
+		return;
+	}
+
+	CRect rc = m_rect;
+	rc.DeflateRect(border.left.width, border.top.width, border.right.width, border.bottom.width);
+
+	if (background.type == BGT_RGB) {
+		CDCHandle dc(hdc);
+		dc.FillSolidRect(rc, background.color);
+		return;
+	}
+
+	CResMgr *pResMgr = CResMgr::getInstance();
+	CResMgr::GpBmpPtr bitmap;
+	if (background.type == BGT_IMAGE_ID) {
+		bitmap = pResMgr->getBitmap(background.id, background.url_or_idtype, disable);
+	} else if (background.type == BGT_IMAGE_URL) {
+		bitmap = pResMgr->getBitmap(background.url_or_idtype, disable);
+	} else {
+		assert(false);
+	}
+	if (bitmap == NULL) {
+		return;
+	}
+
+	int w = rc.Width() > (int)bitmap->GetWidth() ? (int)bitmap->GetWidth() : rc.Width();
+	int h = rc.Height() > (int)bitmap->GetHeight() ? (int)bitmap->GetHeight() : rc.Height();
+
+	Gdiplus::Graphics g(hdc);
+	Gdiplus::RectF dst((float)rc.left, (float)rc.top, (float)rc.Width(), (float)rc.Height());
+	if (background.x == BGIPX_FILL && background.y == BGIPY_FILL) {
+		g.DrawImage(bitmap.get(), dst, 0, 0, (float)bitmap->GetWidth(), (float)bitmap->GetHeight(), Gdiplus::UnitPixel);
+		return;
+	}
+
+	if (background.x == BGIPX_LEFT && background.y == BGIPY_TOP) {
+		g.DrawImage(bitmap.get(), rc.left, rc.top, 0, 0, w, h, Gdiplus::UnitPixel);
+		return;
+	}
+#if 0 // TODO
+	int x = rc.left;
+	int y = rc.top;
+	int ix = 0;
+	int iy = 0;
+	switch (background.x) {
+	case BGIPX_LEFT:
+		x = rc.left;
+		break;
+	case BGIPX_CENTER:
+		x = (rc.Width() - bitmap->GetWidth()) / 2;
+		if (x < 0) {
+			x = 0;
+		}
+		x += rc.left;
+		break;
+	case BGIPX_RIGHT:
+		x = rc.Width() - bitmap->GetWidth();
+		if (x < 0) {
+			x = 0;
+		}
+		x += rc.left;
+		break;
+	}
+#endif
 }
 
 bool CControl::_SetCapture (bool capture) {
@@ -230,7 +303,10 @@ void CControl::draw (HDC hdc, CRect rcClip) {
 		hdcPaint = mdc->m_hDC;
 	}
 
+	_DrawBorder(hdcPaint);
+	_DrawBackground(hdcPaint);
 	drawMe(hdcPaint);
+
 	for (CControlIter it = m_controls.begin(); it != m_controls.end(); ++ it) {
 		(*it)->draw(hdcPaint, rcClip);
 	}
@@ -361,8 +437,8 @@ bool CControl::isPointIn (CPoint pt) const {
 
 void CControl::drawMe (HDC hdc) {
 	CDCHandle dc(hdc);
-	dc.FillSolidRect(m_rect, ::GetSysColor(COLOR_WINDOW));
-	_DrawBorder(hdc);
+	CRect rc = getClientRect();
+	dc.FillSolidRect(rc, ::GetSysColor(COLOR_WINDOW));
 }
 
 

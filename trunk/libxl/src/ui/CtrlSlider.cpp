@@ -30,7 +30,7 @@ int CCtrlSlider::_ValueByPoint (CPoint pt, int thumbWidth) const {
 CCtrlSlider::CCtrlSlider (int _min, int _max, int _curr) 
 	: m_min(_min), m_max(_max), m_curr(_curr)
 	, m_hover(false), m_push(false)
-	, m_barHeight(2)
+	, m_barHeight(4)
 	, m_thumbWidth(16)
 	, m_mouseOffset(0)
 {
@@ -48,7 +48,8 @@ void CCtrlSlider::drawMe (HDC hdc) {
 	rcBar.top += (rcBar.Height() - m_barHeight) / 2;
 	rcBar.bottom = rcBar.top + m_barHeight;
 	CDCHandle dc(hdc);
-	dc.FillSolidRect(rcBar, RGB(127,127,127));
+	// dc.FillSolidRect(rcBar, RGB(127,127,127));
+	dc.Draw3dRect(rcBar, RGB(127,127,127), RGB(212,212,212));
 
 	rc = _GetThumbRect(m_thumbWidth);
 	if (m_hover) {
@@ -56,8 +57,6 @@ void CCtrlSlider::drawMe (HDC hdc) {
 	} else {
 		dc.FillSolidRect(rc, RGB(96, 96, 96));
 	}
-
-	_DrawBorder(hdc);
 }
 
 void CCtrlSlider::onMouseIn (CPoint pt) {

@@ -33,12 +33,20 @@ private:
 	typedef std::map<uint64, HGDIOBJ>     _GdiObjBigMapType;
 	typedef _GdiObjBigMapType::iterator   _GdiObjBigMapIter;
 
-	// typedef Gdiplus::Bitmap              *_GpBmpPtr;
-	typedef std::map<uint, GpBmpPtr>      _GpBmpMapType;
-	typedef _GpBmpMapType::iterator       _GpBmpMapIter;
+	typedef std::map<uint, GpBmpPtr>      _GpBmpIdMapType;
+	typedef _GpBmpIdMapType::iterator     _GpBmpIdMapIter;
+
+	typedef std::map<
+	                 tstring,
+	                 GpBmpPtr,
+	                 tstring_iless<tstring>
+	                >                     _GpBmpFileMapType;
+	typedef _GpBmpFileMapType::iterator   _GpBmpFileMapIter;
 
 	_GdiObjMapType                        m_sysFonts;
-	_GpBmpMapType                         m_gpBitmaps;
+	_GpBmpIdMapType                       m_gpBmpsById;
+	_GpBmpFileMapType                     m_gpBmpsByFile;
+	_GpBmpFileMapType                     m_gpGrayBmpsByFile;
 
 	void _Lock ();
 	void _Unlock ();
@@ -71,9 +79,14 @@ public:
 	HFONT getSysFont (int height = 0, uint style = 0);
 
 	/**
-	 * get Gdiplus::Bitmap* from process resource (not DLL)
+	 * get shared_ptr<Gdiplus::Bitmap> from process resource (not DLL)
 	 */
 	GpBmpPtr getBitmap (ushort id, const tstring &type, bool grayscale = false);
+
+	/**
+	 * get shared_ptr<Gdiplus::Bitmap> from file
+	 */
+	GpBmpPtr getBitmap (const tstring &file, bool grayscale = false);
 
 };
 

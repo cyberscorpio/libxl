@@ -51,6 +51,7 @@ protected:
 	COLORREF _GetColor ();
 	HFONT _GetFont ();
 	void _DrawBorder (HDC hdc);
+	void _DrawBackground (HDC hdc);
 
 	bool _SetCapture (bool capture);
 
