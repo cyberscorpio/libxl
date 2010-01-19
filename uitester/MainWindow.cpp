@@ -103,11 +103,10 @@ class CView : public xl::ui::CControl
 	bool m_hover;
 	CPoint m_pt;
 public:
-	COLORREF m_rgb;
 
-	CView () : m_hover(false), m_rgb(RGB(50,50,50)) {
+	CView () : m_hover(false) {
 		m_id = ID_VIEW;
-		setStyle(_T("px:left; py:top; width:fill; height:fill;margin:5"));
+		setStyle(_T("margin:5; background-color: #323232; px:left; py:top; width:fill; height:fill; "));
 	}
 
 	virtual void onAttach () {
@@ -174,11 +173,10 @@ public:
 
 	virtual void drawMe (HDC hdc) {
 		xl::ui::CDCHandle dc (hdc);
-		dc.FillSolidRect(m_rect, m_rgb);
 		if (m_hover) {
 			TCHAR buf[1024];
 			_stprintf_s(buf, 1024, _T("Mouse: %d - %d"), m_pt.x - m_rect.left, m_pt.y - m_rect.top);
-			dc.DrawText(buf, -1, getClientRect(), DT_SINGLELINE | DT_CENTER | DT_VCENTER);
+			dc.drawTransparentText(buf, -1, getClientRect(), DT_SINGLELINE | DT_CENTER | DT_VCENTER);
 		}
 	}
 };
@@ -231,13 +229,15 @@ void CMainWindow::onSlider (xl::uint id, int _min, int _max, int _curr, bool tra
 	xl::ui::CControlPtr view = pCtrlMain->getControlByID(ID_VIEW);
 	CView *pView = (CView *)view.get();
 	if (_curr == 255) {
-		pView->m_rgb = RGB(255,255,0);
+		pView->setStyle(_T("background-color: #ffff00"));
 	} else if (_curr == 0) {
-		pView->m_rgb = RGB(0,255,255);
+		// pView->setStyle(_T("background-color: #00ffff"));
+		pView->setStyle(_T("background: none"));
 	} else {
-		pView->m_rgb = RGB(_curr, _curr, _curr);
+		TCHAR buf[64];
+		_stprintf_s(buf, 64, _T("background-color: #%02x%02x%02x"), _curr, _curr, _curr);
+		pView->setStyle(buf);
 	}
-	pView->invalidate();
 }
 
 

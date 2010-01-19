@@ -89,9 +89,44 @@ enum BACKGROUNDTYPE {
 	BGT_COUNT
 };
 
+enum BACKGROUNDIMAGEPOS_X {
+	BGIPX_FILL,
+	BGIPX_LEFT,
+	BGIPX_RIGHT,
+	BGIPX_CENTER,
+	BGIPX_REPEAT,
+	GBIPX_COUNT
+};
+
+enum BACKGROUNDIMAGEPOS_Y {
+	BGIPY_FILL,
+	BGIPY_TOP,
+	BGIPY_BOTTOM,
+	BGIPY_CENTER,
+	BGIPY_REPEAT,
+	BGIPY_COUNT
+};
+
 struct BACKGROUND {
 	BACKGROUNDTYPE type;
-	
+	COLORREF color;
+	uint id;
+	tstring url_or_idtype;
+	BACKGROUNDIMAGEPOS_X x;
+	BACKGROUNDIMAGEPOS_Y y;
+
+public:
+	BACKGROUND () 
+		: type(BGT_NONE), color(RGB(0,0,0)), id(0), x(BGIPX_FILL), y(BGIPY_FILL)
+	{}
+
+	void reset () {
+		type = BGT_NONE;
+		color = RGB(0,0,0);
+		id = 0;
+		x = BGIPX_FILL;
+		y = BGIPY_FILL;
+	}
 };
 
 
@@ -119,8 +154,11 @@ protected:
 	void _ParseEdge (tstring value, EDGE &edge);
 	COLORREF _ParseColor (tstring value);
 	void _ParseBorder (tstring key, tstring value);
+	BACKGROUNDIMAGEPOS_X _ParseBackgroundImagePosX (tstring value);
+	BACKGROUNDIMAGEPOS_Y _ParseBackgroundImagePosY (tstring value);
+	void _ParseBackground (tstring key, tstring value);
 	void _Reset ();
-	void _SetStyle (const tstring &style, bool &relayout, bool &redraw);
+	void _SetStyle (tstring style, bool &relayout, bool &redraw);
 
 	/**
 	 * the derived class can have its own _ParseProperty()
@@ -135,6 +173,7 @@ public:
 	EDGE margin;
 	EDGE padding;
 	BORDER border;
+	BACKGROUND background;
 
 	POSITION_X px;
 	POSITION_Y py;

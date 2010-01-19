@@ -9,6 +9,7 @@
 #include <string>
 #include <vector>
 #include <memory>
+#include <functional>
 #include <windows.h>
 #include "common.h"
 
@@ -198,7 +199,26 @@ typedef basic_string<wchar_t, std::char_traits<wchar_t>, std::allocator<wchar_t>
 typedef basic_string<tchar, std::char_traits<tchar>, std::allocator<tchar> >         tstring;
 
 //////////////////////////////////////////////////////////////////////////
-// 
+// case insensitive comparer
+template <class T>
+struct tstring_iless : public std::binary_function <T, T, bool> {
+	bool operator () (const T &lhs, const T &rhs) const;
+};
+
+template <>
+struct tstring_iless <tstring> : public std::binary_function <tstring, tstring, bool> {
+	bool operator () (const tstring &lhs, const tstring &rhs) const {
+		if (_tcsicmp(lhs.c_str(), rhs.c_str()) < 0) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+};
+
+
+//////////////////////////////////////////////////////////////////////////
+// explode
 template <class CharT>
 struct ExplodeT {
 	typedef std::vector<basic_string<CharT, std::char_traits<CharT>, std::allocator<CharT> > > ValueT;

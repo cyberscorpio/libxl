@@ -68,7 +68,7 @@ void CResMgr::_MakeBitmaGray (GpBmpPtr bitmap) {
 	Gdiplus::BitmapData bd;
 	Gdiplus::Rect rc(0, 0, w, h);
 	Gdiplus::Status res = pBitmap->LockBits(&rc,
-		Gdiplus::ImageLockMode::ImageLockModeWrite,
+		Gdiplus::ImageLockModeWrite,
 		PixelFormat32bppARGB,
 		&bd);
 	assert (res == Gdiplus::Ok);
@@ -107,7 +107,7 @@ void CResMgr::reset () {
 	}
 	m_sysFonts.clear();
 
-	m_gpBitmaps.clear();
+	m_gpBmpsById.clear();
 }
 
 CResMgr::GpBmpPtr CResMgr::loadBitmapFromResource (uint id, const tstring &type, HINSTANCE hInst) {
@@ -198,8 +198,8 @@ CResMgr::GpBmpPtr CResMgr::getBitmap (ushort id, const tstring &type, bool grays
 		realid = (1 << (sizeof(id) * 8)) | id;
 	}
 
-	_GpBmpMapIter it = m_gpBitmaps.find(realid);
-	if (it != m_gpBitmaps.end()) {
+	_GpBmpIdMapIter it = m_gpBmpsById.find(realid);
+	if (it != m_gpBmpsById.end()) {
 		return it->second;
 	}
 
@@ -208,10 +208,37 @@ CResMgr::GpBmpPtr CResMgr::getBitmap (ushort id, const tstring &type, bool grays
 		if (grayscale) {
 			_MakeBitmaGray(bitmap);
 		}
-		m_gpBitmaps[realid] = bitmap;
+		m_gpBmpsById[realid] = bitmap;
 		return bitmap;
 	}
 	return GpBmpPtr();
+}
+
+CResMgr::GpBmpPtr CResMgr::getBitmap (const tstring &file, bool grayscale) {
+	_GpBmpFileMapType *pContainer = &m_gpBmpsByFile;
+	if (grayscale) {
+		pContainer = &m_gpGrayBmpsByFile;
+	}
+
+	_GpBmpFileMapIter it = pContainer->find(file);
+	if (it != pContainer->end()) {
+		return it->second;
+	}
+
+	// TODO: make ANSI work
+	Gdiplus::Bitmap *pBitmap = new Gdiplus::Bitmap(file);
+	if (pBitmap->GetLastStatus() != Gdiplus::Ok) {
+		delete pBitmap;
+		return GpBmpPtr();
+	}
+
+	GpBmpPtr bitmap(pBitmap);
+	if (grayscale) {
+		_MakeBitmaGray(bitmap);
+	}
+
+	(*pContainer)[file] = bitmap;
+	return bitmap;
 }
 
 

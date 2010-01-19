@@ -5,14 +5,18 @@
 #include "../../include/string.h"
 /**
  * styles
+ * margin: int[ int[ int[ int]]]
+ * padding: int[ int[ int[ int]]]
+ * border: int[ #hex*6[ style]]
+ * background: none
+ * background-color: #hex*6
+ * background-image-id: int type[ fill | left | right | center | repeat[ fill | top | bottom | center | repeat]]
+ * background-image-url: url[ fill | left | right | center | repeat[ fill | top | bottom | center | repeat]]
  * px: left | right
  * py: top | bottom
  * float: true | false | none
  * width: int | "fill"
  * height: int | "fill"
- * margin: int[ int[ int[ int]]]
- * padding: int[ int[ int[ int]]]
- * border: int[ #hex*6[ style]]
  * font-weight: normal | bold
  * color: #hex*6
  * opacity: [0-100]
@@ -89,6 +93,7 @@ void CWinStyle::_Reset () {
 	margin.left = margin.top = margin.right = margin.bottom = 0;
 	padding.left = padding.top = padding.right = padding.bottom = 0;
 	border.reset();
+	background.reset();
 	px = PX_LEFT;
 	py = PY_TOP;
 	display = true;
@@ -101,8 +106,9 @@ void CWinStyle::_Reset () {
 	opacity = 100;
 }
 
-void CWinStyle::_SetStyle (const tstring &style, bool &relayout, bool &redraw) {
+void CWinStyle::_SetStyle (tstring style, bool &relayout, bool &redraw) {
 	relayout = redraw = false;
+	style.trim();
 	ExplodeT<TCHAR>::ValueT styles = explode(_T(";"), style);
 
 	for (size_t i = 0; i < styles.size(); ++ i) {
@@ -190,6 +196,83 @@ void CWinStyle::_ParseBorder (tstring key, tstring value) {
 	}
 }
 
+BACKGROUNDIMAGEPOS_X CWinStyle::_ParseBackgroundImagePosX (tstring value) {
+	value.trim();
+	if (value == _T("fill")) {
+		return BGIPX_FILL;
+	} else if (value == _T("left")) {
+		return BGIPX_LEFT;
+	} else if (value == _T("right")) {
+		return BGIPX_RIGHT;
+	} else if (value == _T("center")) {
+		return BGIPX_CENTER;
+	} else if (value == _T("repeat")) {
+		return BGIPX_REPEAT;
+	}
+	assert(false);
+	return BGIPX_FILL;
+}
+
+BACKGROUNDIMAGEPOS_Y CWinStyle::_ParseBackgroundImagePosY (tstring value) {
+	value.trim();
+	if (value == _T("fill")) {
+		return BGIPY_FILL;
+	} else if (value == _T("top")) {
+		return BGIPY_TOP;
+	} else if (value == _T("bottom")) {
+		return BGIPY_BOTTOM;
+	} else if (value == _T("center")) {
+		return BGIPY_CENTER;
+	} else if (value == _T("repeat")) {
+		return BGIPY_REPEAT;
+	}
+	assert(false);
+	return BGIPY_FILL;
+}
+
+void CWinStyle::_ParseBackground (tstring key, tstring value) {
+	key.trim();
+	value.trim();
+	if (key == _T("background")) {
+		assert(value == _T("none"));
+		background.type = BGT_NONE;
+	} else if (key == _T("background-color")) {
+		background.type = BGT_RGB;
+		background.color = _ParseColor(value);
+	} else if (key == _T("background-image-id")) {
+		background.type = BGT_IMAGE_ID;
+		background.x = BGIPX_FILL;
+		background.y = BGIPY_FILL;
+		ExplodeT<TCHAR>::ValueT values = explode(_T(" "), value);
+		assert(values.size() > 1);
+		background.id = _tstoi(values[0]);
+		background.url_or_idtype = values[1];
+		if (values.size() > 2) {
+			background.x = _ParseBackgroundImagePosX(values[2]);
+		}
+		if (values.size() > 3) {
+			background.y = _ParseBackgroundImagePosY(values[3]);
+		}
+
+	} else if (key == _T("background-image-url")) {
+		background.type = BGT_IMAGE_URL;
+		background.x = BGIPX_FILL;
+		background.y = BGIPY_FILL;
+		ExplodeT<TCHAR>::ValueT values = explode(_T(" "), value);
+		assert(values.size() > 0);
+		background.url_or_idtype = values[0];
+		if (values.size() > 1) {
+			background.x = _ParseBackgroundImagePosX(values[1]);
+		}
+		if (values.size() > 2) {
+			background.y = _ParseBackgroundImagePosY(values[2]);
+		}
+
+	} else {
+		assert(false);
+	}
+}
+
 void CWinStyle::_ParseProperty (const tstring &key, const tstring &value, bool &relayout, bool &redraw) {
 	if (key == _T("width")) {
 		int w = value == _T("fill") ? SIZE_FILL : _tstoi(value);
@@ -246,6 +329,9 @@ void CWinStyle::_ParseProperty (const tstring &key, const tstring &value, bool &
 	} else if (key.find(_T("border")) == 0) {
 		_ParseBorder(key, value);
 		relayout = true;
+		redraw = true;
+	} else if (key.find(_T("background")) == 0) {
+		_ParseBackground(key, value);
 		redraw = true;
 	} else if (key == _T("opacity")) {
 		opacity = _tstoi(value);

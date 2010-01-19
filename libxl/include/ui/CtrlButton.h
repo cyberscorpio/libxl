@@ -34,12 +34,6 @@ public:
 	virtual void onLostCapture();
 	virtual void onLButtonDown (CPoint pt);
 	virtual void onLButtonUp (CPoint pt);
-
-	//////////////////////////////////////////////////////////////////////////
-	// virtual button methods
-	virtual void drawNormal (HDC hdc);
-	virtual void drawHover (HDC hdc);
-	virtual void drawPush (HDC hdc);
 };
 
 class CCtrlImageButton : public CCtrlButton
@@ -50,9 +44,12 @@ class CCtrlImageButton : public CCtrlButton
 	tstring m_imgType;
 public:
 	CCtrlImageButton (uint id, uint n = 0, uint h = 0, uint p = 0, const tstring &imgType = _T("PNG"));
-	virtual void drawNormal (HDC hdc);
-	virtual void drawHover (HDC hdc);
-	virtual void drawPush (HDC hdc);
+
+	virtual void onMouseIn (CPoint pt);
+	virtual void onMouseOut (CPoint pt);
+	virtual void onLostCapture ();
+	virtual void onLButtonDown (CPoint pt);
+	virtual void onLButtonUp (CPoint pt);
 };
 
 
