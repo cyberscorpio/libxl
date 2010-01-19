@@ -156,10 +156,6 @@
 				RelativePath=".\src\placeholder.cpp"
 				>
 			</File>
-			<File
-				RelativePath=".\src\ui\ResMgr.cpp"
-				>
-			</File>
 			<Filter
 				Name="ui"
 				>
@@ -177,6 +173,10 @@
 				</File>
 				<File
 					RelativePath=".\src\ui\CtrlSlider.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\ui\ResMgr.cpp"
 					>
 				</File>
 				<File
