@@ -64,6 +64,7 @@ void CCtrlGesture::onRButtonUp (CPoint pt) {
 	assert(m_points.size() > 0);
 
 	CPoint ptDown = m_points[0];
+	bool pass2background = m_points.size() == 1;
 	tstring gesture = m_gesture;
 	
 	m_pCtrlMain->removeChild(m_id);
@@ -72,7 +73,7 @@ void CCtrlGesture::onRButtonUp (CPoint pt) {
 		assert(m_target);
 		m_target->onGesture(gesture, true);
 		m_lastMove = 0;
-	} else {
+	} else if (pass2background) {
 		CControlPtr ctrl = m_pCtrlMain->getControlByPoint(ptDown);
 		if (ctrl != NULL) {
 			ctrl->onRButtonDown(ptDown);
@@ -87,7 +88,7 @@ void CCtrlGesture::onRButtonUp (CPoint pt) {
 
 void CCtrlGesture::onMouseMove (CPoint pt) {
 	if (m_points.size() == 0) {
-		return; // only when
+		return; // when called by CCtrlMain::_CheckMouseMove(), this could happen
 	}
 
 	CPoint ptLast = m_points[m_points.size() - 1];
