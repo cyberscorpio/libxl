@@ -19,6 +19,12 @@ bool CCtrlMain::_SetCapture(CControlPtr ctrl) {
 	m_ctrlCapture = ctrl;
 	if (m_ctrlCapture != NULL) {
 		m_ctrlCapture->onGetCapture();
+	} else {
+		// make sure mouse in our area
+		CPoint pt;
+		::GetCursorPos(&pt);
+		assert(m_pWindow != NULL);
+		postMessage(WM_MOUSEMOVE, 0, MAKELPARAM(pt.x, pt.y));
 	}
 
 	return true;
@@ -89,6 +95,14 @@ void CCtrlMain::invalidateControl(CControlPtr ctrl) const {
 	}
 }
 
+bool CCtrlMain::postMessage (UINT msg, WPARAM wParam, LPARAM lParam) {
+	if (!m_pWindow || !m_pWindow->IsWindow()) {
+		return false;
+	}
+
+	return !!m_pWindow->PostMessage(msg, wParam, lParam);
+}
+
 void CCtrlMain::reLayout () const {
 	layout(m_rcLayout);
 	invalidateControl();
@@ -99,6 +113,13 @@ CRect CCtrlMain::layout (CRect rc) const {
 	return CControl::layout(rc);
 }
 
+HWND CCtrlMain::getHWND () {
+	if (m_pWindow) {
+		return m_pWindow->m_hWnd;
+	} else {
+		return NULL;
+	}
+}
 
 //////////////////////////////////////////////////////////////////////////
 // message handles
@@ -232,7 +253,10 @@ LRESULT CCtrlMain::OnRButtonUp(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bH
 	return 0;
 }
 
-LRESULT CCtrlMain::OnSize(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) {
+LRESULT CCtrlMain::OnRemoveControl(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) {
+
+	removeChild((uint)wParam);
+
 	return 0;
 }
 
