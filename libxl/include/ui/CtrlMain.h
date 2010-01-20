@@ -34,6 +34,7 @@ protected:
 	// protected methods
 	bool _SetCapture (CControlPtr ctrl);
 	void _SetHoverCtrl (CControlPtr ctrlHover, CPoint pt);
+	void _CheckMouseMove (CPoint pt);
 
 	//////////////////////////////////////////////////////////////////////////
 	// virtual protected methods
@@ -67,7 +68,7 @@ public:
 		MESSAGE_HANDLER(WM_CREATE, OnCreate)
 		MESSAGE_HANDLER(WM_DESTROY, OnDestroy)
 
-		MESSAGE_HANDLER(WM_XL_REMOVE_CONTROL, OnRemoveControl)
+		MESSAGE_HANDLER(WM_XL_REMOVE_CONTROL, OnWMRemoveControl)
 	END_MSG_MAP()
 
 	LRESULT OnCreate(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
@@ -80,7 +81,7 @@ public:
 	LRESULT OnLButtonUp(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
 	LRESULT OnRButtonDown(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
 	LRESULT OnRButtonUp(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
-	LRESULT OnRemoveControl(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	LRESULT OnWMRemoveControl(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
 };
 
 typedef std::tr1::shared_ptr<CCtrlMain>        CCtrlMainPtr;

@@ -31,7 +31,7 @@ void CCtrlGesture::_ParseProperty (const tstring &key, const tstring &value, boo
 CCtrlGesture::CCtrlGesture (CCtrlMain *pCtrlMain)
 	: m_pCtrlMain(pCtrlMain)
 	, m_gestureSensitivity(10)
-	, m_gestureTimeout(1000)
+	, m_gestureTimeout(500)
 	, m_lastMove(0)
 {
 	assert(m_pCtrlMain);
@@ -46,10 +46,9 @@ CCtrlGesture::~CCtrlGesture () {
 
 
 void CCtrlGesture::onLostCapture() {
-	ATLTRACE(_T("onLostCapture\n"));
 	m_pCtrlMain->postMessage(WM_XL_REMOVE_CONTROL, m_id, 0);
-// 	m_points.clear();
-// 	m_gesture.clear();
+ 	m_points.clear();
+ 	m_gesture.clear();
 }
 
 void CCtrlGesture::onRButtonDown (CPoint pt) {
@@ -63,20 +62,28 @@ void CCtrlGesture::onRButtonDown (CPoint pt) {
 void CCtrlGesture::onRButtonUp (CPoint pt) {
 	assert(m_pCtrlMain->getCaptureCtrl() == shared_from_this());
 
+	tstring gesture = m_gesture;
+	m_pCtrlMain->removeChild(m_id);
+
 	if (::GetTickCount() - m_lastMove < m_gestureTimeout) {
 		assert(m_target);
-		m_target->onGesture(m_gesture, true);
+		m_target->onGesture(gesture, true);
 		m_lastMove = 0;
+	} else {
+		CControlPtr ctrl = m_pCtrlMain->getControlByPoint(pt);
+		ctrl->onRButtonUp(pt);
 	}
 
-	ATLTRACE(_T("onRButtonUp\n"));
-	if (_GetMainCtrl() != NULL) {
-		_SetCapture(false); // clear in onLostCapture()
-	}
+// 	if (_GetMainCtrl() != NULL) {
+// 		_SetCapture(false); // clear in onLostCapture()
+// 	}
 }
 
 void CCtrlGesture::onMouseMove (CPoint pt) {
-	assert(m_points.size() > 0);
+	if (m_points.size() == 0) {
+		return; // only when
+	}
+
 	CPoint ptLast = m_points[m_points.size() - 1];
 	if (abs(pt.x - ptLast.x) < m_gestureSensitivity && abs(pt.y - ptLast.y) < m_gestureSensitivity) {
 		return;

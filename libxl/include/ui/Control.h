@@ -43,7 +43,6 @@ protected:
 	mutable CRect        m_rect;
 
 	void _LayoutChildren () const;
-	CControlPtr _GetControlByPoint (CPoint pt);
 
 	void _SetParent (CControlPtr parent);
 	void _SetTarget (CCtrlTargetRawPtr target);
@@ -69,6 +68,7 @@ public:
 	bool insertChild (CControlPtr child);
 	CControlPtr removeChild (uint id);
 	CControlPtr getControlByID (uint id);
+	CControlPtr getControlByPoint (CPoint pt);
 	void invalidate ();
 
 	void resetStyle ();
