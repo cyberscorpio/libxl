@@ -103,7 +103,6 @@ void CCtrlSlider::onLButtonDown (CPoint pt) {
 			m_target->onSlider(m_id, m_min, m_max, m_curr, false, shared_from_this());
 			invalidate();
 		}
-		return;
 	} else {
 		assert(!m_push);
 		m_push = true;

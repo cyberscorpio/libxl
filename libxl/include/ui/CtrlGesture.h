@@ -12,10 +12,15 @@ class CCtrlMain;
 class CCtrlGesture : public CControl 
 {
 	CCtrlMain             *m_pCtrlMain;
+	int                    m_gestureSensitivity;
+	uint                   m_gestureTimeout;
 	std::vector<CPoint>    m_points;
 	uint                   m_lastMove;
 	tstring                m_gesture;
-	bool                   m_inRButtonUp;
+
+protected:
+	virtual void _ParseProperty (const tstring &key, const tstring &value, bool &relayout, bool &redraw);
+
 public:
 	CCtrlGesture (CCtrlMain *pCtrlMain);
 	virtual ~CCtrlGesture ();

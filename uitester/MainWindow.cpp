@@ -155,12 +155,20 @@ public:
 		_GetMainCtrl()->invalidateControl(shared_from_this());
 	}
 
-	virtual void onRButtonDown (CPoint pt) {
+	virtual void onLButtonDown (CPoint pt) {
 		_SetCapture(true);
 	}
 
-	virtual void onRButtonUp (CPoint pt) {
+	virtual void onLButtonUp (CPoint pt) {
 		_SetCapture(false);
+		invalidate();
+	}
+
+	virtual void onRButtonDown (CPoint pt) {
+	}
+
+	virtual void onRButtonUp (CPoint pt) {
+		::MessageBox(_GetMainCtrl()->getHWND(), _T("RButton up!"), _T(""), 0);
 	}
 
 	virtual void onLostCapture () {
@@ -271,7 +279,7 @@ LRESULT CMainWindow::OnCreate (UINT msg, WPARAM wParam, LPARAM lParam, BOOL &bHa
 	}
 	m_ctrlMain->setStyle(_T("px:left;py:top;width:fill;height:fill;"));
 	m_ctrlMain->enableGesture(true);
-	// m_ctrlMain->getGestureCtrl()->setStyle(_T("color:#ff0000;background:none;opacity:100;"));
+	m_ctrlMain->getGestureCtrl()->setStyle(_T("color:#ff0000;background:none;gesture-sensitivity:20;gesture-timeout:2000;"));
 
 	xl::ui::CControlPtr ctrl(new CToolbar());
 	m_ctrlMain->insertChild(ctrl);

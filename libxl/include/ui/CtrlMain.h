@@ -6,6 +6,10 @@
 #include "Control.h"
 #include "CtrlGesture.h"
 
+#define WM_XL_BEGIN               WM_APP
+#define WM_XL_END                 (WM_XL_BEGIN + 32)
+#define WM_XL_REMOVE_CONTROL      WM_XL_BEGIN // WPARAM: id; LPARAM: not used
+
 
 namespace xl {
 	namespace ui {
@@ -41,12 +45,15 @@ public:
 	void enableGesture (bool enable);
 
 	void invalidateControl (CControlPtr ctrl = CControlPtr()) const;
-	void reLayout () const;
+	bool postMessage (UINT msg, WPARAM wParam, LPARAM lParam);
 	CControlPtr getHoverCtrl () { return m_ctrlHover; }
 	CControlPtr getCaptureCtrl () { return m_ctrlCapture; }
 	CControlPtr getGestureCtrl () { return m_ctrlGesture; }
 
+	void reLayout () const;
 	virtual CRect layout (CRect rc) const;
+
+	HWND getHWND ();
 
 	BEGIN_MSG_MAP(CCtrlMain)
 		MESSAGE_HANDLER(WM_MOUSEMOVE, OnMouseMove)
@@ -59,6 +66,8 @@ public:
 		MESSAGE_HANDLER(WM_RBUTTONUP, OnRButtonUp)
 		MESSAGE_HANDLER(WM_CREATE, OnCreate)
 		MESSAGE_HANDLER(WM_DESTROY, OnDestroy)
+
+		MESSAGE_HANDLER(WM_XL_REMOVE_CONTROL, OnRemoveControl)
 	END_MSG_MAP()
 
 	LRESULT OnCreate(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
@@ -71,7 +80,7 @@ public:
 	LRESULT OnLButtonUp(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
 	LRESULT OnRButtonDown(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
 	LRESULT OnRButtonUp(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
-	LRESULT OnSize(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	LRESULT OnRemoveControl(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
 };
 
 typedef std::tr1::shared_ptr<CCtrlMain>        CCtrlMainPtr;
