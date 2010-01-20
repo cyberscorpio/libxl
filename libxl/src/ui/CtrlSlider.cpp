@@ -1,5 +1,5 @@
 #include <assert.h>
-#include "../../include/ui/gdi.h"
+#include "../../include/ui/Gdi.h"
 #include "../../include/ui/CtrlTarget.h"
 #include "../../include/ui/CtrlMain.h"
 #include "../../include/ui/CtrlSlider.h"

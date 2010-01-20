@@ -67,6 +67,7 @@ public:
 	CRect getClientRect () const; // exclude the border and padding
 
 	bool insertChild (CControlPtr child);
+	CControlPtr removeChild (uint id);
 	CControlPtr getControlByID (uint id);
 	void invalidate ();
 

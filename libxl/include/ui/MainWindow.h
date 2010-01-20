@@ -26,10 +26,10 @@ class CMainWindowT
 	typedef ATL::CWindow  _TBase;
 
 protected:
-	xl::ui::CControlPtr m_ctrl;
+	xl::ui::CCtrlMainPtr m_ctrlMain;
 
 public:
-	CMainWindowT (void) : m_ctrl(new CCtrlMain(this, this)) {
+	CMainWindowT (CCtrlMain *pCtrlMain = NULL) : m_ctrlMain(pCtrlMain) {
 	}
 
 	virtual ~CMainWindowT (void) {
@@ -70,7 +70,7 @@ public:
 
 	BEGIN_MSG_MAP(CMainWindowT)
 		{
-			CCtrlMain *ctrlMain = (CCtrlMain *)m_ctrl.get();
+			CCtrlMain *ctrlMain = (CCtrlMain *)m_ctrlMain.get();
 			if (ctrlMain) {
 				if(ctrlMain->ProcessWindowMessage(hWnd, uMsg, wParam, lParam, lResult))
 					return TRUE; 

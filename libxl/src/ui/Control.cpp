@@ -1,8 +1,8 @@
 #include <assert.h>
 #include "../../include/common.h"
+#include "../../include/ui/Gdi.h"
 #include "../../include/ui/Control.h"
 #include "../../include/ui/CtrlMain.h"
-#include "../../include/ui/gdi.h"
 
 #ifndef NDEBUG
 static int s_control_counts = 0;
@@ -12,11 +12,7 @@ namespace xl {
 	namespace ui {
 
 void CControl::_LayoutChildren () const {
-	CRect rc = m_rect;
-	rc.left += padding.left;
-	rc.top += padding.top;
-	rc.right -= padding.right;
-	rc.bottom -= padding.bottom;
+	CRect rc = getClientRect();
 
 	for (CControlConstIter it = m_controls.begin(); it != m_controls.end(); ++ it) {
 		rc = (*it)->layout(rc);
@@ -41,11 +37,15 @@ CControlPtr CControl::_GetControlByPoint (CPoint pt) {
 }
 
 void CControl::_SetParent (CControlPtr parent) {
-	if (m_parent.lock() != NULL) {
+	if (_GetMainCtrl() != NULL) {
 		onDetach();
 	}
+
 	m_parent = parent;
-	onAttach();
+	
+	if (_GetMainCtrl() != NULL) {
+		onAttach();
+	}
 }
 
 void CControl::_SetTarget (CCtrlTargetRawPtr target) {
@@ -226,8 +226,46 @@ bool CControl::insertChild (CControlPtr child) {
 	child->_SetTarget(m_target);
 
 	m_controls.push_back(child);
-	_LayoutChildren();
+	CCtrlMain *pCtrlMain = _GetMainCtrl();
+	if (pCtrlMain) {
+		pCtrlMain->reLayout();
+	}
 	return true;
+}
+
+CControlPtr CControl::removeChild (uint id) {
+	CControlPtr ctrl = getControlByID(id);
+	if (ctrl != NULL) {
+		CCtrlMain *pCtrlMain = _GetMainCtrl();
+		if (pCtrlMain) {
+			if (pCtrlMain->getCaptureCtrl() == ctrl) {
+				ctrl->_SetCapture(false);
+			}
+
+			if (pCtrlMain->getHoverCtrl() == ctrl) {
+				pCtrlMain->_SetHoverCtrl(CControlPtr(), CPoint(0, 0));
+			}
+		}
+
+		CControlPtr parent = ctrl->m_parent.lock();
+		assert(parent != NULL);
+		bool found = false;
+		for (CControlIter it = parent->m_controls.begin(); it != parent->m_controls.end(); ++ it) {
+			if ((*it)->getID() == id) {
+				found = true;
+				parent->m_controls.erase(it);
+				break;
+			}
+		}
+		assert(found);
+		ctrl->_SetParent(CControlPtr());
+
+		if (pCtrlMain) {
+			pCtrlMain->reLayout();
+		}
+	}
+
+	return ctrl;
 }
 
 CControlPtr CControl::getControlByID (uint id) {
