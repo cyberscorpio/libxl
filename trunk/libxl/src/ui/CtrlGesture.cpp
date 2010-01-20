@@ -61,8 +61,11 @@ void CCtrlGesture::onRButtonDown (CPoint pt) {
 
 void CCtrlGesture::onRButtonUp (CPoint pt) {
 	assert(m_pCtrlMain->getCaptureCtrl() == shared_from_this());
+	assert(m_points.size() > 0);
 
+	CPoint ptDown = m_points[0];
 	tstring gesture = m_gesture;
+	
 	m_pCtrlMain->removeChild(m_id);
 
 	if (::GetTickCount() - m_lastMove < m_gestureTimeout) {
@@ -70,13 +73,16 @@ void CCtrlGesture::onRButtonUp (CPoint pt) {
 		m_target->onGesture(gesture, true);
 		m_lastMove = 0;
 	} else {
-		CControlPtr ctrl = m_pCtrlMain->getControlByPoint(pt);
-		ctrl->onRButtonUp(pt);
-	}
+		CControlPtr ctrl = m_pCtrlMain->getControlByPoint(ptDown);
+		if (ctrl != NULL) {
+			ctrl->onRButtonDown(ptDown);
+		}
 
-// 	if (_GetMainCtrl() != NULL) {
-// 		_SetCapture(false); // clear in onLostCapture()
-// 	}
+		ctrl = m_pCtrlMain->getControlByPoint(pt);
+		if (ctrl != NULL) {
+			ctrl->onRButtonUp(pt);
+		}
+	}
 }
 
 void CCtrlGesture::onMouseMove (CPoint pt) {

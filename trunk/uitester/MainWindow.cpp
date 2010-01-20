@@ -260,7 +260,7 @@ xl::tstring CMainWindow::onGesture (const xl::tstring &gesture, bool release) {
 		return _T("Next");
 	} else if (gesture == _T("LR")) {
 		return _T("Prev");
-	} else if (gesture == _T("R")) {
+	} else if (gesture == _T("DR")) {
 		if (release) {
 			::MessageBox(m_hWnd, gesture, _T("Gesture:"), 0);
 		}
