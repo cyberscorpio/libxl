@@ -19,23 +19,6 @@ void CControl::_LayoutChildren () const {
 	}
 }
 
-CControlPtr CControl::_GetControlByPoint (CPoint pt) {
-	if (display && isPointIn(pt)) {
-		for (CControlIterR itr = m_controls.rbegin(); itr != m_controls.rend(); ++ itr) {
-			if ((*itr)->isPointIn(pt)) {
-				CControlPtr ctrl = (*itr)->_GetControlByPoint(pt);
-				if (ctrl != NULL) {
-					return ctrl;
-				}
-			}
-		}
-
-		return shared_from_this();
-	}
-
-	return CControlPtr();
-}
-
 void CControl::_SetParent (CControlPtr parent) {
 	if (_GetMainCtrl() != NULL) {
 		onDetach();
@@ -279,6 +262,23 @@ CControlPtr CControl::getControlByID (uint id) {
 			return ctrl;
 		}
 	}
+	return CControlPtr();
+}
+
+CControlPtr CControl::getControlByPoint (CPoint pt) {
+	if (display && isPointIn(pt)) {
+		for (CControlIterR itr = m_controls.rbegin(); itr != m_controls.rend(); ++ itr) {
+			if ((*itr)->isPointIn(pt)) {
+				CControlPtr ctrl = (*itr)->getControlByPoint(pt);
+				if (ctrl != NULL) {
+					return ctrl;
+				}
+			}
+		}
+
+		return shared_from_this();
+	}
+
 	return CControlPtr();
 }
 

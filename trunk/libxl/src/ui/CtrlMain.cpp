@@ -23,8 +23,9 @@ bool CCtrlMain::_SetCapture(CControlPtr ctrl) {
 		// make sure mouse in our area
 		CPoint pt;
 		::GetCursorPos(&pt);
-		assert(m_pWindow != NULL);
-		postMessage(WM_MOUSEMOVE, 0, MAKELPARAM(pt.x, pt.y));
+		assert(m_pWindow);
+		m_pWindow->ScreenToClient(&pt);
+		_CheckMouseMove(pt);
 	}
 
 	return true;
@@ -55,6 +56,31 @@ void CCtrlMain::_SetHoverCtrl (CControlPtr ctrlHover, CPoint pt) {
 			ctrl->onMouseInChild(pt);
 			ctrl = ctrl->m_parent.lock();
 		}
+	}
+}
+
+void CCtrlMain::_CheckMouseMove (CPoint pt) {
+	CPoint ptScreen = pt;
+	m_pWindow->ClientToScreen(&ptScreen);
+	CRect rc;
+	m_pWindow->GetClientRect(rc);
+	if (rc.PtInRect(pt) && ::WindowFromPoint(ptScreen) == m_pWindow->m_hWnd) {
+		CControlPtr ctrl = getControlByPoint(pt);
+		assert (ctrl == NULL || ctrl->display == true);
+		if (ctrl != m_ctrlHover) {
+			_SetHoverCtrl(ctrl, pt);
+		}
+
+		if (ctrl != NULL) {
+			ctrl->onMouseMove(pt);
+		}
+
+	} else {
+		::ReleaseCapture();
+		if (m_ctrlHover != NULL) {
+			_SetHoverCtrl(CControlPtr(), pt);
+		}
+		m_captured = false;
 	}
 }
 
@@ -109,6 +135,7 @@ void CCtrlMain::reLayout () const {
 }
 
 CRect CCtrlMain::layout (CRect rc) const {
+	invalidateControl();
 	m_rcLayout = rc;
 	return CControl::layout(rc);
 }
@@ -139,8 +166,6 @@ LRESULT CCtrlMain::OnMouseMove(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bH
 		m_captured = true;
 	}
 
-	CRect rc;
-	m_pWindow->GetClientRect(rc);
 	int x = GET_X_LPARAM(lParam);
 	int y = GET_Y_LPARAM(lParam);
 	CPoint pt(x, y);
@@ -149,26 +174,7 @@ LRESULT CCtrlMain::OnMouseMove(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bH
 		return 0;
 	}
 
-	CPoint ptScreen = pt;
-	m_pWindow->ClientToScreen(&ptScreen);
-	if (rc.PtInRect(pt) && ::WindowFromPoint(ptScreen) == m_pWindow->m_hWnd) {
-		CControlPtr ctrl = _GetControlByPoint(pt);
-		assert (ctrl == NULL || ctrl->display == true);
-		if (ctrl != m_ctrlHover) {
-			_SetHoverCtrl(ctrl, pt);
-		}
-
-		if (ctrl != NULL) {
-			ctrl->onMouseMove(pt);
-		}
-
-	} else {
-		::ReleaseCapture();
-		if (m_ctrlHover != NULL) {
-			_SetHoverCtrl(CControlPtr(), pt);
-		}
-		m_captured = false;
-	}
+	_CheckMouseMove(pt);
 
 	return 0;
 }
@@ -253,7 +259,7 @@ LRESULT CCtrlMain::OnRButtonUp(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bH
 	return 0;
 }
 
-LRESULT CCtrlMain::OnRemoveControl(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) {
+LRESULT CCtrlMain::OnWMRemoveControl(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) {
 
 	removeChild((uint)wParam);
 

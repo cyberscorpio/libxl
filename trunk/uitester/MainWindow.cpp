@@ -279,7 +279,7 @@ LRESULT CMainWindow::OnCreate (UINT msg, WPARAM wParam, LPARAM lParam, BOOL &bHa
 	}
 	m_ctrlMain->setStyle(_T("px:left;py:top;width:fill;height:fill;"));
 	m_ctrlMain->enableGesture(true);
-	m_ctrlMain->getGestureCtrl()->setStyle(_T("color:#ff0000;background:none;gesture-sensitivity:20;gesture-timeout:2000;"));
+	m_ctrlMain->getGestureCtrl()->setStyle(_T("color:#ff0000;background:none;gesture-sensitivity:20"));
 
 	xl::ui::CControlPtr ctrl(new CToolbar());
 	m_ctrlMain->insertChild(ctrl);
@@ -306,15 +306,6 @@ LRESULT CMainWindow::OnCreate (UINT msg, WPARAM wParam, LPARAM lParam, BOOL &bHa
 	return TRUE;
 }
 
-// LRESULT CMainWindow::OnEraseBkGnd (UINT msg, WPARAM wParam, LPARAM lParam, BOOL &bHandled) {
-// 	return 1;
-// }
-// 
-// LRESULT CMainWindow::OnPaint (UINT msg, WPARAM wParam, LPARAM lParam, BOOL &bHandled) {
-// 	xl::ui::CPaintDC dc(m_hWnd);
-// 	m_ctrlMain->draw(dc.m_hDC);
-// 	return 0;
-// }
 
 LRESULT CMainWindow::OnSize (UINT msg, WPARAM wParam, LPARAM lParam, BOOL &bHandled) {
 	if (m_ctrlMain) {
