@@ -168,6 +168,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\ui\CtrlGesture.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\src\ui\CtrlMain.cpp"
 					>
 				</File>
@@ -223,6 +227,10 @@
 				</File>
 				<File
 					RelativePath=".\include\ui\CtrlButton.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\ui\CtrlGesture.h"
 					>
 				</File>
 				<File

@@ -4,6 +4,7 @@
 #include <atlbase.h>
 #include <atlwin.h>
 #include "Control.h"
+#include "CtrlGesture.h"
 
 
 namespace xl {
@@ -22,6 +23,7 @@ protected:
 	bool m_captured;
 	CControlPtr m_ctrlHover;
 	CControlPtr m_ctrlCapture;
+	CCtrlGesturePtr m_ctrlGesture;
 	mutable CRect m_rcLayout; // save the rect passed by this->layout(rc), used by reLayout()
 
 	//////////////////////////////////////////////////////////////////////////
@@ -36,10 +38,13 @@ protected:
 public:
 	CCtrlMain (ATL::CWindow *, CCtrlTargetRawPtr target);
 	virtual ~CCtrlMain ();
+	void enableGesture (bool enable);
+
 	void invalidateControl (CControlPtr ctrl = CControlPtr()) const;
 	void reLayout () const;
 	CControlPtr getHoverCtrl () { return m_ctrlHover; }
 	CControlPtr getCaptureCtrl () { return m_ctrlCapture; }
+	CControlPtr getGestureCtrl () { return m_ctrlGesture; }
 
 	virtual CRect layout (CRect rc) const;
 
@@ -66,7 +71,10 @@ public:
 	LRESULT OnLButtonUp(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
 	LRESULT OnRButtonDown(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
 	LRESULT OnRButtonUp(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	LRESULT OnSize(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
 };
+
+typedef std::tr1::shared_ptr<CCtrlMain>        CCtrlMainPtr;
 
 
 	} // ui

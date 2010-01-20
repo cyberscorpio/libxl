@@ -68,6 +68,18 @@ CCtrlMain::~CCtrlMain () {
 
 }
 
+void CCtrlMain::enableGesture (bool enable) {
+	if (enable && m_ctrlGesture == NULL) {
+		m_ctrlGesture.reset(new CCtrlGesture(this));
+		return;
+	}
+
+	if (!enable && m_ctrlGesture != NULL) {
+		// TODO: check whether gesture is in used ?
+		m_ctrlGesture.reset();
+	}
+}
+
 
 void CCtrlMain::invalidateControl(CControlPtr ctrl) const {
 	if (ctrl != NULL) {
@@ -200,6 +212,8 @@ LRESULT CCtrlMain::OnRButtonDown(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& 
 	CPoint pt(x, y);
 	if (m_ctrlCapture != NULL) {
 		m_ctrlCapture->onRButtonDown(pt);
+	} else if (m_ctrlGesture != NULL) {
+		m_ctrlGesture->onRButtonDown(pt);
 	} else if (m_ctrlHover != NULL) {
 		m_ctrlHover->onRButtonDown(pt);
 	}
@@ -215,6 +229,10 @@ LRESULT CCtrlMain::OnRButtonUp(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bH
 	} else if (m_ctrlHover != NULL) {
 		m_ctrlHover->onRButtonUp(pt);
 	}
+	return 0;
+}
+
+LRESULT CCtrlMain::OnSize(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) {
 	return 0;
 }
 

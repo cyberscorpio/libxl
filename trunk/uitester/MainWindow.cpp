@@ -100,11 +100,10 @@ public:
 
 class CView : public xl::ui::CControl
 {
-	bool m_hover;
 	CPoint m_pt;
 public:
 
-	CView () : m_hover(false) {
+	CView () {
 		m_id = ID_VIEW;
 		setStyle(_T("margin:5; background-color: #323232; px:left; py:top; width:fill; height:fill; "));
 	}
@@ -143,13 +142,11 @@ public:
 	}
 
 	virtual void onMouseIn (CPoint pt) {
-		m_hover = true;
 		m_pt = pt;
 		_GetMainCtrl()->invalidateControl(shared_from_this());
 	}
 
 	virtual void onMouseOut (CPoint pt) {
-		m_hover = false;
 		_GetMainCtrl()->invalidateControl(shared_from_this());
 	}
 
@@ -167,13 +164,12 @@ public:
 	}
 
 	virtual void onLostCapture () {
-		m_hover = false;
 		_GetMainCtrl()->invalidateControl(shared_from_this());
 	}
 
 	virtual void drawMe (HDC hdc) {
 		xl::ui::CDCHandle dc (hdc);
-		if (m_hover) {
+		if (_GetMainCtrl()->getHoverCtrl() == shared_from_this()) {
 			TCHAR buf[1024];
 			_stprintf_s(buf, 1024, _T("Mouse: %d - %d"), m_pt.x - m_rect.left, m_pt.y - m_rect.top);
 			dc.drawTransparentText(buf, -1, getClientRect(), DT_SINGLELINE | DT_CENTER | DT_VCENTER);
@@ -181,51 +177,62 @@ public:
 	}
 };
 
-
+xl::ui::CControlPtr s_removed;
 void CMainWindow::onCommand (xl::uint id, xl::ui::CControlPtr ctrl) {
 	xl::ui::CCtrlButton *button = (xl::ui::CCtrlButton *)ctrl.get();
 	if (id == 1) {
-		MessageBox(_T("You click button 1"), _T("OK"));
+		if (s_removed == NULL) {
+			MessageBox(_T("You click button 1"), _T("OK"));
+		} else {
+			xl::ui::CControlPtr view = m_ctrlMain->getControlByID(ID_VIEW);
+			view->insertChild(s_removed);
+			s_removed.reset();
+		}
 	} else if (id == 2) {
-		xl::ui::CControlPtr button_1 = m_ctrl->getControlByID(1);
+		xl::ui::CControlPtr button_1 = m_ctrlMain->getControlByID(1);
 		if (!button_1->display) {
 			button_1->setStyle(_T("display:true"));
-			button_1 = m_ctrl->getControlByID(2);
+			button_1 = m_ctrlMain->getControlByID(2);
 			button->setText(_T("Display"));
 		} else {
 			button_1->setStyle(_T("display:false"));
-			button_1 = m_ctrl->getControlByID(2);
+			button_1 = m_ctrlMain->getControlByID(2);
 			button->setText(_T("Hide"));
 		}
 	} else if (id == 3) {
-		xl::ui::CControlPtr ctrl = m_ctrl->getControlByID(1);
+		xl::ui::CControlPtr ctrl = m_ctrlMain->getControlByID(1);
 		if (!ctrl->disable) {
 			ctrl->setStyle(_T("disable:true"));
-			ctrl = m_ctrl->getControlByID(3);
+			ctrl = m_ctrlMain->getControlByID(3);
 			button->setText(_T("Enable"));
 		} else {
 			ctrl->setStyle(_T("disable:false"));
-			ctrl = m_ctrl->getControlByID(3);
+			ctrl = m_ctrlMain->getControlByID(3);
 			button->setText(_T("Disable"));
 		}
 	} else if (id == 4) {
 		static bool larged = true;
 		larged = !larged;
-		xl::ui::CControlPtr ctrl = m_ctrl->getControlByID(1);
+		xl::ui::CControlPtr ctrl = m_ctrlMain->getControlByID(1);
 		if (!larged) {
 			ctrl->setStyle(_T("width:120"));
-			ctrl = m_ctrl->getControlByID(4);
+			ctrl = m_ctrlMain->getControlByID(4);
 			button->setText(_T("Shrink"));
 		} else {
 			ctrl->setStyle(_T("width:80"));
-			ctrl = m_ctrl->getControlByID(4);
+			ctrl = m_ctrlMain->getControlByID(4);
 			button->setText(_T("Enlarge"));
+		}
+	} else if (id == 5) {
+		xl::ui::CControlPtr ctrl = m_ctrlMain->removeChild(5);
+		if (ctrl != NULL) {
+			s_removed = ctrl;
 		}
 	}
 }
 
 void CMainWindow::onSlider (xl::uint id, int _min, int _max, int _curr, bool tracking, xl::ui::CControlPtr ctrl) {
-	xl::ui::CCtrlMain *pCtrlMain = (xl::ui::CCtrlMain *)m_ctrl.get();
+	xl::ui::CCtrlMain *pCtrlMain = (xl::ui::CCtrlMain *)m_ctrlMain.get();
 	xl::ui::CControlPtr view = pCtrlMain->getControlByID(ID_VIEW);
 	CView *pView = (CView *)view.get();
 	if (_curr == 255) {
@@ -240,21 +247,40 @@ void CMainWindow::onSlider (xl::uint id, int _min, int _max, int _curr, bool tra
 	}
 }
 
+xl::tstring CMainWindow::onGesture (const xl::tstring &gesture, bool release) {
+	if (gesture == _T("RL")) {
+		return _T("Next");
+	} else if (gesture == _T("LR")) {
+		return _T("Prev");
+	} else if (gesture == _T("R")) {
+		if (release) {
+			::MessageBox(m_hWnd, gesture, _T("Gesture:"), 0);
+		}
+		return _T("Message Box");
+	} else {
+		return xl::ui::CCtrlTarget::onGesture(gesture, release);
+	}
+}
+
 
 LRESULT CMainWindow::OnCreate (UINT msg, WPARAM wParam, LPARAM lParam, BOOL &bHandled) {
 	bHandled = false;
 
-	assert (m_ctrl != NULL);
-	m_ctrl->setStyle(_T("px:left;py:top;width:fill;height:fill;"));
+	if (m_ctrlMain == NULL) {
+		m_ctrlMain.reset(new xl::ui::CCtrlMain(this, this));
+	}
+	m_ctrlMain->setStyle(_T("px:left;py:top;width:fill;height:fill;"));
+	m_ctrlMain->enableGesture(true);
+	// m_ctrlMain->getGestureCtrl()->setStyle(_T("color:#ff0000;background:none;opacity:100;"));
 
 	xl::ui::CControlPtr ctrl(new CToolbar());
-	m_ctrl->insertChild(ctrl);
+	m_ctrlMain->insertChild(ctrl);
 
 	ctrl.reset(new CStatusbar);
-	m_ctrl->insertChild(ctrl);
+	m_ctrlMain->insertChild(ctrl);
 
 	xl::ui::CControlPtr client(new CClient());
-	m_ctrl->insertChild(client);
+	m_ctrlMain->insertChild(client);
 
 	ctrl.reset(new CExplorer());
 	client->insertChild(ctrl);
@@ -267,7 +293,7 @@ LRESULT CMainWindow::OnCreate (UINT msg, WPARAM wParam, LPARAM lParam, BOOL &bHa
 	client->insertChild(ctrl);
 
 	ctrl.reset(new CFloat());
-	m_ctrl->insertChild(ctrl);
+	m_ctrlMain->insertChild(ctrl);
 
 	return TRUE;
 }
@@ -278,17 +304,15 @@ LRESULT CMainWindow::OnCreate (UINT msg, WPARAM wParam, LPARAM lParam, BOOL &bHa
 // 
 // LRESULT CMainWindow::OnPaint (UINT msg, WPARAM wParam, LPARAM lParam, BOOL &bHandled) {
 // 	xl::ui::CPaintDC dc(m_hWnd);
-// 	m_ctrl->draw(dc.m_hDC);
+// 	m_ctrlMain->draw(dc.m_hDC);
 // 	return 0;
 // }
 
 LRESULT CMainWindow::OnSize (UINT msg, WPARAM wParam, LPARAM lParam, BOOL &bHandled) {
-	
-	CRect rc;
-	GetClientRect(rc);
-	m_ctrl->layout(rc);
-
-	Invalidate();
-
+	if (m_ctrlMain) {
+		CRect rc;
+		GetClientRect(rc);
+		m_ctrlMain->layout(rc);
+	}
 	return 0;
 }
