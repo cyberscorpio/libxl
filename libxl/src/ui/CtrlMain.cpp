@@ -67,8 +67,7 @@ void CCtrlMain::_BeforeRemoveCtrl (CControlPtr ctrl) {
 void CCtrlMain::_CheckMouseMove (CPoint pt) {
 	CPoint ptScreen = pt;
 	m_pWindow->ClientToScreen(&ptScreen);
-	CRect rc;
-	m_pWindow->GetClientRect(rc);
+	CRect rc = m_rect;
 	if (rc.PtInRect(pt) && ::WindowFromPoint(ptScreen) == m_pWindow->m_hWnd) {
 		CControlPtr ctrl = getControlByPoint(pt);
 		assert (ctrl == NULL || ctrl->display == true);
@@ -122,6 +121,19 @@ uint CCtrlMain::_Wparam2KeyStatus (WPARAM wParam) {
 	}
 
 	return ks;
+}
+
+uint CCtrlMain::_SetTimer (CControlPtr ctrl, uint elapse, uint id) {
+	assert(ctrl != NULL);
+	assert(m_pWindow != NULL && m_pWindow->IsWindow());
+
+	id = m_pWindow->SetTimer(id, elapse, NULL);
+	if (id != 0) {
+		m_timerCtrls[id] = ctrl;
+	} else {
+		assert(false);
+	}
+	return id;
 }
 
 
@@ -249,6 +261,25 @@ LRESULT CCtrlMain::OnEraseBkGnd(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& b
 LRESULT CCtrlMain::OnPaint(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) {
 	CPaintDC dc(m_pWindow->m_hWnd);
 	draw(dc.m_hDC, dc.m_ps.rcPaint);
+	return 0;
+}
+
+LRESULT CCtrlMain::OnTimer(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) {
+	assert(m_pWindow != NULL && m_pWindow->IsWindow());
+	uint id = (uint)wParam;
+	m_pWindow->KillTimer(id);
+
+	_TimerControlIter it = m_timerCtrls.find(id);
+	if (it == m_timerCtrls.end()) {
+		bHandled = false;
+	} else {
+		CControlPtr ctrl = it->second;
+		m_timerCtrls.erase(it);
+		if (ctrl->_GetMainCtrl() == this) {
+			ctrl->onTimer(id);
+		}
+	}
+
 	return 0;
 }
 

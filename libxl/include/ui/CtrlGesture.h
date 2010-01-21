@@ -14,9 +14,11 @@ class CCtrlGesture : public CControl
 	CCtrlMain             *m_pCtrlMain;
 	int                    m_gestureSensitivity;
 	uint                   m_gestureTimeout;
+	int                    m_gestureLineWidth;
 	std::vector<CPoint>    m_points;
 	uint                   m_lastMove;
 	tstring                m_gesture;
+	bool                   m_isTimeout;
 
 protected:
 	virtual void _ParseProperty (const tstring &key, const tstring &value, bool &relayout, bool &redraw);
@@ -29,6 +31,7 @@ public:
 	virtual void onRButtonDown (CPoint pt, uint key);
 	virtual void onRButtonUp (CPoint pt, uint key);
 	virtual void onMouseMove (CPoint pt, uint key);
+	virtual void onTimer (uint id);
 	virtual void drawMe (HDC hdc);
 };
 

@@ -67,6 +67,7 @@ protected:
 	void _DrawBackground (HDC hdc);
 
 	bool _Capture (bool capture);
+	uint _SetTimer (uint elapse, uint id = 0);
 
 	//////////////////////////////////////////////////////////////////////////
 	// virtual protected methods
@@ -109,6 +110,7 @@ public:
 	virtual void onRButtonDown (CPoint pt, uint key) {}
 	virtual void onRButtonUp (CPoint pt, uint key) {}
 	virtual void onLostCapture () {} // called only when lost capture CAUSED BY SYSTEM
+	virtual void onTimer (uint id) {}
 };
 	} // ui
 } // xl

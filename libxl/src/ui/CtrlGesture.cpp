@@ -10,6 +10,7 @@
  * setStyle:
  * gesture-sensitivity: int
  * gesture-timeout: int
+ * gesture-line-width: int
  */
 
 namespace xl {
@@ -22,6 +23,9 @@ void CCtrlGesture::_ParseProperty (const tstring &key, const tstring &value, boo
 	} else if (key == _T("gesture-timeout")) {
 		m_gestureTimeout = _tstoi(value);
 		assert(m_gestureTimeout > 0);
+	} else if (key == _T("gesture-line-width")) {
+		m_gestureLineWidth = _tstoi(value);
+		assert(m_gestureLineWidth >= 0);
 	} else {
 		CControl::_ParseProperty(key, value, relayout, redraw);
 	}
@@ -31,8 +35,10 @@ void CCtrlGesture::_ParseProperty (const tstring &key, const tstring &value, boo
 CCtrlGesture::CCtrlGesture (CCtrlMain *pCtrlMain)
 	: m_pCtrlMain(pCtrlMain)
 	, m_gestureSensitivity(10)
-	, m_gestureTimeout(500)
+	, m_gestureTimeout(1000)
+	, m_gestureLineWidth(5)
 	, m_lastMove(0)
+	, m_isTimeout(false)
 {
 	assert(m_pCtrlMain);
 	// setStyle(_T("px:left;py:top;width:fill;height:fill;color:#ffffff;background-color:#000000;opacity:50;"));
@@ -59,6 +65,7 @@ void CCtrlGesture::onRButtonDown (CPoint pt, uint key) {
 	m_points.clear();
 	m_gesture.clear();
 	m_points.push_back(pt);
+	m_isTimeout = false;
 }
 
 void CCtrlGesture::onRButtonUp (CPoint pt, uint key) {
@@ -68,17 +75,19 @@ void CCtrlGesture::onRButtonUp (CPoint pt, uint key) {
 	CPoint ptDown = m_points[0];
 	bool pass2background = m_points.size() == 1;
 	tstring gesture = m_gesture;
+	bool isTimeout = m_isTimeout;
 	
 	_Capture(false);
 	m_pCtrlMain->removeChild(m_id);
 	m_points.clear();
 	m_gesture.clear();
+	m_isTimeout = false;
 
-	if (::GetTickCount() - m_lastMove < m_gestureTimeout) {
+	if (::GetTickCount() - m_lastMove < m_gestureTimeout && !isTimeout) {
 		assert(m_target);
 		m_target->onGesture(gesture, true);
 		m_lastMove = 0;
-	} else if (pass2background) {
+	} else if (pass2background && !isTimeout) {
 		CControlPtr ctrl = m_pCtrlMain->getControlByPoint(ptDown);
 		if (ctrl != NULL) {
 			ctrl->onRButtonDown(ptDown, key);
@@ -101,6 +110,9 @@ void CCtrlGesture::onMouseMove (CPoint pt, uint key) {
 		return;
 	}
 
+	assert(m_gestureTimeout > 0);
+	m_isTimeout = false;
+	_SetTimer(m_gestureTimeout, (uint)this);
 	m_lastMove = ::GetTickCount();
 	int x = pt.x - ptLast.x;
 	int y = pt.y - ptLast.y;
@@ -128,6 +140,12 @@ void CCtrlGesture::onMouseMove (CPoint pt, uint key) {
 	invalidate();
 }
 
+void CCtrlGesture::onTimer (uint id) {
+	assert(id == (uint)this);
+	m_isTimeout = true;
+	invalidate();
+}
+
 void CCtrlGesture::drawMe (HDC hdc) {
 	if (m_points.size() <= 1) {
 		return;
@@ -136,20 +154,20 @@ void CCtrlGesture::drawMe (HDC hdc) {
 	CRect rc = getClientRect();
 
 	CDCHandle dc(hdc);
-	HPEN pen = ::CreatePen(PS_SOLID, 5, RGB(255,0,0));
-	HPEN oldPen = dc.SelectPen(pen);
+	if (m_gestureLineWidth > 0) {
+		HPEN pen = ::CreatePen(PS_SOLID, m_gestureLineWidth, RGB(255,0,0));
+		HPEN oldPen = dc.SelectPen(pen);
 
-	for (size_t i = 0; i < m_points.size() - 1; ++ i) {
-		dc.drawLine(m_points[i], m_points[i + 1]);
+		dc.Polyline(&m_points[0], m_points.size());
+
+		dc.SelectPen(oldPen);
+		::DeleteObject(pen);
 	}
-
-	dc.SelectPen(oldPen);
-	::DeleteObject(pen);
 
 	assert(m_target);
 	tstring text = m_gesture;
 	text += _T(" (");
-	text += m_target->onGesture(m_gesture, false);
+	text += m_target->onGesture(m_isTimeout ? _T("canceled") : m_gesture, false);
 	text += _T(")");
 
 	rc.top = rc.bottom - 20;

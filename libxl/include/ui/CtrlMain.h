@@ -1,6 +1,7 @@
 #ifndef XL_UI_CTRL_MGR_H
 #define XL_UI_CTRL_MGR_H
 #include <vector>
+#include <map>
 #include <atlbase.h>
 #include <atlwin.h>
 #include "Control.h"
@@ -19,6 +20,9 @@ class CCtrlMain : public CControl
 	friend class CControl;
 
 protected:
+	typedef std::map<uint, CControlPtr>   _TimerControls;
+	typedef _TimerControls::iterator      _TimerControlIter;
+
 	ATL::CWindow         *m_pWindow;
 
 	/**
@@ -28,6 +32,7 @@ protected:
 	CControlPtr m_ctrlHover;
 	CControlPtr m_ctrlCapture;
 	CCtrlGesturePtr m_ctrlGesture;
+	_TimerControls m_timerCtrls;
 	mutable CRect m_rcLayout; // save the rect passed by this->layout(rc), used by reLayout()
 
 	//////////////////////////////////////////////////////////////////////////
@@ -35,9 +40,12 @@ protected:
 	bool _SetCaptureCtrl (CControlPtr ctrl);
 	void _SetHoverCtrl (CControlPtr ctrlHover, CPoint pt);
 	void _BeforeRemoveCtrl (CControlPtr ctrl); // call before remove control in CCtrlMain
+
 	void _CheckMouseMove (CPoint pt);
-	void _CheckMouseMove ();
+	void _CheckMouseMove (); // _CheckMouseMove will get mouse position itself
 	uint _Wparam2KeyStatus (WPARAM wParam);
+
+	uint _SetTimer (CControlPtr ctrl, uint elapse, uint id = 0);
 
 	//////////////////////////////////////////////////////////////////////////
 	// virtual protected methods
@@ -63,6 +71,7 @@ public:
 		MESSAGE_HANDLER(WM_MOUSEMOVE, OnMouseMove)
 		MESSAGE_HANDLER(WM_ERASEBKGND, OnEraseBkGnd)
 		MESSAGE_HANDLER(WM_PAINT, OnPaint)
+		MESSAGE_HANDLER(WM_TIMER, OnTimer)
 		MESSAGE_HANDLER(WM_CAPTURECHANGED, OnCaptureChanged)
 		MESSAGE_HANDLER(WM_LBUTTONDOWN, OnLButtonDown)
 		MESSAGE_HANDLER(WM_LBUTTONUP, OnLButtonUp)
@@ -80,6 +89,7 @@ public:
 	LRESULT OnCaptureChanged(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
 	LRESULT OnEraseBkGnd(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
 	LRESULT OnPaint(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	LRESULT OnTimer(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
 	LRESULT OnLButtonDown(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
 	LRESULT OnLButtonUp(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
 	LRESULT OnRButtonDown(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
