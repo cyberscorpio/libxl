@@ -265,6 +265,8 @@ xl::tstring CMainWindow::onGesture (const xl::tstring &gesture, bool release) {
 			::MessageBox(m_hWnd, gesture, _T("Gesture:"), 0);
 		}
 		return _T("Message Box");
+	} else if (gesture == _T("canceled")) {
+		return _T("手势已取消");
 	} else {
 		return xl::ui::CCtrlTarget::onGesture(gesture, release);
 	}

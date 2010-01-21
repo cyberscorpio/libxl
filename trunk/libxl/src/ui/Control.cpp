@@ -167,6 +167,16 @@ bool CControl::_Capture (bool capture) {
 	}
 }
 
+uint CControl::_SetTimer (uint elapse, uint id) {
+	CCtrlMain *pCtrlMain = _GetMainCtrl();
+	assert(pCtrlMain);
+	if (!pCtrlMain) {
+		return 0;
+	}
+
+	return pCtrlMain->_SetTimer(shared_from_this(), elapse, id);
+}
+
 CCtrlMain* CControl::_GetMainCtrl () {
 	CControlPtr parent = m_parent.lock();
 	if (parent != NULL) {

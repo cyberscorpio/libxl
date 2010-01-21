@@ -13,6 +13,7 @@ public:
 	virtual void onCommand (uint id, CControlPtr ctrl) {}
 	virtual void onSlider (uint id, int _min, int _max, int _curr, bool tracking, CControlPtr ctrl) {}
 
+	// if timeout, gesture = _T("canceled")
 	virtual tstring onGesture (const tstring &gesture, bool release) { return _T("Unknown"); }
 
 	virtual void onUserEvent (uint evt, void *param, CControlPtr ctrl) {}
