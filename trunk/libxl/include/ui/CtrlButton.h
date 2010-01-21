@@ -10,7 +10,7 @@ namespace xl {
 class CCtrlButton : public CControl 
 {
 protected:
-	bool m_push;
+	bool m_pushAndCapture;
 	tstring m_text;
 	int m_text_image_pading;
 	uint m_idImg;
@@ -32,8 +32,8 @@ public:
 	virtual void onMouseIn (CPoint pt);
 	virtual void onMouseOut (CPoint pt);
 	virtual void onLostCapture();
-	virtual void onLButtonDown (CPoint pt);
-	virtual void onLButtonUp (CPoint pt);
+	virtual void onLButtonDown (CPoint pt, uint key);
+	virtual void onLButtonUp (CPoint pt, uint key);
 };
 
 class CCtrlImageButton : public CCtrlButton
@@ -48,8 +48,8 @@ public:
 	virtual void onMouseIn (CPoint pt);
 	virtual void onMouseOut (CPoint pt);
 	virtual void onLostCapture ();
-	virtual void onLButtonDown (CPoint pt);
-	virtual void onLButtonUp (CPoint pt);
+	virtual void onLButtonDown (CPoint pt, uint key);
+	virtual void onLButtonUp (CPoint pt, uint key);
 };
 
 

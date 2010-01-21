@@ -15,7 +15,7 @@ void CCtrlButton::_DrawImageAndText (HDC hdc) {
 
 	CDCHandle dc(hdc);
 	CRect rc = getClientRect();
-	if (m_push) {
+	if (m_pushAndCapture) {
 		rc.OffsetRect(1, 1);
 	}
 	UINT format = DT_CENTER | DT_VCENTER | DT_SINGLELINE;
@@ -48,7 +48,7 @@ void CCtrlButton::_DrawImageAndText (HDC hdc) {
 
 CCtrlButton::CCtrlButton (uint id, const tstring &text, uint idImg, const tstring &imgType)
 	: CControl(id)
-	, m_push(false)
+	, m_pushAndCapture(false)
 	, m_text(text)
 	, m_text_image_pading(2)
 	, m_idImg(idImg)
@@ -108,28 +108,28 @@ void CCtrlButton::onMouseOut (CPoint pt) {
 }
 
 void CCtrlButton::onLostCapture () {
-	m_push = false;
+	m_pushAndCapture = false;
 	invalidate();
 }
 
-void CCtrlButton::onLButtonDown (CPoint pt) {
+void CCtrlButton::onLButtonDown (CPoint pt, uint key) {
 	if (disable) {
 		return;
 	}
-	_SetCapture(true);
-	m_push = true;
+	_Capture(true);
+	m_pushAndCapture = true;
 	invalidate();
 }
 
-void CCtrlButton::onLButtonUp (CPoint pt) {
+void CCtrlButton::onLButtonUp (CPoint pt, uint key) {
 	if (disable) {
 		if (_GetMainCtrl()->getCaptureCtrl() == shared_from_this()) {
-			_SetCapture(false);
+			_Capture(false);
 		}
 		return;
 	}
-	_SetCapture(false);
-	m_push = false;
+	_Capture(false);
+	m_pushAndCapture = false;
 	invalidate();
 
 	assert (m_target != NULL);
@@ -247,24 +247,24 @@ void CCtrlImageButton::onLostCapture () {
 	setStyle(buf);
 }
 
-void CCtrlImageButton::onLButtonDown (CPoint pt) {
+void CCtrlImageButton::onLButtonDown (CPoint pt, uint key) {
 	if (disable) {
 		return;
 	}
-	CCtrlButton::onLButtonDown(pt);
+	CCtrlButton::onLButtonDown(pt, key);
 	TCHAR buf[256];
 	_stprintf_s(buf, 256, _T("background-image-id: %d %s"), m_idImagePush, m_imgType.c_str());
 	setStyle(buf);
 }
 
-void CCtrlImageButton::onLButtonUp (CPoint pt) {
+void CCtrlImageButton::onLButtonUp (CPoint pt, uint key) {
 	if (disable) {
 		if (_GetMainCtrl()->getCaptureCtrl() == shared_from_this()) {
-			_SetCapture(false);
+			_Capture(false);
 		}
 		return;
 	}
-	CCtrlButton::onLButtonUp(pt);
+	CCtrlButton::onLButtonUp(pt, key);
 	TCHAR buf[256];
 	_stprintf_s(buf, 256, _T("background-image-id: %d %s"), 
 		isPointIn(pt) ? m_idImageHover : m_idImageNormal, m_imgType.c_str());

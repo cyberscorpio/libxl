@@ -4,28 +4,19 @@
 namespace xl {
 	namespace ui {
 
-bool CCtrlMain::_SetCapture(CControlPtr ctrl) {
+bool CCtrlMain::_SetCaptureCtrl(CControlPtr ctrl) {
 	if (m_ctrlCapture == ctrl) {
 		return true;
 	}
 
 	if (ctrl != NULL) {
-		assert (getControlByID(ctrl->m_id) == ctrl);
+		assert(getControlByID(ctrl->m_id) == ctrl);
 	}
 
-	if (m_ctrlCapture != NULL) {
-		m_ctrlCapture->onLostCapture();
-	}
 	m_ctrlCapture = ctrl;
-	if (m_ctrlCapture != NULL) {
-		m_ctrlCapture->onGetCapture();
-	} else {
-		// make sure mouse in our area
-		CPoint pt;
-		::GetCursorPos(&pt);
-		assert(m_pWindow);
-		m_pWindow->ScreenToClient(&pt);
-		_CheckMouseMove(pt);
+
+	if (m_ctrlCapture == NULL) {
+		_CheckMouseMove();
 	}
 
 	return true;
@@ -59,6 +50,20 @@ void CCtrlMain::_SetHoverCtrl (CControlPtr ctrlHover, CPoint pt) {
 	}
 }
 
+void CCtrlMain::_BeforeRemoveCtrl (CControlPtr ctrl) {
+	if (getCaptureCtrl() == ctrl) {
+		ctrl->_Capture(false);
+	}
+
+	if (getHoverCtrl() == ctrl) {
+		CPoint pt;
+		::GetCursorPos(&pt);
+		assert(m_pWindow);
+		m_pWindow->ScreenToClient(&pt);
+		_SetHoverCtrl(CControlPtr(), pt);
+	}
+}
+
 void CCtrlMain::_CheckMouseMove (CPoint pt) {
 	CPoint ptScreen = pt;
 	m_pWindow->ClientToScreen(&ptScreen);
@@ -72,7 +77,7 @@ void CCtrlMain::_CheckMouseMove (CPoint pt) {
 		}
 
 		if (ctrl != NULL) {
-			ctrl->onMouseMove(pt);
+			ctrl->onMouseMove(pt, 0);
 		}
 
 	} else {
@@ -84,6 +89,40 @@ void CCtrlMain::_CheckMouseMove (CPoint pt) {
 	}
 }
 
+void CCtrlMain::_CheckMouseMove () {
+	CPoint pt;
+	::GetCursorPos(&pt);
+	assert(m_pWindow);
+	m_pWindow->ScreenToClient(&pt);
+	_CheckMouseMove(pt);
+}
+
+uint CCtrlMain::_Wparam2KeyStatus (WPARAM wParam) {
+	uint ks = 0;
+	uint keys[] = {
+		MK_CONTROL,
+		MK_LBUTTON,
+		MK_MBUTTON,
+		MK_RBUTTON,
+		MK_SHIFT,
+	};
+	uint values[] = {
+		KP_CONTROL,
+		KP_LBUTTON,
+		KP_MBUTTON,
+		KP_RBUTTON,
+		KP_SHIFT,
+	};
+	assert(COUNT_OF(keys) == COUNT_OF(values));
+
+	for (int i = 0; i < COUNT_OF(keys); ++ i) {
+		if (wParam & keys[i]) {
+			ks |= values[i];
+		}
+	}
+
+	return ks;
+}
 
 
 CCtrlMain::CCtrlMain (ATL::CWindow *pWindow, CCtrlTargetRawPtr target) 
@@ -129,8 +168,11 @@ bool CCtrlMain::postMessage (UINT msg, WPARAM wParam, LPARAM lParam) {
 	return !!m_pWindow->PostMessage(msg, wParam, lParam);
 }
 
-void CCtrlMain::reLayout () const {
+void CCtrlMain::reLayout () {
 	layout(m_rcLayout);
+
+	_CheckMouseMove();
+	
 	invalidateControl();
 }
 
@@ -170,7 +212,7 @@ LRESULT CCtrlMain::OnMouseMove(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bH
 	int y = GET_Y_LPARAM(lParam);
 	CPoint pt(x, y);
 	if (m_ctrlCapture != NULL) {
-		m_ctrlCapture->onMouseMove(pt);
+		m_ctrlCapture->onMouseMove(pt, _Wparam2KeyStatus(wParam));
 		return 0;
 	}
 
@@ -192,7 +234,8 @@ LRESULT CCtrlMain::OnCaptureChanged(UINT uMsg, WPARAM wParam, LPARAM lParam, BOO
 			}
 
 			if (m_ctrlCapture != NULL) {
-				_SetCapture(CControlPtr());
+				m_ctrlCapture->onLostCapture();
+				_SetCaptureCtrl(CControlPtr());
 			}
 		}
 	}
@@ -214,9 +257,9 @@ LRESULT CCtrlMain::OnLButtonDown(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& 
 	int y = GET_Y_LPARAM(lParam);
 	CPoint pt(x, y);
 	if (m_ctrlCapture != NULL) {
-		m_ctrlCapture->onLButtonDown(pt);
+		m_ctrlCapture->onLButtonDown(pt, _Wparam2KeyStatus(wParam));
 	} else if (m_ctrlHover != NULL) {
-		m_ctrlHover->onLButtonDown(pt);
+		m_ctrlHover->onLButtonDown(pt, _Wparam2KeyStatus(wParam));
 	}
 	return 0;
 }
@@ -226,9 +269,9 @@ LRESULT CCtrlMain::OnLButtonUp(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bH
 	int y = GET_Y_LPARAM(lParam);
 	CPoint pt(x, y);
 	if (m_ctrlCapture != NULL) {
-		m_ctrlCapture->onLButtonUp(pt);
+		m_ctrlCapture->onLButtonUp(pt, _Wparam2KeyStatus(wParam));
 	} else if (m_ctrlHover != NULL) {
-		m_ctrlHover->onLButtonUp(pt);
+		m_ctrlHover->onLButtonUp(pt, _Wparam2KeyStatus(wParam));
 	}
 	return 0;
 }
@@ -238,11 +281,11 @@ LRESULT CCtrlMain::OnRButtonDown(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& 
 	int y = GET_Y_LPARAM(lParam);
 	CPoint pt(x, y);
 	if (m_ctrlCapture != NULL) {
-		m_ctrlCapture->onRButtonDown(pt);
+		m_ctrlCapture->onRButtonDown(pt, _Wparam2KeyStatus(wParam));
 	} else if (m_ctrlGesture != NULL) {
-		m_ctrlGesture->onRButtonDown(pt);
+		m_ctrlGesture->onRButtonDown(pt, _Wparam2KeyStatus(wParam));
 	} else if (m_ctrlHover != NULL) {
-		m_ctrlHover->onRButtonDown(pt);
+		m_ctrlHover->onRButtonDown(pt, _Wparam2KeyStatus(wParam));
 	}
 	return 0;
 }
@@ -252,9 +295,9 @@ LRESULT CCtrlMain::OnRButtonUp(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bH
 	int y = GET_Y_LPARAM(lParam);
 	CPoint pt(x, y);
 	if (m_ctrlCapture != NULL) {
-		m_ctrlCapture->onRButtonUp(pt);
+		m_ctrlCapture->onRButtonUp(pt, _Wparam2KeyStatus(wParam));
 	} else if (m_ctrlHover != NULL) {
-		m_ctrlHover->onRButtonUp(pt);
+		m_ctrlHover->onRButtonUp(pt, _Wparam2KeyStatus(wParam));
 	}
 	return 0;
 }

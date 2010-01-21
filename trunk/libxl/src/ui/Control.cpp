@@ -144,19 +144,23 @@ void CControl::_DrawBackground (HDC hdc) {
 #endif
 }
 
-bool CControl::_SetCapture (bool capture) {
+bool CControl::_Capture (bool capture) {
 	CCtrlMain *pCtrlMain = _GetMainCtrl();
 	CControlPtr pThis = shared_from_this();
 	assert (pCtrlMain);
+	CControlPtr ctrlCapture = pCtrlMain->getCaptureCtrl();
 	if (capture) {
-		if (pCtrlMain->getCaptureCtrl() != pThis) {
-			return pCtrlMain->_SetCapture(pThis);
+		if (ctrlCapture != pThis) {
+			if (ctrlCapture != NULL) {
+				ctrlCapture->onLostCapture();
+			}
+			return pCtrlMain->_SetCaptureCtrl(pThis);
 		} else {
 			return true;
 		}
 	} else {
-		if (pCtrlMain->getCaptureCtrl() == pThis) {
-			return pCtrlMain->_SetCapture(CControlPtr());
+		if (ctrlCapture == pThis) {
+			return pCtrlMain->_SetCaptureCtrl(CControlPtr());
 		} else {
 			return true;
 		}
@@ -221,13 +225,7 @@ CControlPtr CControl::removeChild (uint id) {
 	if (ctrl != NULL) {
 		CCtrlMain *pCtrlMain = _GetMainCtrl();
 		if (pCtrlMain) {
-			if (pCtrlMain->getCaptureCtrl() == ctrl) {
-				ctrl->_SetCapture(false);
-			}
-
-			if (pCtrlMain->getHoverCtrl() == ctrl) {
-				pCtrlMain->_SetHoverCtrl(CControlPtr(), CPoint(0, 0));
-			}
+			pCtrlMain->_BeforeRemoveCtrl(ctrl);
 		}
 
 		CControlPtr parent = ctrl->m_parent.lock();

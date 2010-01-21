@@ -141,33 +141,33 @@ public:
 		insertChild(button);
 	}
 
-	virtual void onMouseIn (CPoint pt) {
+	virtual void onMouseIn (CPoint pt, xl::uint) {
 		m_pt = pt;
 		_GetMainCtrl()->invalidateControl(shared_from_this());
 	}
 
-	virtual void onMouseOut (CPoint pt) {
+	virtual void onMouseOut (CPoint pt, xl::uint) {
 		_GetMainCtrl()->invalidateControl(shared_from_this());
 	}
 
-	virtual void onMouseMove (CPoint pt) {
+	virtual void onMouseMove (CPoint pt, xl::uint) {
 		m_pt = pt;
 		_GetMainCtrl()->invalidateControl(shared_from_this());
 	}
 
-	virtual void onLButtonDown (CPoint pt) {
-		_SetCapture(true);
+	virtual void onLButtonDown (CPoint pt, xl::uint) {
+		_Capture(true);
 	}
 
-	virtual void onLButtonUp (CPoint pt) {
-		_SetCapture(false);
+	virtual void onLButtonUp (CPoint pt, xl::uint) {
+		_Capture(false);
 		invalidate();
 	}
 
-	virtual void onRButtonDown (CPoint pt) {
+	virtual void onRButtonDown (CPoint pt, xl::uint) {
 	}
 
-	virtual void onRButtonUp (CPoint pt) {
+	virtual void onRButtonUp (CPoint pt, xl::uint) {
 		::MessageBox(_GetMainCtrl()->getHWND(), _T("RButton up!"), _T(""), 0);
 	}
 

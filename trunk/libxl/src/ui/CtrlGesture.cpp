@@ -46,20 +46,22 @@ CCtrlGesture::~CCtrlGesture () {
 
 
 void CCtrlGesture::onLostCapture() {
-	m_pCtrlMain->postMessage(WM_XL_REMOVE_CONTROL, m_id, 0);
+	// m_pCtrlMain->postMessage(WM_XL_REMOVE_CONTROL, m_id, 0);
+	m_pCtrlMain->removeChild(m_id);
  	m_points.clear();
  	m_gesture.clear();
 }
 
-void CCtrlGesture::onRButtonDown (CPoint pt) {
+void CCtrlGesture::onRButtonDown (CPoint pt, uint key) {
 	m_pCtrlMain->insertChild(shared_from_this());
-	_SetCapture(true);
+	assert (m_pCtrlMain->getControlByID(m_id) == shared_from_this());
+	_Capture(true);
 	m_points.clear();
 	m_gesture.clear();
 	m_points.push_back(pt);
 }
 
-void CCtrlGesture::onRButtonUp (CPoint pt) {
+void CCtrlGesture::onRButtonUp (CPoint pt, uint key) {
 	assert(m_pCtrlMain->getCaptureCtrl() == shared_from_this());
 	assert(m_points.size() > 0);
 
@@ -67,7 +69,10 @@ void CCtrlGesture::onRButtonUp (CPoint pt) {
 	bool pass2background = m_points.size() == 1;
 	tstring gesture = m_gesture;
 	
+	_Capture(false);
 	m_pCtrlMain->removeChild(m_id);
+	m_points.clear();
+	m_gesture.clear();
 
 	if (::GetTickCount() - m_lastMove < m_gestureTimeout) {
 		assert(m_target);
@@ -76,17 +81,17 @@ void CCtrlGesture::onRButtonUp (CPoint pt) {
 	} else if (pass2background) {
 		CControlPtr ctrl = m_pCtrlMain->getControlByPoint(ptDown);
 		if (ctrl != NULL) {
-			ctrl->onRButtonDown(ptDown);
+			ctrl->onRButtonDown(ptDown, key);
 		}
 
 		ctrl = m_pCtrlMain->getControlByPoint(pt);
 		if (ctrl != NULL) {
-			ctrl->onRButtonUp(pt);
+			ctrl->onRButtonUp(pt, key);
 		}
 	}
 }
 
-void CCtrlGesture::onMouseMove (CPoint pt) {
+void CCtrlGesture::onMouseMove (CPoint pt, uint key) {
 	if (m_points.size() == 0) {
 		return; // when called by CCtrlMain::_CheckMouseMove(), this could happen
 	}
