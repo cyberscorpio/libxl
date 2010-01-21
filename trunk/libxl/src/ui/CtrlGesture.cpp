@@ -155,7 +155,7 @@ void CCtrlGesture::drawMe (HDC hdc) {
 
 	CDCHandle dc(hdc);
 	if (m_gestureLineWidth > 0) {
-		HPEN pen = ::CreatePen(PS_SOLID, m_gestureLineWidth, RGB(255,0,0));
+		HPEN pen = ::CreatePen(PS_SOLID, m_gestureLineWidth, _GetColor());
 		HPEN oldPen = dc.SelectPen(pen);
 
 		dc.Polyline(&m_points[0], m_points.size());
