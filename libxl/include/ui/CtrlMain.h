@@ -32,9 +32,12 @@ protected:
 
 	//////////////////////////////////////////////////////////////////////////
 	// protected methods
-	bool _SetCapture (CControlPtr ctrl);
+	bool _SetCaptureCtrl (CControlPtr ctrl);
 	void _SetHoverCtrl (CControlPtr ctrlHover, CPoint pt);
+	void _BeforeRemoveCtrl (CControlPtr ctrl); // call before remove control in CCtrlMain
 	void _CheckMouseMove (CPoint pt);
+	void _CheckMouseMove ();
+	uint _Wparam2KeyStatus (WPARAM wParam);
 
 	//////////////////////////////////////////////////////////////////////////
 	// virtual protected methods
@@ -51,7 +54,7 @@ public:
 	CControlPtr getCaptureCtrl () { return m_ctrlCapture; }
 	CControlPtr getGestureCtrl () { return m_ctrlGesture; }
 
-	void reLayout () const;
+	void reLayout ();
 	virtual CRect layout (CRect rc) const;
 
 	HWND getHWND ();

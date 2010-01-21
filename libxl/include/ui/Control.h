@@ -10,6 +10,8 @@
 namespace xl {
 	namespace ui {
 
+//////////////////////////////////////////////////////////////////////////
+// forward prototypes
 class CCtrlMain;
 class CCtrlTarget;
 
@@ -18,9 +20,21 @@ class CCtrlTarget;
 class CControl;
 typedef std::tr1::shared_ptr<CControl>       CControlPtr;
 typedef std::tr1::weak_ptr<CControl>         CControlWeakPtr;
+typedef CControl                             *CControlRawPtr;
 
 typedef std::tr1::shared_ptr<CCtrlTarget>    CCtrlTargetPtr;
 typedef CCtrlTarget                          *CCtrlTargetRawPtr;
+
+//////////////////////////////////////////////////////////////////////////
+// consts
+
+// used in onXXX for mouse event
+const uint KP_CONTROL = 0x0001;
+const uint KP_LBUTTON = 0x0002;
+const uint KP_MBUTTON = 0x0004;
+const uint KP_RBUTTON = 0x0008;
+const uint KP_SHIFT   = 0x0010;
+
 
 //////////////////////////////////////////////////////////////////////////
 // CControl
@@ -52,7 +66,7 @@ protected:
 	void _DrawBorder (HDC hdc);
 	void _DrawBackground (HDC hdc);
 
-	bool _SetCapture (bool capture);
+	bool _Capture (bool capture);
 
 	//////////////////////////////////////////////////////////////////////////
 	// virtual protected methods
@@ -82,20 +96,19 @@ public:
 	virtual void draw (HDC hdc, CRect rcClip);
 	virtual void drawMe (HDC hdc);
 
-	virtual void onAttach () {}
-	virtual void onDetach () {}
+	virtual void onAttach () {} // called only when attached to CCtrlMain (no matter directly or not)
+	virtual void onDetach () {} // called only when detached from CCtrlMain (no matter directly or not)
 
-	virtual void onMouseIn (CPoint pt) {}
-	virtual void onMouseInChild (CPoint pt) {}
-	virtual void onMouseOut (CPoint pt) {}
-	virtual void onMouseOutChild (CPoint pt) {}
-	virtual void onMouseMove (CPoint pt) {}
-	virtual void onLButtonDown (CPoint pt) {}
-	virtual void onLButtonUp (CPoint pt) {}
-	virtual void onRButtonDown (CPoint pt) {}
-	virtual void onRButtonUp (CPoint pt) {}
-	virtual void onGetCapture () {}
-	virtual void onLostCapture () {}
+	virtual void onMouseIn (CPoint pt) {} // called when mouse moved in
+	virtual void onMouseInChild (CPoint pt) {} // called when mouse moved in some child
+	virtual void onMouseOut (CPoint pt) {} // called when mouse moved out (note maybe in its children)
+	virtual void onMouseOutChild (CPoint pt) {} // called when mouse moved out its child
+	virtual void onMouseMove (CPoint pt, uint key) {} // called when mouse moved (in or has capture)
+	virtual void onLButtonDown (CPoint pt, uint key) {}
+	virtual void onLButtonUp (CPoint pt, uint key) {}
+	virtual void onRButtonDown (CPoint pt, uint key) {}
+	virtual void onRButtonUp (CPoint pt, uint key) {}
+	virtual void onLostCapture () {} // called only when lost capture CAUSED BY SYSTEM
 };
 	} // ui
 } // xl

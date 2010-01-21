@@ -14,8 +14,8 @@ protected:
 	int m_max;
 	int m_curr; // in [m_min, m_max]
 
-	bool m_hover;
-	bool m_push;
+	bool m_hoverThumb;
+	bool m_pushAndCapture;
 	int m_barHeight;
 	int m_thumbWidth;
 	int m_mouseOffset;
@@ -37,10 +37,10 @@ public:
 
 	virtual void onMouseIn (CPoint pt);
 	virtual void onMouseOut (CPoint pt);
-	virtual void onMouseMove (CPoint pt);
+	virtual void onMouseMove (CPoint pt, uint key);
 	virtual void onLostCapture();
-	virtual void onLButtonDown (CPoint pt);
-	virtual void onLButtonUp (CPoint pt);
+	virtual void onLButtonDown (CPoint pt, uint key);
+	virtual void onLButtonUp (CPoint pt, uint key);
 };
 
 	} // ui

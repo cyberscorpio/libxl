@@ -29,7 +29,7 @@ int CCtrlSlider::_ValueByPoint (CPoint pt, int thumbWidth) const {
 
 CCtrlSlider::CCtrlSlider (int _min, int _max, int _curr) 
 	: m_min(_min), m_max(_max), m_curr(_curr)
-	, m_hover(false), m_push(false)
+	, m_hoverThumb(false), m_pushAndCapture(false)
 	, m_barHeight(4)
 	, m_thumbWidth(16)
 	, m_mouseOffset(0)
@@ -52,7 +52,7 @@ void CCtrlSlider::drawMe (HDC hdc) {
 	dc.Draw3dRect(rcBar, RGB(127,127,127), RGB(212,212,212));
 
 	rc = _GetThumbRect(m_thumbWidth);
-	if (m_hover) {
+	if (m_hoverThumb) {
 		dc.FillSolidRect(rc, RGB(0, 0, 0));
 	} else {
 		dc.FillSolidRect(rc, RGB(96, 96, 96));
@@ -67,9 +67,9 @@ void CCtrlSlider::onMouseOut (CPoint pt) {
 
 }
 
-void CCtrlSlider::onMouseMove (CPoint pt) {
+void CCtrlSlider::onMouseMove (CPoint pt, uint key) {
 	CRect rc = _GetThumbRect(m_thumbWidth);
-	if (m_push) {
+	if (m_pushAndCapture) {
 		int v = _ValueByPoint(pt, m_thumbWidth);
 		if (v != m_curr) {
 			m_curr = v;
@@ -78,23 +78,23 @@ void CCtrlSlider::onMouseMove (CPoint pt) {
 		}
 	} else {
 		bool inThumb = rc.PtInRect(pt) ? true : false;
-		if (inThumb != m_hover) {
-			m_hover = inThumb;
+		if (inThumb != m_hoverThumb) {
+			m_hoverThumb = inThumb;
 			invalidate();
 		}
 	}
 }
 
 void CCtrlSlider::onLostCapture() {
-	if (m_hover || m_push) {
+	if (m_hoverThumb || m_pushAndCapture) {
 		invalidate();
 	}
-	m_hover = false;
-	m_push = false;
+	m_hoverThumb = false;
+	m_pushAndCapture = false;
 	m_mouseOffset = 0;
 }
 
-void CCtrlSlider::onLButtonDown (CPoint pt) {
+void CCtrlSlider::onLButtonDown (CPoint pt, uint key) {
 	CRect rc = _GetThumbRect(m_thumbWidth);
 	if (!rc.PtInRect(pt)) {
 		int v = _ValueByPoint(pt, m_thumbWidth);
@@ -104,19 +104,19 @@ void CCtrlSlider::onLButtonDown (CPoint pt) {
 			invalidate();
 		}
 	} else {
-		assert(!m_push);
-		m_push = true;
+		assert(!m_pushAndCapture);
+		m_pushAndCapture = true;
 		m_mouseOffset = pt.x - rc.left;
-		_SetCapture(true);
+		_Capture(true);
 		invalidate();
 	}
 }
 
-void CCtrlSlider::onLButtonUp (CPoint pt) {
-	if (m_push) {
-		m_push = false;
+void CCtrlSlider::onLButtonUp (CPoint pt, uint key) {
+	if (m_pushAndCapture) {
+		m_pushAndCapture = false;
 		m_mouseOffset = 0;
-		_SetCapture(false);
+		_Capture(false);
 		m_target->onSlider(m_id, m_min, m_max, m_curr, false, shared_from_this());
 		invalidate();
 	}

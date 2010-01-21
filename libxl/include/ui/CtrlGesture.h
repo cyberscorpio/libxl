@@ -26,9 +26,9 @@ public:
 	virtual ~CCtrlGesture ();
 
 	virtual void onLostCapture();
-	virtual void onRButtonDown (CPoint pt);
-	virtual void onRButtonUp (CPoint pt);
-	virtual void onMouseMove (CPoint pt);
+	virtual void onRButtonDown (CPoint pt, uint key);
+	virtual void onRButtonUp (CPoint pt, uint key);
+	virtual void onMouseMove (CPoint pt, uint key);
 	virtual void drawMe (HDC hdc);
 };
 
