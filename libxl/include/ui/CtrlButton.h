@@ -18,12 +18,14 @@ protected:
 
 	void _DrawImageAndText (HDC);
 
+	//////////////////////////////////////////////////////////////////////////
+	// protected virtual methods
+	virtual void _ParseProperty (const tstring &key, const tstring &value, bool &relayout, bool &redraw);
+
 public:
 	CCtrlButton (uint id, const tstring &text = _T(""), uint idImg = 0, const tstring &imgType = _T("PNG"));
 	virtual ~CCtrlButton ();
-	void setImg (uint idImg, const tstring &imgType = _T("PNG"));
 	void setText (const tstring &text);
-	void setTextImagePadding (int padding);
 
 	//////////////////////////////////////////////////////////////////////////
 	// virtual methods
@@ -42,6 +44,12 @@ class CCtrlImageButton : public CCtrlButton
 	uint m_idImageHover;
 	uint m_idImagePush;
 	tstring m_imgType;
+
+protected:
+	//////////////////////////////////////////////////////////////////////////
+	// protected virtual methods
+	virtual void _ParseProperty (const tstring &key, const tstring &value, bool &relayout, bool &redraw);
+
 public:
 	CCtrlImageButton (uint id, uint n = 0, uint h = 0, uint p = 0, const tstring &imgType = _T("PNG"));
 

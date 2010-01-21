@@ -116,15 +116,14 @@ void CWinStyle::_SetStyle (tstring style, bool &relayout, bool &redraw) {
 		ExplodeT<TCHAR>::ValueT kv = explode(_T(":"), property);
 		assert (kv.size() == 2);
 		kv[0].trim();
+		while (kv[1].replace(_T("  "), _T(" ")) > 0)
+			;
 		kv[1].trim();
 		_ParseProperty(kv[0], kv[1], relayout, redraw);
 	}
 }
 
 void CWinStyle::_ParseEdge (tstring value, EDGE &edge) {
-	while (value.replace(_T("  "), _T(" ")) > 0)
-		;
-	value.trim(_T(" "));
 	tchar tmp[32];
 	_stprintf(tmp, _T("%d"), EDGE_AUTO);
 	value.replace(_T("auto"), tmp);
@@ -152,7 +151,6 @@ void CWinStyle::_ParseEdge (tstring value, EDGE &edge) {
 
 COLORREF CWinStyle::_ParseColor (tstring value) {
 	COLORREF color = RGB(0,0,0);
-	value.trim();
 	assert(value.length() == 7 && value.at(0) == _T('#')); // #ffffff
 	if (value.length() == 7 && value.at(0) == _T('#')) {
 		tchar tmp[5] = {_T('0'), _T('x'), 0, 0, 0};
@@ -171,10 +169,6 @@ COLORREF CWinStyle::_ParseColor (tstring value) {
 }
 
 void CWinStyle::_ParseBorder (tstring key, tstring value) {
-	key.trim();
-	while (value.replace(_T("  "), _T(" ")) > 0)
-		;
-	value.trim(_T(" "));
 	ExplodeT<TCHAR>::ValueT values = explode(_T(" "), value);
 	if (key == _T("border") || key == _T("border-top") || key == _T("border-right")
 	    || key == _T("border-bottom") || key == _T("border-left")) // border[-top|-right|-bottom|-left]: int[ color[ style]]
@@ -197,7 +191,6 @@ void CWinStyle::_ParseBorder (tstring key, tstring value) {
 }
 
 BACKGROUNDIMAGEPOS_X CWinStyle::_ParseBackgroundImagePosX (tstring value) {
-	value.trim();
 	if (value == _T("fill")) {
 		return BGIPX_FILL;
 	} else if (value == _T("left")) {
@@ -231,8 +224,6 @@ BACKGROUNDIMAGEPOS_Y CWinStyle::_ParseBackgroundImagePosY (tstring value) {
 }
 
 void CWinStyle::_ParseBackground (tstring key, tstring value) {
-	key.trim();
-	value.trim();
 	if (key == _T("background")) {
 		assert(value == _T("none"));
 		background.type = BGT_NONE;

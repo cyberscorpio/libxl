@@ -109,11 +109,15 @@ public:
 	}
 
 	virtual void onAttach () {
-		xl::ui::CCtrlButton *pButton = new xl::ui::CCtrlImageButton(1, IDB_PNG1, IDB_PNG2, IDB_PNG3);
-		pButton->setImg(IDB_PNG5);
-		pButton->setTextImagePadding(6);
+		xl::ui::CCtrlButton *pButton = new xl::ui::CCtrlImageButton(1);
+		TCHAR buf[256];
+		_stprintf_s(buf, 256, _T("button-image: %d PNG;button-image-text-padding:4"), IDB_PNG5);
+		pButton->setStyle(buf);
+		_stprintf_s(buf, 256, _T("imagebutton-image: %d %d %d PNG"), IDB_PNG1, IDB_PNG2, IDB_PNG3);
+		pButton->setStyle(buf);
 		xl::ui::CControlPtr button (pButton);
-		button->setStyle(_T("margin:10;width:100;height:40;border:0;font-weight:bold;"));// opacity:50;
+		button->setStyle(_T("margin:10;width:100;height:40;border:0;font-weight:bold;"));
+		// button->setStyle(_T("opacity:50"));
 		insertChild(button);
 
 		pButton->setText(_T("Prompt"));
@@ -141,12 +145,12 @@ public:
 		insertChild(button);
 	}
 
-	virtual void onMouseIn (CPoint pt, xl::uint) {
+	virtual void onMouseIn (CPoint pt) {
 		m_pt = pt;
 		_GetMainCtrl()->invalidateControl(shared_from_this());
 	}
 
-	virtual void onMouseOut (CPoint pt, xl::uint) {
+	virtual void onMouseOut (CPoint pt) {
 		_GetMainCtrl()->invalidateControl(shared_from_this());
 	}
 
