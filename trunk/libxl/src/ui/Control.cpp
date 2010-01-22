@@ -482,9 +482,6 @@ bool CControl::isPointIn (CPoint pt) const {
 }
 
 void CControl::drawMe (HDC hdc) {
-	CDCHandle dc(hdc);
-	CRect rc = getClientRect();
-	dc.FillSolidRect(rc, ::GetSysColor(COLOR_WINDOW));
 }
 
 
