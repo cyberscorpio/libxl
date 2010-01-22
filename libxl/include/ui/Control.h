@@ -7,8 +7,8 @@
 #include <atlapp.h>
 #include "WinStyle.h"
 
-namespace xl {
-	namespace ui {
+XL_BEGIN
+UI_BEGIN
 
 //////////////////////////////////////////////////////////////////////////
 // forward prototypes
@@ -112,6 +112,7 @@ public:
 	virtual void onLostCapture () {} // called only when lost capture CAUSED BY SYSTEM
 	virtual void onTimer (uint id) {}
 };
-	} // ui
-} // xl
+
+UI_END
+XL_END
 #endif

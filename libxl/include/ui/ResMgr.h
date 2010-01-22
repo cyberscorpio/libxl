@@ -8,8 +8,8 @@
 #include "../common.h"
 #include "../string.h"
 
-namespace xl {
-	namespace ui {
+XL_BEGIN
+UI_BEGIN
 
 /**
  * Manage resources such as fonts, icons, cursors, and so on.
@@ -90,8 +90,7 @@ public:
 
 };
 
-	} // namespace ui
-} // namespace xl
-
+UI_END
+XL_END
 
 #endif

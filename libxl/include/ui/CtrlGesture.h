@@ -5,8 +5,8 @@
 #include "../string.h"
 #include "Control.h"
 
-namespace xl {
-	namespace ui {
+XL_BEGIN
+UI_BEGIN
 
 class CCtrlMain;
 class CCtrlGesture : public CControl 
@@ -37,7 +37,6 @@ public:
 
 typedef std::tr1::shared_ptr<CCtrlGesture>     CCtrlGesturePtr;
 
-	} // ui
-} // xl
-
+UI_END
+XL_END
 #endif

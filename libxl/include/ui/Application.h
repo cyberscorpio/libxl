@@ -7,8 +7,8 @@
 
 #pragma comment (linker, "/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 
-namespace xl {
-	namespace ui {
+XL_BEGIN
+UI_BEGIN
 
 
 template <class T>
@@ -88,8 +88,8 @@ public:
 	}
 };
 
-	} // namespace ui
-} // namespace xl
+UI_END
+XL_END
 
 #endif
 

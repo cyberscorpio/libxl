@@ -4,8 +4,8 @@
 #include "../string.h"
 #include "Control.h"
 
-namespace xl {
-	namespace ui {
+XL_BEGIN
+UI_BEGIN
 
 class CCtrlSlider : public CControl
 {
@@ -48,7 +48,7 @@ public:
 	virtual void onLButtonUp (CPoint pt, uint key);
 };
 
-	} // ui
-} // xl
+UI_END
+XL_END
 
 #endif

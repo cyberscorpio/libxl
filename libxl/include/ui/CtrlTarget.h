@@ -4,8 +4,8 @@
 #include "../string.h"
 #include "Control.h"
 
-namespace xl {
-	namespace ui {
+XL_BEGIN
+UI_BEGIN
 
 class CCtrlTarget
 {
@@ -19,8 +19,7 @@ public:
 	virtual void onUserEvent (uint evt, void *param, CControlPtr ctrl) {}
 };
 
-	} // ui
-} // xl
-
+UI_END
+XL_END
 
 #endif

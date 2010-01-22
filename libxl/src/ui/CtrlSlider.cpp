@@ -10,8 +10,8 @@
  * slider: int int int (min max curr)
  */
 
-namespace xl {
-	namespace ui {
+XL_BEGIN
+UI_BEGIN
 
 CRect CCtrlSlider::_GetThumbRect (int thumbWidth) const {
 	CRect rc = getClientRect();
@@ -165,6 +165,5 @@ void CCtrlSlider::onLButtonUp (CPoint pt, uint key) {
 }
 
 
-
-	} // ui
-} // xl
+UI_END
+XL_END

@@ -16,8 +16,8 @@
  * imagebutton-image: int int int type
  */
 
-namespace xl {
-	namespace ui {
+XL_BEGIN
+UI_BEGIN
 
 void CCtrlButton::_DrawImageAndText (HDC hdc) {
 	if (m_text.length() == 0) {
@@ -274,5 +274,5 @@ void CCtrlImageButton::onLButtonUp (CPoint pt, uint key) {
 
 
 
-	}
-}
+UI_END
+XL_END

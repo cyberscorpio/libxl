@@ -6,7 +6,7 @@
 #include "common.h"
 #include "string.h"
 
-namespace xl {
+XL_BEGIN
 
 bool file_existsA (const string &filename);
 bool file_existsW (const wstring &filename);
@@ -81,7 +81,7 @@ inline bool file_get_contents (const tstring &filename, std::string &data, size_
 }
 
 
-}
+XL_END
 
 
 #endif

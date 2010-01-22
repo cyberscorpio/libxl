@@ -33,9 +33,8 @@
 
 #pragma warning (disable : 4996)
 
-namespace xl {
-	namespace ui {
-
+XL_BEGIN
+UI_BEGIN
 
 void BORDER::reset () {
 	top.reset();
@@ -364,5 +363,5 @@ void CWinStyle::_ParseProperty (const tstring &key, const tstring &value, bool &
 }
 
 
-	} // ui
-} // xl
+UI_END
+XL_END
