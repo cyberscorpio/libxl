@@ -23,6 +23,11 @@ protected:
 	CRect _GetThumbRect (int thumbWidth) const;
 	int _ValueByPoint (CPoint pt, int thumbWidth) const;
 
+protected:
+	//////////////////////////////////////////////////////////////////////////
+	// protected virtual methods
+	virtual void _ParseProperty (const tstring &key, const tstring &value, bool &relayout, bool &redraw);
+
 // 	virtual void _DrawThumb (HDC);
 // 	virtual void _DrawThumbHover (HDC);
 // 	virtual void _DrawThumbPush (HDC);
