@@ -26,6 +26,9 @@ void CCtrlGesture::_ParseProperty (const tstring &key, const tstring &value, boo
 	} else if (key == _T("gesture-line-width")) {
 		m_gestureLineWidth = _tstoi(value);
 		assert(m_gestureLineWidth >= 0);
+	} else if (key == _T("float")) {
+		CControl::_ParseProperty(key, value, relayout, redraw);
+		assert(isfloat == true);
 	} else {
 		CControl::_ParseProperty(key, value, relayout, redraw);
 	}
@@ -42,7 +45,7 @@ CCtrlGesture::CCtrlGesture (CCtrlMain *pCtrlMain)
 {
 	assert(m_pCtrlMain);
 	// setStyle(_T("px:left;py:top;width:fill;height:fill;color:#ffffff;background-color:#000000;opacity:50;"));
-	setStyle(_T("px:left;py:top;width:fill;height:fill;"));
+	setStyle(_T("px:left;py:top;width:fill;height:fill;float:true;"));
 }
 
 CCtrlGesture::~CCtrlGesture () {
