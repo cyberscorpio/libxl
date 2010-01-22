@@ -5,8 +5,8 @@
 #pragma comment (lib, "gdiplus.lib")
 #pragma comment (lib, "ole32.lib")
 
-namespace xl {
-	namespace ui {
+XL_BEGIN
+UI_BEGIN
 
 ///////////////////////////////////////////////////////////
 // private
@@ -243,7 +243,5 @@ CResMgr::GpBmpPtr CResMgr::getBitmap (const tstring &file, bool grayscale) {
 	return bitmap;
 }
 
-
-	} // namespace ui
-} // namespace xl
-
+UI_END
+XL_END

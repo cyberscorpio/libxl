@@ -21,7 +21,7 @@
 #undef min
 #endif
 
-namespace xl {
+XL_BEGIN
 
 template< class CharT,
           class Traits,
@@ -292,7 +292,7 @@ tstring s2ts (const string &s) {
 }
 #endif
 
-}
+XL_END
 
 
 #ifdef RESTORE_MIN_MAX

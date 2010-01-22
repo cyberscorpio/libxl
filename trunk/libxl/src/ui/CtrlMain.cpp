@@ -1,8 +1,8 @@
 #include <assert.h>
 #include "../../include/ui/CtrlMain.h"
 
-namespace xl {
-	namespace ui {
+XL_BEGIN
+UI_BEGIN
 
 bool CCtrlMain::_SetCaptureCtrl(CControlPtr ctrl) {
 	if (m_ctrlCapture == ctrl) {
@@ -341,6 +341,5 @@ LRESULT CCtrlMain::OnWMRemoveControl(UINT uMsg, WPARAM wParam, LPARAM lParam, BO
 }
 
 
-
-	} // ui
-} // xl
+UI_END
+XL_END

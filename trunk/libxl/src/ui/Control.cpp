@@ -8,8 +8,8 @@
 static int s_control_counts = 0;
 #endif
 
-namespace xl {
-	namespace ui {
+XL_BEGIN
+UI_BEGIN
 
 void CControl::_LayoutChildren () const {
 	CRect rc = getClientRect();
@@ -486,5 +486,5 @@ void CControl::drawMe (HDC hdc) {
 
 
 
-	} // ui
-} // xl
+UI_END
+XL_END

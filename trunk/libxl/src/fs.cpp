@@ -52,7 +52,7 @@ static bool _file_get_contents(FILE *file, std::string &data, size_t offset) {
 }
 
 
-namespace xl {
+XL_BEGIN
 
 bool file_existsA (const string &filename) {
 	FILE *file = fopen(filename, "r");
@@ -235,7 +235,4 @@ bool file_get_contentsW (const wstring &filename, std::string &data, size_t offs
 	return result;
 }
 
-
-
-
-}
+XL_END

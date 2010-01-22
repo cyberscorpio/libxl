@@ -4,8 +4,8 @@
 #include "../string.h"
 #include "Control.h"
 
-namespace xl {
-	namespace ui {
+XL_BEGIN
+UI_BEGIN
 
 class CCtrlButton : public CControl 
 {
@@ -61,8 +61,7 @@ public:
 };
 
 
-	} // ui
-} // xl
-
+UI_END
+XL_END
 
 #endif

@@ -13,8 +13,8 @@
 #endif
 
 
-namespace xl {
-	namespace ui {
+XL_BEGIN
+UI_BEGIN
 
 
 
@@ -192,8 +192,9 @@ public:
 
 
 
-	} // ui
-} // xl
+UI_END
+XL_END
+
 
 #ifdef RESTORE_MIN_MAX
 #pragma pop_macro ("max")

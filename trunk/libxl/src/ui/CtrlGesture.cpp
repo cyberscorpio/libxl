@@ -13,8 +13,8 @@
  * gesture-line-width: int
  */
 
-namespace xl {
-	namespace ui {
+XL_BEGIN
+UI_BEGIN
 
 void CCtrlGesture::_ParseProperty (const tstring &key, const tstring &value, bool &relayout, bool &redraw) {
 	if (key == _T("gesture-sensitivity")) {
@@ -180,5 +180,5 @@ void CCtrlGesture::drawMe (HDC hdc) {
 }
 
 
-	} // ui
-} // xl
+UI_END
+XL_END

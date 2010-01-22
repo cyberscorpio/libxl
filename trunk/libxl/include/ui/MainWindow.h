@@ -8,8 +8,8 @@
 #include "CtrlMain.h"
 #include "CtrlTarget.h"
 
-namespace xl {
-	namespace ui {
+XL_BEGIN
+UI_BEGIN
 
 typedef CWinTraits<
                    WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN | WS_CLIPSIBLINGS,
@@ -90,7 +90,7 @@ public:
 	}
 };
 
-	} // namespace ui
-} // namespace xl
+UI_END
+XL_END
 
 #endif

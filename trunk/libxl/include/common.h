@@ -4,6 +4,12 @@
 #ifndef XL_COMMON_H
 #define XL_COMMON_H
 
+#define XL_BEGIN namespace xl {
+#define XL_END }
+
+#define UI_BEGIN namespace ui {
+#define UI_END }
+
 //////////////////////////////////////////////////////////////////////////
 // typedef 
 #ifdef _MSC_VER
@@ -12,7 +18,7 @@
 #error "Implement tchar.h here"
 #endif
 
-namespace xl {
+XL_BEGIN
 
 typedef TCHAR tchar;
 
@@ -21,7 +27,7 @@ typedef unsigned short      ushort;
 typedef __int64             int64;
 typedef unsigned __int64    uint64;
 
-}
+XL_END
 
 
 

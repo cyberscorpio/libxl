@@ -12,8 +12,8 @@
 #define WM_XL_REMOVE_CONTROL      WM_XL_BEGIN // WPARAM: id; LPARAM: not used
 
 
-namespace xl {
-	namespace ui {
+XL_BEGIN
+UI_BEGIN
 
 class CCtrlMain : public CControl
 {
@@ -100,8 +100,8 @@ public:
 typedef std::tr1::shared_ptr<CCtrlMain>        CCtrlMainPtr;
 
 
-	} // ui
-} // xl
+UI_END
+XL_END
 
 
 #endif

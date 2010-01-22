@@ -153,6 +153,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\src\Language.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\src\placeholder.cpp"
 				>
 			</File>
@@ -200,6 +204,10 @@
 			</File>
 			<File
 				RelativePath=".\include\fs.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\Language.h"
 				>
 			</File>
 			<File
