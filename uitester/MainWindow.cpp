@@ -6,6 +6,7 @@
 #include "resource.h"
 
 #define ID_VIEW 99
+#define ID_SLIDER 98
 
 class CToolbar : public xl::ui::CControl
 {
@@ -23,7 +24,8 @@ public:
 class CFloat : public xl::ui::CCtrlSlider
 {
 public:
-	CFloat () : xl::ui::CCtrlSlider(0, 255, 50) {
+	CFloat () : xl::ui::CCtrlSlider(0, 0, 0) {
+		m_id = ID_SLIDER;
 		setStyle(_T("px:left; py:bottom; padding:0; height:32; width:600; float:true; margin:0 auto 20;opacity:25;"));
 	}
 
@@ -45,11 +47,17 @@ public:
 // 	}
 
 	virtual void onMouseIn (CPoint pt) {
+		if (disable) {
+			return;
+		}
 		setStyle(_T("opacity:100"));
 		_GetMainCtrl()->invalidateControl(shared_from_this());
 	}
 
 	virtual void onMouseOut (CPoint pt) {
+		if (disable) {
+			return;
+		}
 		setStyle(_T("opacity:25"));
 		_GetMainCtrl()->invalidateControl(shared_from_this());
 	}
@@ -236,10 +244,12 @@ void CMainWindow::onCommand (xl::uint id, xl::ui::CControlPtr ctrl) {
 			button->setText(_T("Enlarge"));
 		}
 	} else if (id == 5) {
-		xl::ui::CControlPtr ctrl = m_ctrlMain->removeChild(5);
-		if (ctrl != NULL) {
-			s_removed = ctrl;
-		}
+		// xl::ui::CControlPtr ctrl = m_ctrlMain->removeChild(5);
+		// if (ctrl != NULL) {
+		// 	s_removed = ctrl;
+		// }
+		xl::ui::CControlPtr ctrl = m_ctrlMain->getControlByID(ID_SLIDER);
+		ctrl->setStyle(_T("disable:false;slider:0 255 50;"));
 	}
 }
 

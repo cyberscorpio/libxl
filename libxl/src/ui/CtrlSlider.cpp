@@ -5,12 +5,19 @@
 #include "../../include/ui/CtrlSlider.h"
 #include "../../include/ui/ResMgr.h"
 
+/**
+ * setStyle:
+ * slider: int int int (min max curr)
+ */
+
 namespace xl {
 	namespace ui {
 
 CRect CCtrlSlider::_GetThumbRect (int thumbWidth) const {
 	CRect rc = getClientRect();
-	rc.left += m_curr * (rc.Width() - thumbWidth) / (m_max - m_min);
+	if (m_max > m_min) {
+		rc.left += m_curr * (rc.Width() - thumbWidth) / (m_max - m_min);
+	}
 	rc.right = rc.left + thumbWidth;
 	return rc;
 }
@@ -26,6 +33,23 @@ int CCtrlSlider::_ValueByPoint (CPoint pt, int thumbWidth) const {
 	return v;
 }
 
+void CCtrlSlider::_ParseProperty (const tstring &key, const tstring &value, bool &relayout, bool &redraw) {
+	if (key == _T("slider")) {
+		ExplodeT<TCHAR>::ValueT values = explode(_T(" "), value);
+		assert(values.size() == 3);
+		m_min = _tstoi(values[0]);
+		m_max = _tstoi(values[1]);
+		m_curr = _tstoi(values[2]);
+		assert(m_curr >= m_min && m_curr <= m_max);
+		if (m_min == m_max) {
+			setStyle(_T("disable:true"));
+		}
+		redraw = true;
+	} else {
+		CControl::_ParseProperty(key, value, relayout, redraw);
+	}
+}
+
 
 CCtrlSlider::CCtrlSlider (int _min, int _max, int _curr) 
 	: m_min(_min), m_max(_max), m_curr(_curr)
@@ -34,7 +58,10 @@ CCtrlSlider::CCtrlSlider (int _min, int _max, int _curr)
 	, m_thumbWidth(16)
 	, m_mouseOffset(0)
 {
-	assert (m_curr >= m_min && m_curr <= m_max);
+	assert(m_curr >= m_min && m_curr <= m_max);
+	if (m_min == m_max) {
+		// setStyle(_T("disable:true"));
+	}
 }
 
 CCtrlSlider::~CCtrlSlider() {
@@ -68,6 +95,9 @@ void CCtrlSlider::onMouseOut (CPoint pt) {
 }
 
 void CCtrlSlider::onMouseMove (CPoint pt, uint key) {
+	if (disable) {
+		return;
+	}
 	CRect rc = _GetThumbRect(m_thumbWidth);
 	if (m_pushAndCapture) {
 		int v = _ValueByPoint(pt, m_thumbWidth);
@@ -95,12 +125,21 @@ void CCtrlSlider::onLostCapture() {
 }
 
 void CCtrlSlider::onLButtonDown (CPoint pt, uint key) {
+	if (disable) {
+		return;
+	}
 	CRect rc = _GetThumbRect(m_thumbWidth);
 	if (!rc.PtInRect(pt)) {
 		int v = _ValueByPoint(pt, m_thumbWidth);
 		if (v != m_curr) {
 			m_curr = v;
 			m_target->onSlider(m_id, m_min, m_max, m_curr, false, shared_from_this());
+
+			// check for hover
+			rc = _GetThumbRect(m_thumbWidth);
+			if (rc.PtInRect(pt)) {
+				m_hoverThumb = true;
+			}
 			invalidate();
 		}
 	} else {
@@ -113,6 +152,9 @@ void CCtrlSlider::onLButtonDown (CPoint pt, uint key) {
 }
 
 void CCtrlSlider::onLButtonUp (CPoint pt, uint key) {
+	if (disable) {
+		return;
+	}
 	if (m_pushAndCapture) {
 		m_pushAndCapture = false;
 		m_mouseOffset = 0;
