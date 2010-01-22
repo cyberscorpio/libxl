@@ -196,8 +196,8 @@ public:
 } // xl
 
 #ifdef RESTORE_MIN_MAX
-#pragma pop_macro ("min")
 #pragma pop_macro ("max")
+#pragma pop_macro ("min")
 #undef RESTORE_MIN_MAX
 #endif
 
