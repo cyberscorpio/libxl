@@ -63,7 +63,8 @@ public:
 	CControlPtr getGestureCtrl () { return m_ctrlGesture; }
 
 	void reLayout ();
-	virtual CRect layout (CRect rc) const;
+	virtual CRect layout (CRect rc);
+	virtual void draw (HDC hdc, CRect rcClip);
 
 	HWND getHWND ();
 

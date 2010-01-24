@@ -163,6 +163,9 @@ public:
 	}
 
 	virtual void onMouseMove (CPoint pt, xl::uint) {
+		if (m_pt == pt) {
+			return;
+		}
 		m_pt = pt;
 		_GetMainCtrl()->invalidateControl(shared_from_this());
 	}

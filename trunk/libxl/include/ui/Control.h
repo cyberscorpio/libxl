@@ -54,9 +54,9 @@ protected:
 	CControlWeakPtr      m_parent;
 	CCtrlTargetRawPtr    m_target;
 	CControlContainer    m_controls;
-	mutable CRect        m_rect;
+	CRect                m_rect;
 
-	void _LayoutChildren () const;
+	void _LayoutChildren ();
 
 	void _SetParent (CControlPtr parent);
 	void _SetTarget (CCtrlTargetRawPtr target);
@@ -92,7 +92,7 @@ public:
 
 	//////////////////////////////////////////////////////////////////////////
 	// virtual
-	virtual CRect layout (CRect rc) const;
+	virtual CRect layout (CRect rc);
 	virtual bool isPointIn (CPoint pt) const;
 	virtual void draw (HDC hdc, CRect rcClip);
 	virtual void drawMe (HDC hdc);
@@ -100,6 +100,7 @@ public:
 	virtual void onAttach () {} // called only when attached to CCtrlMain (no matter directly or not)
 	virtual void onDetach () {} // called only when detached from CCtrlMain (no matter directly or not)
 
+	virtual void onSize () {}
 	virtual void onMouseIn (CPoint pt) {} // called when mouse moved in
 	virtual void onMouseInChild (CPoint pt) {} // called when mouse moved in some child
 	virtual void onMouseOut (CPoint pt) {} // called when mouse moved out (note maybe in its children)
