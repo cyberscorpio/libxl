@@ -188,10 +188,17 @@ void CCtrlMain::reLayout () {
 	invalidateControl();
 }
 
-CRect CCtrlMain::layout (CRect rc) const {
+CRect CCtrlMain::layout (CRect rc) {
 	invalidateControl();
 	m_rcLayout = rc;
 	return CControl::layout(rc);
+}
+
+void CCtrlMain::draw (HDC hdc, CRect rcClip) {
+	DWORD tick = ::GetTickCount();
+	CControl::draw(hdc, rcClip);
+	tick = ::GetTickCount() - tick;
+	ATLTRACE(_T("CCtrlMain::draw(%d x %d) cost %dms\n"), rcClip.Width(), rcClip.Height(), tick);
 }
 
 HWND CCtrlMain::getHWND () {

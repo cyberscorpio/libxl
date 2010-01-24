@@ -11,7 +11,7 @@ static int s_control_counts = 0;
 XL_BEGIN
 UI_BEGIN
 
-void CControl::_LayoutChildren () const {
+void CControl::_LayoutChildren () {
 	CRect rc = getClientRect();
 
 	for (CControlConstIter it = m_controls.begin(); it != m_controls.end(); ++ it) {
@@ -365,10 +365,11 @@ void CControl::draw (HDC hdc, CRect rcClip) {
 	}
 }
 
-CRect CControl::layout (CRect rc) const {
+CRect CControl::layout (CRect rc) {
 	CControlPtr parent = m_parent.lock();
 	int x, y, width, height;
 	CRect rcRemain = rc;
+	CRect rcOld = m_rect;
 
 	if (isfloat) {
 		assert (parent != NULL);
@@ -472,6 +473,10 @@ CRect CControl::layout (CRect rc) const {
 
 	if (isfloat) {
 		rcRemain = rc;
+	}
+
+	if (rcOld != m_rect) {
+		onSize();
 	}
 
 	return rcRemain;
