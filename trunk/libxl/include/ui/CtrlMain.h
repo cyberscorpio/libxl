@@ -67,6 +67,7 @@ public:
 	virtual void draw (HDC hdc, CRect rcClip);
 
 	HWND getHWND ();
+	ATL::CWindow* getWindow ();
 
 	BEGIN_MSG_MAP(CCtrlMain)
 		MESSAGE_HANDLER(WM_MOUSEMOVE, OnMouseMove)
