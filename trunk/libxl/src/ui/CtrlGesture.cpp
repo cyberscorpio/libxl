@@ -76,7 +76,6 @@ void CCtrlGesture::onRButtonUp (CPoint pt, uint key) {
 	assert(m_points.size() > 0);
 
 	CPoint ptDown = m_points[0];
-	CPoint ptUp = m_points[m_points.size() - 1];
 	bool pass2background = m_points.size() == 1;
 	tstring gesture = m_gesture;
 	bool isTimeout = m_isTimeout;
@@ -89,7 +88,7 @@ void CCtrlGesture::onRButtonUp (CPoint pt, uint key) {
 
 	if (::GetTickCount() - m_lastMove < m_gestureTimeout && !isTimeout) {
 		assert(m_target);
-		m_target->onGesture(gesture, ptDown, ptUp, true);
+		m_target->onGesture(gesture, ptDown, true);
 		m_lastMove = 0;
 	} else if (pass2background && !isTimeout) {
 		CControlPtr ctrl = m_pCtrlMain->getControlByPoint(ptDown);
@@ -171,7 +170,7 @@ void CCtrlGesture::drawMe (HDC hdc) {
 	assert(m_target);
 	tstring text = m_gesture;
 	text += _T(" (");
-	text += m_target->onGesture(m_isTimeout ? _T("canceled") : m_gesture, m_points[0], m_points[m_points.size() - 1], false);
+	text += m_target->onGesture(m_isTimeout ? _T("canceled") : m_gesture, m_points[0], false);
 	text += _T(")");
 
 	rc.top = rc.bottom - 20;

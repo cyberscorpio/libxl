@@ -272,7 +272,7 @@ void CMainWindow::onSlider (xl::uint id, int _min, int _max, int _curr, bool tra
 	}
 }
 
-xl::tstring CMainWindow::onGesture (const xl::tstring &gesture, CPoint ptOrg, CPoint ptNow, bool release) {
+xl::tstring CMainWindow::onGesture (const xl::tstring &gesture, CPoint ptDown, bool release) {
 	if (gesture == _T("RL")) {
 		return _T("Next");
 	} else if (gesture == _T("LR")) {
@@ -285,7 +285,7 @@ xl::tstring CMainWindow::onGesture (const xl::tstring &gesture, CPoint ptOrg, CP
 	} else if (gesture == _T("canceled")) {
 		return _T("手势已取消");
 	} else {
-		return xl::ui::CCtrlTarget::onGesture(gesture, ptOrg, ptNow, release);
+		return xl::ui::CCtrlTarget::onGesture(gesture, ptDown, release);
 	}
 }
 
