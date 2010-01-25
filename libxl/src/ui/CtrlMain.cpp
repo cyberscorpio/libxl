@@ -209,6 +209,10 @@ HWND CCtrlMain::getHWND () {
 	}
 }
 
+ATL::CWindow* CCtrlMain::getWindow () {
+	return m_pWindow;
+}
+
 //////////////////////////////////////////////////////////////////////////
 // message handles
 LRESULT CCtrlMain::OnCreate(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) {
