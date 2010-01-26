@@ -1,6 +1,7 @@
 #include <assert.h>
 #include <limits>
 #include "../../include/ui/DIBSection.h"
+#include "../../include/ui/Gdi.h"
 
 #ifdef max // <windows.h> defines max & min
 #define RESTORE_MIN_MAX
@@ -9,6 +10,10 @@
 #undef max
 #undef min
 #endif
+
+namespace {
+	static int dibcount = 0;
+}
 
 
 XL_BEGIN
@@ -20,6 +25,7 @@ UI_BEGIN
 void CDIBSection::_Clear () {
 	if (m_hBitmap) {
 		::DeleteObject(m_hBitmap);
+		memset(&m_section, 0, sizeof(m_section));
 	}
 }
 
@@ -30,11 +36,13 @@ void CDIBSection::_Clear () {
 CDIBSection::CDIBSection ()
 	: m_hBitmap(NULL)
 {
-
+	dibcount ++;
 }
 
 CDIBSection::~CDIBSection () {
 	_Clear();
+	dibcount --;
+	ATLTRACE(_T("%d DIBSection remains\n"), dibcount);
 }
 
 bool CDIBSection::create (int w, int h, int bitcount /* = 24 */, bool usefilemap /* = false */) {
@@ -61,7 +69,7 @@ bool CDIBSection::create (int w, int h, int bitcount /* = 24 */, bool usefilemap
 	::ReleaseDC(NULL, hdc);
 
 	if (m_hBitmap) {
-		::GetObject(m_hBitmap, sizeof(m_bitmap), &m_bitmap);
+		::GetObject(m_hBitmap, sizeof(m_section), &m_section);
 		return true;
 	} else {
 		return false;
@@ -69,26 +77,26 @@ bool CDIBSection::create (int w, int h, int bitcount /* = 24 */, bool usefilemap
 }
 
 int CDIBSection::getWidth () const {
-	return m_hBitmap == NULL ? -1 : m_bitmap.bmWidth;
+	return m_hBitmap == NULL ? -1 : m_section.dsBm.bmWidth;
 }
 
 int CDIBSection::getHeight () const {
-	return m_hBitmap == NULL ? -1 : m_bitmap.bmHeight;
+	return m_hBitmap == NULL ? -1 : m_section.dsBm.bmHeight;
 }
 
 int CDIBSection::getBitCounts () const {
-	return m_hBitmap == NULL ? -1 : m_bitmap.bmBitsPixel;
+	return m_hBitmap == NULL ? -1 : m_section.dsBm.bmBitsPixel;
 }
 
 int CDIBSection::getStride () const {
 	if (m_hBitmap == NULL) {
 		return -1;
 	} else {
-		uint stride = (uint)m_bitmap.bmWidth * (getBitCounts() / 8);
+		uint stride = (uint)m_section.dsBm.bmWidth * (getBitCounts() / 8);
 		stride += 3;
 		stride &= ~(uint)3;
 		assert(stride < (uint)std::numeric_limits<int>::max());
-		assert(stride == m_bitmap.bmWidthBytes);
+		assert(stride == m_section.dsBm.bmWidthBytes);
 		return (int)stride;
 	}
 }
@@ -98,7 +106,7 @@ void* CDIBSection::getLine (int line) {
 		return NULL;
 	} else {
 		assert(line >= 0 && line < getHeight());
-		unsigned char *data = (unsigned char *)m_bitmap.bmBits;
+		unsigned char *data = (unsigned char *)m_section.dsBm.bmBits;
 		assert(data != NULL);
 		data += line * getStride();
 		return data;
@@ -106,7 +114,7 @@ void* CDIBSection::getLine (int line) {
 }
 
 void* CDIBSection::getData () {
-	return m_hBitmap == NULL ? NULL : m_bitmap.bmBits;
+	return m_hBitmap == NULL ? NULL : m_section.dsBm.bmBits;
 }
 
 CDIBSection::operator HBITMAP() {
@@ -115,8 +123,45 @@ CDIBSection::operator HBITMAP() {
 
 
 CDIBSectionPtr CDIBSection::clone () {
-	// CDIBSectionPtr dib = CreateDIBSection();
-	return CDIBSectionPtr();
+	if (m_hBitmap == NULL) {
+		return CDIBSectionPtr(new CDIBSection());
+	}
+
+	assert(m_section.dshSection == NULL);
+	CDIBSectionPtr dib = createDIBSection(getWidth(), getHeight(), getBitCounts());
+	if (dib) {
+		assert(getStride() == dib->getStride());
+		void *src = getData();
+		void *dst = dib->getData();
+		memcpy(dst, src, getStride() * getHeight());
+	}
+	return CDIBSectionPtr(dib);
+}
+
+CDIBSectionPtr CDIBSection::resize (int w, int h, int bitcount, bool usefilemap) {
+	assert(m_hBitmap != NULL);
+	assert(w > 0 && h > 0);
+	CDIBSectionPtr dib = createDIBSection(w, h, bitcount, usefilemap);
+	if (dib) {
+		CDC dc;
+		HDC hdc = ::GetDC(NULL);
+		dc.CreateCompatibleDC(hdc);
+		::ReleaseDC(NULL, hdc);
+
+		HBITMAP oldBitmap = dc.SelectBitmap(*dib);
+		CDC mdc;
+		mdc.CreateCompatibleDC(dc);
+		HBITMAP oldMBitmap = mdc.SelectBitmap(*this);
+		int oldMode = dc.SetStretchBltMode(HALFTONE);
+
+		dc.StretchBlt(0, 0, w, h, mdc, 0, 0, getWidth(), getHeight(), SRCCOPY);
+
+		dc.SetStretchBltMode(oldMode);
+		mdc.SelectBitmap(oldMBitmap);
+		dc.SelectBitmap(oldBitmap);
+	}
+
+	return CDIBSectionPtr(dib);
 }
 
 

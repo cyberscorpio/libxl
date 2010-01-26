@@ -15,7 +15,7 @@ class CDIBSection
 {
 protected:
 	HBITMAP m_hBitmap;
-	BITMAP m_bitmap;
+	DIBSECTION m_section;
 
 protected:
 	void _Clear ();
@@ -35,7 +35,7 @@ public:
 	operator HBITMAP ();
 
 	CDIBSectionPtr clone ();
-	bool resize (int w, int h);
+	CDIBSectionPtr resize (int w, int h, int bitcount = 24, bool usefilemap = false);
 
 	static CDIBSectionPtr createDIBSection (int w, int h, int bitcount = 24, bool usefilemap = false);
 };
