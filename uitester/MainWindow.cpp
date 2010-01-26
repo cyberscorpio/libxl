@@ -134,6 +134,9 @@ public:
 				}
 			}
 		}
+
+		m_bitmap = m_bitmap->clone();
+		m_bitmap = m_bitmap->resize(400, 200);
 	}
 
 	virtual void onAttach () {
