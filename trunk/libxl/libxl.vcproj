@@ -184,6 +184,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\ui\DIBSection.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\src\ui\ResMgr.cpp"
 					>
 				</File>
@@ -251,6 +255,10 @@
 				</File>
 				<File
 					RelativePath=".\include\ui\CtrlTarget.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\ui\DIBSection.h"
 					>
 				</File>
 				<File

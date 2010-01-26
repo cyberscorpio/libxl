@@ -2,6 +2,7 @@
 #include "../libxl/include/ui/ResMgr.h"
 #include "../libxl/include/ui/CtrlButton.h"
 #include "../libxl/include/ui/CtrlSlider.h"
+#include "../libxl/include/ui/DIBSection.h"
 #include "MainWindow.h"
 #include "resource.h"
 
@@ -109,11 +110,30 @@ public:
 class CView : public xl::ui::CControl
 {
 	CPoint m_pt;
+	xl::ui::CDIBSectionPtr m_bitmap;
 public:
 
-	CView () {
+	CView () : m_bitmap(xl::ui::CDIBSection::createDIBSection(100, 100)) {
 		m_id = ID_VIEW;
 		setStyle(_T("margin:5; background-color: #323232; px:left; py:top; width:fill; height:fill; "));
+
+		int w = m_bitmap->getWidth();
+		int h = m_bitmap->getHeight();
+		for (int y = 0; y < h; ++ y) {
+			unsigned char *data = (unsigned char *)m_bitmap->getLine(y);
+			if (y % 2) {
+				for (int x = 0; x < w; ++ x) {
+					*data ++ = 0xff;
+					*data ++ = 0xff;
+					*data ++ = 0xff;
+				}
+			} else {
+				for (int x = 0; x < w; ++ x) {
+					data += 2;
+					*data ++ = 0xff;
+				}
+			}
+		}
 	}
 
 	virtual void onAttach () {
@@ -192,10 +212,35 @@ public:
 
 	virtual void drawMe (HDC hdc) {
 		xl::ui::CDCHandle dc (hdc);
+		CRect rc = getClientRect();
+
+		xl::ui::CDC mdc;
+		mdc.CreateCompatibleDC(hdc);
+		HBITMAP oldBmp = mdc.SelectBitmap(*m_bitmap);
+		int w = m_bitmap->getWidth();
+		int h = m_bitmap->getHeight();
+		int x = rc.left + (rc.Width() - w) / 2;
+		int y = rc.top + (rc.Height() - h) / 2;
+		if (x < rc.left) {
+			x = rc.left;
+		}
+		if (y < rc.top) {
+			y = rc.top;
+		}
+		if (x + w > rc.right) {
+			w = rc.right - x;
+		}
+		if (y + h > rc.bottom) {
+			h = rc.bottom - y;
+		}
+		dc.BitBlt(x, y, w, h, mdc, 0, 0, SRCCOPY);
+
+		mdc.SelectBitmap(oldBmp);
+
 		if (_GetMainCtrl()->getHoverCtrl() == shared_from_this()) {
 			TCHAR buf[1024];
 			_stprintf_s(buf, 1024, _T("Mouse: %d - %d"), m_pt.x - m_rect.left, m_pt.y - m_rect.top);
-			dc.drawTransparentText(buf, -1, getClientRect(), DT_SINGLELINE | DT_CENTER | DT_VCENTER);
+			dc.drawTransparentText(buf, -1, rc, DT_SINGLELINE | DT_CENTER | DT_VCENTER);
 		}
 	}
 };

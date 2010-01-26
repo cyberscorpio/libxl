@@ -6,6 +6,7 @@
 #include <atlapp.h>
 #include <atlgdi.h>
 #include "ResMgr.h"
+#include "DIBSection.h"
 
 namespace xl {
 	namespace ui {
