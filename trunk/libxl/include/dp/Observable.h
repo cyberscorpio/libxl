@@ -3,14 +3,15 @@
 #include <assert.h>
 #include <vector>
 #include <windows.h>
+#include "../common.h"
 
 /**
  * -= How to use =-
  *
  * 1. derived class should be:
-class CObj : public xl::CObserableT<CObj> {
+class CObj : public xl::dp::CObserableT<CObj> {
 public:
-	enum EVENT : xl::CObserableT<CObj>::EVT {
+	enum EVENT : xl::dp::CObserableT<CObj>::EVT {
 		EVT_1,
 		EVT_2,
 		// ...
@@ -37,7 +38,8 @@ public:
  * param is derived class defined
  */
 
-namespace xl {
+XL_BEGIN
+DP_BEGIN
 
 template <class T>
 class CObserableT
@@ -126,6 +128,7 @@ public:
 	}
 };
 
-} // namespace xl
+DP_END
+XL_END
 
 #endif

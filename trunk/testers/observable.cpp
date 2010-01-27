@@ -6,9 +6,9 @@
 
 static std::stringstream ss;
 
-class CObj : public xl::CObserableT<CObj> {
+class CObj : public xl::dp::CObserableT<CObj> {
 public:
-	enum EVENT : xl::CObserableT<CObj>::EVT {
+	enum EVENT : xl::dp::CObserableT<CObj>::EVT {
 		EVT_1,
 		EVT_2,
 		EVT_NUM

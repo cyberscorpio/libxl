@@ -41,11 +41,26 @@ inline __int64 file_get_length (const tstring &filename) {
 
 string file_get_directoryA (const string &filename, bool mustExist = false);
 wstring file_get_directoryW (const wstring &filename, bool mustExist = false);
+/**
+ * return the director contains the file, not include the last '\\'.
+ * for example, if pass c:\windows\system32\drivers\etc\hosts, it will return
+ * c:\windows\system32\drivers\etc
+ */
 inline tstring file_get_directory (const tstring &filename, bool mustExist = false) {
 #ifdef UNICODE
 	return file_get_directoryW(filename, mustExist);
 #else
 	return file_get_directoryA(filename, mustExist);
+#endif
+}
+
+string file_get_nameA (const string &filename, bool mustExist = false);
+wstring file_get_nameW (const wstring &filename, bool mustExist = false);
+inline tstring file_get_name (const tstring &filename, bool mustExist = false) {
+#ifdef UNICODE
+	return file_get_nameW(filename, mustExist);
+#else
+	return file_get_nameA(filename, mustExist);
 #endif
 }
 
