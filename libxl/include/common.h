@@ -10,6 +10,9 @@
 #define UI_BEGIN namespace ui {
 #define UI_END }
 
+#define DP_BEGIN namespace dp {
+#define DP_END }
+
 //////////////////////////////////////////////////////////////////////////
 // typedef 
 #ifdef _MSC_VER

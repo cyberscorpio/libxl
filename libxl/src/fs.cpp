@@ -181,12 +181,38 @@ wstring file_get_directoryW (const wstring &filename, bool mustExist) {
 	return d;
 }
 
+string file_get_nameA (const string &filename, bool mustExist) {
+	assert (!mustExist || file_existsA(filename));
+	size_t offset = filename.find_last_of(dirsepA);
+	if (offset == filename.npos) {
+		offset = filename.find_last_of('/');
+	}
+	string n;
+	if (offset != filename.npos) {
+		n = filename.substr(offset + 1);
+	}
+	return n;
+}
+
+wstring file_get_nameW (const wstring &filename, bool mustExist) {
+	assert (!mustExist || file_existsW(filename));
+	size_t offset = filename.find_last_of(dirsepW);
+	if (offset == filename.npos) {
+		offset = filename.find_last_of(_T('/'));
+	}
+	wstring n;
+	if (offset != filename.npos) {
+		n = filename.substr(offset + 1);
+	}
+	return n;
+}
+
 
 /**
  * @brief put the whole content of data into the file indicated by filename.
  * @note all content in the file will be destroyed.
  */
-// ascii version
+// ASCII version
 int file_put_contentsA(const string &filename, const std::string &data) {
 	FILE *file = fopen(filename, "w+b");
 	if (!file) {
