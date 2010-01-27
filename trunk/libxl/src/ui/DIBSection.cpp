@@ -138,7 +138,7 @@ CDIBSectionPtr CDIBSection::clone () {
 	return CDIBSectionPtr(dib);
 }
 
-CDIBSectionPtr CDIBSection::resize (int w, int h, int bitcount, bool usefilemap) {
+CDIBSectionPtr CDIBSection::resize (int w, int h, bool usehalftone, int bitcount, bool usefilemap) {
 	assert(m_hBitmap != NULL);
 	assert(w > 0 && h > 0);
 	CDIBSectionPtr dib = createDIBSection(w, h, bitcount, usefilemap);
@@ -152,7 +152,7 @@ CDIBSectionPtr CDIBSection::resize (int w, int h, int bitcount, bool usefilemap)
 		CDC mdc;
 		mdc.CreateCompatibleDC(dc);
 		HBITMAP oldMBitmap = mdc.SelectBitmap(*this);
-		int oldMode = dc.SetStretchBltMode(HALFTONE);
+		int oldMode = dc.SetStretchBltMode(usehalftone ? HALFTONE : COLORONCOLOR);
 
 		dc.StretchBlt(0, 0, w, h, mdc, 0, 0, getWidth(), getHeight(), SRCCOPY);
 

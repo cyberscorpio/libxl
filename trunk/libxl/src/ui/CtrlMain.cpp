@@ -1,5 +1,6 @@
 #include <assert.h>
 #include "../../include/ui/CtrlMain.h"
+#include "../../include/utilities.h"
 
 XL_BEGIN
 UI_BEGIN
@@ -195,10 +196,8 @@ CRect CCtrlMain::layout (CRect rc) {
 }
 
 void CCtrlMain::draw (HDC hdc, CRect rcClip) {
-	DWORD tick = ::GetTickCount();
+	CTimerLogger log(_T("CCtrlMain::draw cost"));
 	CControl::draw(hdc, rcClip);
-	tick = ::GetTickCount() - tick;
-	ATLTRACE(_T("CCtrlMain::draw(%d x %d) cost %dms\n"), rcClip.Width(), rcClip.Height(), tick);
 }
 
 HWND CCtrlMain::getHWND () {

@@ -35,7 +35,7 @@ public:
 	operator HBITMAP ();
 
 	CDIBSectionPtr clone ();
-	CDIBSectionPtr resize (int w, int h, int bitcount = 24, bool usefilemap = false);
+	CDIBSectionPtr resize (int w, int h, bool usehalftone = true, int bitcount = 24, bool usefilemap = false);
 
 	static CDIBSectionPtr createDIBSection (int w, int h, int bitcount = 24, bool usefilemap = false);
 };

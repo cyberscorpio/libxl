@@ -160,6 +160,10 @@
 				RelativePath=".\src\placeholder.cpp"
 				>
 			</File>
+			<File
+				RelativePath=".\src\utilities.cpp"
+				>
+			</File>
 			<Filter
 				Name="ui"
 				>
@@ -216,6 +220,10 @@
 			</File>
 			<File
 				RelativePath=".\include\string.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\utilities.h"
 				>
 			</File>
 			<Filter
