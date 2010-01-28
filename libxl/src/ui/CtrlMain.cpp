@@ -143,13 +143,14 @@ CCtrlMain::CCtrlMain (ATL::CWindow *pWindow, CCtrlTargetRawPtr target)
 	, m_pWindow(pWindow)
 	, m_captured(false) 
 {
+	::InitializeCriticalSection(&m_cs);
 	assert (m_pWindow != NULL);
 	assert (target != NULL);
 	_SetTarget(target);
 }
 
 CCtrlMain::~CCtrlMain () {
-
+	::DeleteCriticalSection(&m_cs);
 }
 
 void CCtrlMain::enableGesture (bool enable) {
@@ -186,16 +187,19 @@ void CCtrlMain::reLayout () {
 
 	_CheckMouseMove();
 	
-	invalidateControl();
+	// invalidateControl(); // called already in CCtrlMain::layout()
 }
 
 CRect CCtrlMain::layout (CRect rc) {
+	CSimpleLock lock(&m_cs);
+
 	invalidateControl();
 	m_rcLayout = rc;
 	return CControl::layout(rc);
 }
 
 void CCtrlMain::draw (HDC hdc, CRect rcClip) {
+	CSimpleLock lock(&m_cs);
 	CTimerLogger log(_T("CCtrlMain::draw cost"));
 	CControl::draw(hdc, rcClip);
 }

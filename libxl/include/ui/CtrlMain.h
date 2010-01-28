@@ -9,7 +9,7 @@
 
 #define WM_XL_BEGIN               WM_APP
 #define WM_XL_END                 (WM_XL_BEGIN + 32)
-#define WM_XL_REMOVE_CONTROL      WM_XL_BEGIN // WPARAM: id; LPARAM: not used
+// #define WM_XL_REMOVE_CONTROL      WM_XL_BEGIN // WPARAM: id; LPARAM: not used
 
 
 XL_BEGIN
@@ -20,6 +20,7 @@ class CCtrlMain : public CControl
 	friend class CControl;
 
 protected:
+	CRITICAL_SECTION m_cs;
 	typedef std::map<uint, CControlPtr>   _TimerControls;
 	typedef _TimerControls::iterator      _TimerControlIter;
 
@@ -82,7 +83,6 @@ public:
 		MESSAGE_HANDLER(WM_CREATE, OnCreate)
 		MESSAGE_HANDLER(WM_DESTROY, OnDestroy)
 
-		MESSAGE_HANDLER(WM_XL_REMOVE_CONTROL, OnWMRemoveControl)
 	END_MSG_MAP()
 
 	LRESULT OnCreate(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
@@ -96,6 +96,8 @@ public:
 	LRESULT OnLButtonUp(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
 	LRESULT OnRButtonDown(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
 	LRESULT OnRButtonUp(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+
+	// NOT USED
 	LRESULT OnWMRemoveControl(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
 };
 

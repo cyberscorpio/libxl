@@ -26,5 +26,17 @@ public:
 };
 
 
+//////////////////////////////////////////////////////////////////////////
+// CSimpleLock
+class CSimpleLock
+{
+	CRITICAL_SECTION *m_pcs;
+public:
+	CSimpleLock (CRITICAL_SECTION *pcs);
+	~CSimpleLock ();
+	void unlock ();
+};
+
+
 XL_END
 #endif
