@@ -203,7 +203,7 @@ CControl::CControl (uint id)
 CControl::~CControl () {
 #ifndef NDEBUG
 	-- s_control_counts;
-	ATLTRACE (_T("%d control(s) remains\n"), s_control_counts);
+	// ATLTRACE (_T("%d control(s) remains\n"), s_control_counts);
 #endif
 }
 

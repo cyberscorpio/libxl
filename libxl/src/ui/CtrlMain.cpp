@@ -200,7 +200,7 @@ CRect CCtrlMain::layout (CRect rc) {
 
 void CCtrlMain::draw (HDC hdc, CRect rcClip) {
 	CSimpleLock lock(&m_cs);
-	CTimerLogger log(_T("CCtrlMain::draw cost"));
+	// CTimerLogger log(_T("CCtrlMain::draw cost"));
 	CControl::draw(hdc, rcClip);
 }
 

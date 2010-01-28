@@ -67,13 +67,20 @@ void CTimerLogger::restart (const tstring &msg, bool useMsgBox) {
 
 //////////////////////////////////////////////////////////////////////////
 // CSimpleLock
-CSimpleLock::CSimpleLock (CRITICAL_SECTION *pcs) : m_pcs(pcs) {
-	assert(m_pcs != NULL);
-	::EnterCriticalSection(m_pcs);
+CSimpleLock::CSimpleLock (CRITICAL_SECTION *pcs) : m_pcs(NULL) {
+	lock(pcs);
 }
 
 CSimpleLock::~CSimpleLock () {
 	unlock();
+}
+
+void CSimpleLock::lock (CRITICAL_SECTION *pcs) {
+	assert(pcs != NULL);
+	assert(m_pcs == NULL);
+
+	m_pcs = pcs;
+	::EnterCriticalSection(m_pcs);
 }
 
 void CSimpleLock::unlock () {
