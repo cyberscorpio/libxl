@@ -55,7 +55,6 @@ CCtrlGesture::~CCtrlGesture () {
 
 
 void CCtrlGesture::onLostCapture() {
-	// m_pCtrlMain->postMessage(WM_XL_REMOVE_CONTROL, m_id, 0);
 	m_pCtrlMain->removeChild(m_id);
  	m_points.clear();
  	m_gesture.clear();
