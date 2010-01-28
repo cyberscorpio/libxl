@@ -34,6 +34,7 @@ class CSimpleLock
 public:
 	CSimpleLock (CRITICAL_SECTION *pcs);
 	~CSimpleLock ();
+	void lock (CRITICAL_SECTION *pcs);
 	void unlock ();
 };
 

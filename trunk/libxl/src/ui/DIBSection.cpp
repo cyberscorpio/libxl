@@ -42,7 +42,7 @@ CDIBSection::CDIBSection ()
 CDIBSection::~CDIBSection () {
 	_Clear();
 	dibcount --;
-	ATLTRACE(_T("%d DIBSection remains\n"), dibcount);
+	// ATLTRACE(_T("%d DIBSection remains\n"), dibcount);
 }
 
 bool CDIBSection::create (int w, int h, int bitcount /* = 24 */, bool usefilemap /* = false */) {
