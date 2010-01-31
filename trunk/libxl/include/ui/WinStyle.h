@@ -151,6 +151,7 @@ enum FONTWEIGHT {
 
 class CWinStyle {
 protected:
+	void _ParsePosition (tstring value);
 	void _ParseEdge (tstring value, EDGE &edge);
 	COLORREF _ParseColor (tstring value);
 	void _ParseBorder (tstring key, tstring value);

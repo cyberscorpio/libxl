@@ -27,7 +27,7 @@ class CFloat : public xl::ui::CCtrlSlider
 public:
 	CFloat () : xl::ui::CCtrlSlider(0, 0, 0) {
 		m_id = ID_SLIDER;
-		setStyle(_T("px:left; py:bottom; padding:0; height:32; width:600; float:true; margin:0 auto 20;opacity:25;"));
+		setStyle(_T("position:left bottom; padding:0; height:32; width:600; float:true; margin:0 auto 20;opacity:25;"));
 	}
 
 // 	virtual void drawMe (HDC hdc) {
