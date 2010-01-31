@@ -14,6 +14,7 @@
  * background-image-url: url[ fill | left | right | center | repeat[ fill | top | bottom | center | repeat]]
  * px: left | right
  * py: top | bottom
+ * position: left | right top | bottom
  * float: true | false | none
  * width: int | "fill"
  * height: int | "fill"
@@ -120,6 +121,17 @@ void CWinStyle::_SetStyle (tstring style, bool &relayout, bool &redraw) {
 		kv[1].trim();
 		_ParseProperty(kv[0], kv[1], relayout, redraw);
 	}
+}
+
+void CWinStyle::_ParsePosition (tstring value) {
+	value.trim();
+	ExplodeT<TCHAR>::ValueT values = explode(_T(" "), value);
+	assert(values.size() == 2);
+	values[0].trim();
+	values[1].trim();
+
+	px = values[0] == _T("left") ? PX_LEFT : (values[0] == _T("right") ? PX_RIGHT : PX_COUNT);
+	py = values[1] == _T("top") ? PY_TOP : (values[1] == _T("bottom") ? PY_BOTTOM : PY_COUNT);
 }
 
 void CWinStyle::_ParseEdge (tstring value, EDGE &edge) {
@@ -275,6 +287,14 @@ void CWinStyle::_ParseProperty (const tstring &key, const tstring &value, bool &
 		int h = value == _T("fill") ? SIZE_FILL : _tstoi(value);
 		if (h != height) {
 			height = h;
+			relayout = true;
+			redraw = true;
+		}
+	} else if (key == _T("position")) {
+		POSITION_X _px = px;
+		POSITION_Y _py = py;
+		_ParsePosition(value);
+		if (_px != px || _py != py) {
 			relayout = true;
 			redraw = true;
 		}

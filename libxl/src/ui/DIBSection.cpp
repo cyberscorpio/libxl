@@ -46,6 +46,7 @@ CDIBSection::~CDIBSection () {
 }
 
 bool CDIBSection::create (int w, int h, int bitcount /* = 24 */, bool usefilemap /* = false */) {
+	GdiFlush();
 	_Clear();
 
 	assert(w > 0 && h > 0);
@@ -70,6 +71,8 @@ bool CDIBSection::create (int w, int h, int bitcount /* = 24 */, bool usefilemap
 
 	if (m_hBitmap) {
 		::GetObject(m_hBitmap, sizeof(m_section), &m_section);
+		assert(m_section.dsBm.bmWidth == w);
+		assert(m_section.dsBm.bmHeight == h);
 		return true;
 	} else {
 		return false;
@@ -123,13 +126,17 @@ CDIBSection::operator HBITMAP() {
 
 
 CDIBSectionPtr CDIBSection::clone () {
+	GdiFlush();
 	if (m_hBitmap == NULL) {
 		return CDIBSectionPtr(new CDIBSection());
 	}
 
 	assert(m_section.dshSection == NULL);
+	assert(getWidth() > 0 && getHeight() > 0);
 	CDIBSectionPtr dib = createDIBSection(getWidth(), getHeight(), getBitCounts());
 	if (dib) {
+		assert(getWidth() == dib->getWidth());
+		assert(getHeight() == dib->getHeight());
 		assert(getStride() == dib->getStride());
 		void *src = getData();
 		void *dst = dib->getData();
@@ -139,10 +146,13 @@ CDIBSectionPtr CDIBSection::clone () {
 }
 
 CDIBSectionPtr CDIBSection::resize (int w, int h, bool usehalftone, int bitcount, bool usefilemap) {
+	GdiFlush();
 	assert(m_hBitmap != NULL);
 	assert(w > 0 && h > 0);
 	CDIBSectionPtr dib = createDIBSection(w, h, bitcount, usefilemap);
 	if (dib) {
+		assert(w == dib->getWidth());
+		assert(h == dib->getHeight());
 		CDC dc;
 		HDC hdc = ::GetDC(NULL);
 		dc.CreateCompatibleDC(hdc);
