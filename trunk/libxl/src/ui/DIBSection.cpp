@@ -1,5 +1,7 @@
 #include <assert.h>
 #include <limits>
+#include <map>
+#include "../../include/utilities.h"
 #include "../../include/ui/DIBSection.h"
 #include "../../include/ui/Gdi.h"
 
@@ -117,6 +119,14 @@ void* CDIBSection::getLine (int line) {
 }
 
 void* CDIBSection::getData () {
+	if (m_hBitmap == NULL) {
+		assert(false);
+		return NULL;
+	}
+
+	void *p = m_section.dsBm.bmBits;
+	::GetObject(m_hBitmap, sizeof(m_section), &m_section);
+	assert(p == (void *)m_section.dsBm.bmBits);
 	return m_hBitmap == NULL ? NULL : m_section.dsBm.bmBits;
 }
 

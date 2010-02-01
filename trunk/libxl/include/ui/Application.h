@@ -20,6 +20,10 @@ protected:
 	CApplicationT ()
 		: m_initialized(false)
 	{
+#ifndef NDEBUG
+		// s.rock.e@gmail.com told me to do so, for checking the memory leak
+		_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+#endif
 	}
 	~CApplicationT () {
 
