@@ -13,19 +13,25 @@ XL_BEGIN
 void trace (const tchar *format, ...) {
 	va_list args;
 	int     len;
-	tchar    *buffer;
+	tchar  *buffer;
+	tchar   buf[MAX_PATH];
 
 	va_start(args, format);
 
 	len = _vsctprintf(format, args) + 1;
-	buffer = (tchar *)malloc(len * sizeof(tchar));
+	if (len > MAX_PATH) {
+		buffer = (tchar *)malloc(len * sizeof(tchar));
+	} else {
+		buffer = buf;
+	}
 	assert(buffer);
 	_vstprintf_s(buffer, len, format, args);
 
 	OutputDebugString(buffer);
-	// OutputDebugString(_T("\n"));
 
-	free(buffer);
+	if (buffer != buf) {
+		free(buffer);
+	}
 }
 
 
