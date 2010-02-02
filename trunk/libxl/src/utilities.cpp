@@ -13,24 +13,32 @@ XL_BEGIN
 void trace (const tchar *format, ...) {
 	va_list args;
 	int     len;
-	tchar  *buffer;
+	tchar  *buffer, *bufferex;
 	tchar   buf[MAX_PATH];
+	tchar   bufex[MAX_PATH];
+	tstring formatex;
 
 	va_start(args, format);
 
-	len = _vsctprintf(format, args) + 1;
+	len = _vsctprintf(format, args) + 20;
 	if (len > MAX_PATH) {
 		buffer = (tchar *)malloc(len * sizeof(tchar));
+		bufferex = (tchar *)malloc(len * sizeof(tchar));
 	} else {
 		buffer = buf;
+		bufferex = bufex;
 	}
 	assert(buffer);
 	_vstprintf_s(buffer, len, format, args);
+	_stprintf_s(bufferex, len, _T("%d:\t%s"), ::GetTickCount(), buffer);
 
-	OutputDebugString(buffer);
+	OutputDebugString(bufferex);
 
 	if (buffer != buf) {
 		free(buffer);
+	}
+	if (bufferex != bufex) {
+		free(bufferex);
 	}
 }
 
