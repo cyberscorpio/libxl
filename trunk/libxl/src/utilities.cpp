@@ -52,6 +52,34 @@ CTimerLogger::CTimerLogger (const tstring &msg, bool useMsgBox /* = false */)
 {
 }
 
+CTimerLogger::CTimerLogger (bool useMsgBox, const tchar *format, ...) 
+	: m_useMsgBox(useMsgBox), m_logged(false)
+	, m_tick(::GetTickCount())
+{
+	va_list args;
+	int     len;
+	tchar  *buffer;
+	tchar   buf[MAX_PATH];
+	tstring formatex;
+
+	va_start(args, format);
+
+	len = _vsctprintf(format, args) + 20;
+	if (len > MAX_PATH) {
+		buffer = (tchar *)malloc(len * sizeof(tchar));
+	} else {
+		buffer = buf;
+	}
+	assert(buffer);
+	_vstprintf_s(buffer, len, format, args);
+
+	m_msg = buffer;
+
+	if (buffer != buf) {
+		free(buffer);
+	}
+}
+
 CTimerLogger::~CTimerLogger () {
 	log();
 }

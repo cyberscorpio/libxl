@@ -2,6 +2,13 @@
 #define XL_UTLITIES_H
 #include "common.h"
 #include "string.h"
+
+#ifdef XL_TRACE_ENABLE
+#define XLTRACE(format, ...) xl::trace(format, __VA_ARGS__)
+#else
+#define XLTRACE(format, ...)
+#endif
+
 XL_BEGIN
 
 //////////////////////////////////////////////////////////////////////////
@@ -19,6 +26,7 @@ class CTimerLogger
 	uint m_tick;
 public:
 	CTimerLogger (const tstring &msg, bool useMsgBox = false);
+	CTimerLogger (bool useMsgBox, const tchar *format, ...);
 	~CTimerLogger ();
 
 	void log ();
