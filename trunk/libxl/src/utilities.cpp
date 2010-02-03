@@ -20,7 +20,7 @@ void trace (const tchar *format, ...) {
 
 	va_start(args, format);
 
-	len = _vsctprintf(format, args) + 20;
+	len = _vsctprintf(format, args) + 32;
 	if (len > MAX_PATH) {
 		buffer = (tchar *)malloc(len * sizeof(tchar));
 		bufferex = (tchar *)malloc(len * sizeof(tchar));
@@ -30,7 +30,7 @@ void trace (const tchar *format, ...) {
 	}
 	assert(buffer);
 	_vstprintf_s(buffer, len, format, args);
-	_stprintf_s(bufferex, len, _T("%d:\t%s"), ::GetTickCount(), buffer);
+	_stprintf_s(bufferex, len, _T("%d(tid:%d):\t%s"), ::GetTickCount(), ::GetCurrentThreadId(), buffer);
 
 	OutputDebugString(bufferex);
 
@@ -64,7 +64,7 @@ CTimerLogger::CTimerLogger (bool useMsgBox, const tchar *format, ...)
 
 	va_start(args, format);
 
-	len = _vsctprintf(format, args) + 20;
+	len = _vsctprintf(format, args) + 1;
 	if (len > MAX_PATH) {
 		buffer = (tchar *)malloc(len * sizeof(tchar));
 	} else {
