@@ -219,7 +219,7 @@ public:
 
 		xl::ui::CDC mdc;
 		mdc.CreateCompatibleDC(hdc);
-		HBITMAP oldBmp = mdc.SelectBitmap(*m_bitmap);
+		m_bitmap->attachToDC(mdc);
 		int w = m_bitmap->getWidth();
 		int h = m_bitmap->getHeight();
 		int x = rc.left + (rc.Width() - w) / 2;
@@ -238,7 +238,7 @@ public:
 		}
 		dc.BitBlt(x, y, w, h, mdc, 0, 0, SRCCOPY);
 
-		mdc.SelectBitmap(oldBmp);
+		m_bitmap->detachFromDC(mdc);
 
 		if (_GetMainCtrl()->getHoverCtrl() == shared_from_this()) {
 			TCHAR buf[1024];
