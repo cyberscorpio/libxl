@@ -21,20 +21,20 @@ class CCtrlMain : public CControl
 
 protected:
 	CRITICAL_SECTION m_cs;
-	typedef std::map<uint, CControlPtr>   _TimerControls;
-	typedef _TimerControls::iterator      _TimerControlIter;
+	typedef std::map<uint, CControlPtr>            _TimerControls;
+	typedef _TimerControls::iterator               _TimerControlIter;
 
-	ATL::CWindow         *m_pWindow;
+	ATL::CWindow      *m_pWindow;
 
 	/**
 	 * inner properties
 	 */
-	bool m_captured;
-	CControlPtr m_ctrlHover;
-	CControlPtr m_ctrlCapture;
-	CCtrlGesturePtr m_ctrlGesture;
-	_TimerControls m_timerCtrls;
-	mutable CRect m_rcLayout; // save the rect passed by this->layout(rc), used by reLayout()
+	bool               m_captured;
+	CControlPtr        m_ctrlHover;
+	CControlPtr        m_ctrlCapture;
+	CCtrlGesturePtr    m_ctrlGesture;
+	_TimerControls     m_timerCtrls;
+	mutable CRect      m_rcLayout; // save the rect passed by this->layout(rc), used by reLayout()
 
 	//////////////////////////////////////////////////////////////////////////
 	// protected methods
