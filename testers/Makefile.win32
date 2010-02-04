@@ -7,16 +7,16 @@ libinc = "..\libxl\include\header"
 
 # rules
 .cpp.obj:
-	cl.exe -c -EHsc $<
+	cl.exe -c -EHsc -MT $<
 
 .obj.exe:
-	link $< "..\release\libxl.lib"
+	link  $< "..\release\libxl.lib"
 
 
 # all targets
 headers = $(libinc:header=common.h) $(libinc:header=fs.h) \
 	$(libinc:header=string.h) $(libinc:header=dp\Observable.h)
-modules = fs.test string.test observable.test
+modules = fs.test string.test observable.test sharedptr.test
 objects = $(modules:test=obj)
 targets = $(modules:test=exe)
 

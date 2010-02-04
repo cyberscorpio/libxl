@@ -43,18 +43,18 @@ class CControl : public CWinStyle
 {
 protected:
 	friend class CCtrlMain;
-	typedef std::vector<CControlPtr>             CControlContainer;
-	typedef CControlContainer::iterator          CControlIter;
-	typedef CControlContainer::const_iterator    CControlConstIter;
-	typedef CControlContainer::reverse_iterator  CControlIterR;
-	// typedef CControlContainer::const_iterator    CControlConstIter;
+	typedef std::vector<CControlPtr>               CControlContainer;
+	typedef CControlContainer::iterator            CControlIter;
+	typedef CControlContainer::const_iterator      CControlConstIter;
+	typedef CControlContainer::reverse_iterator    CControlIterR;
+	// typedef CControlContainer::const_iterator      CControlConstIter;
 
-	uint                 m_id;
+	uint               m_id;
 
-	CControlWeakPtr      m_parent;
-	CCtrlTargetRawPtr    m_target;
-	CControlContainer    m_controls;
-	CRect                m_rect;
+	CControlWeakPtr    m_parent;
+	CCtrlTargetRawPtr  m_target;
+	CControlContainer  m_controls;
+	CRect              m_rect;
 
 	void _LayoutChildren ();
 

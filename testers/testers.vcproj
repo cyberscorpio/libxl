@@ -184,6 +184,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\sharedptr.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\string.cpp"
 				>
 			</File>

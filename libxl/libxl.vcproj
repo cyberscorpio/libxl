@@ -223,6 +223,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\include\tsptr.h"
+				>
+			</File>
+			<File
 				RelativePath=".\include\utilities.h"
 				>
 			</File>
