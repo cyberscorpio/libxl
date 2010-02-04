@@ -14,8 +14,11 @@ class CDIBSection
 	: public std::tr1::enable_shared_from_this<CDIBSection>
 {
 protected:
-	HBITMAP m_hBitmap;
-	DIBSECTION m_section;
+	mutable CRITICAL_SECTION                              m_cs;
+	HBITMAP                                               m_hBitmap;
+	DIBSECTION                                            m_section;
+
+	HBITMAP                                               m_hOldBitmap;
 
 protected:
 	void _Clear ();
@@ -32,12 +35,29 @@ public:
 	void* getLine (int line);
 	void* getData ();
 
-	operator HBITMAP ();
+	void attachToDC (HDC hdc);
+	bool tryAttachToDC (HDC hdc);
+	void detachFromDC (HDC hdc);
 
 	CDIBSectionPtr clone ();
 	CDIBSectionPtr resize (int w, int h, bool usehalftone = true, int bitcount = 24, bool usefilemap = false);
 
 	static CDIBSectionPtr createDIBSection (int w, int h, int bitcount = 24, bool usefilemap = false);
+};
+
+
+//////////////////////////////////////////////////////////////////////////
+// A scope helper wrap attachToDC() and detachFromDC()
+class CDIBSectionHelper
+{
+	CDIBSectionPtr     m_dib;
+	HDC                m_hdc;
+
+public:
+	CDIBSectionHelper (CDIBSectionPtr dib, HDC hdc);
+	~CDIBSectionHelper ();
+
+	void detach ();
 };
 
 
