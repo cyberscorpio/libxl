@@ -2,6 +2,7 @@
 #define XL_UTLITIES_H
 #include "common.h"
 #include "string.h"
+#include "lockable.h"
 
 #ifdef XL_TRACE_ENABLE
 #define XLTRACE(format, ...) xl::trace(format, __VA_ARGS__)
@@ -35,14 +36,15 @@ public:
 
 
 //////////////////////////////////////////////////////////////////////////
-// CSimpleLock
-class CSimpleLock
+// CScopeLock
+class CScopeLock
 {
-	CRITICAL_SECTION *m_pcs;
+	const ILockable   *m_lock;
 public:
-	CSimpleLock (CRITICAL_SECTION *pcs);
-	~CSimpleLock ();
-	void lock (CRITICAL_SECTION *pcs);
+	CScopeLock (const ILockable *lock);
+	CScopeLock (ILockable *lock);
+	~CScopeLock ();
+	void lock (const ILockable *lock);
 	void unlock ();
 };
 
