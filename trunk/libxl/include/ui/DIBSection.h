@@ -3,6 +3,7 @@
 #include <memory>
 #include <Windows.h>
 #include "../common.h"
+#include "../lockable.h"
 
 XL_BEGIN
 UI_BEGIN
@@ -11,16 +12,24 @@ class CDIBSection;
 typedef std::tr1::shared_ptr<CDIBSection>    CDIBSectionPtr;
 
 class CDIBSection
-	: public std::tr1::enable_shared_from_this<CDIBSection>
+	: public CUserLock
+	, public std::tr1::enable_shared_from_this<CDIBSection>
 {
 protected:
-	mutable CRITICAL_SECTION                              m_cs;
 	HBITMAP                                               m_hBitmap;
 	DIBSECTION                                            m_section;
 
 	HBITMAP                                               m_hOldBitmap;
 
 protected:
+	void _ClearNoLock ();
+	int _GetWidthNoLock () const;
+	int _GetHeightNoLock () const;
+	int _GetBitCountsNoLock () const;
+	int _GetStrideNoLock () const;
+	void* _GetLineNoLock (int line);
+	void* _GetDataNoLock ();
+
 	void _Clear ();
 
 public:

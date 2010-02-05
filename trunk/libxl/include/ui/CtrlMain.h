@@ -4,6 +4,8 @@
 #include <map>
 #include <atlbase.h>
 #include <atlwin.h>
+#include "../common.h"
+#include "../lockable.h"
 #include "Control.h"
 #include "CtrlGesture.h"
 
@@ -15,12 +17,13 @@
 XL_BEGIN
 UI_BEGIN
 
-class CCtrlMain : public CControl
+class CCtrlMain 
+	: public CControl
+	, public CUserLock
 {
 	friend class CControl;
 
 protected:
-	CRITICAL_SECTION m_cs;
 	typedef std::map<uint, CControlPtr>            _TimerControls;
 	typedef _TimerControls::iterator               _TimerControlIter;
 

@@ -113,7 +113,7 @@ class CView : public xl::ui::CControl
 	xl::ui::CDIBSectionPtr m_bitmap;
 public:
 
-	CView () : m_bitmap(xl::ui::CDIBSection::createDIBSection(100, 100)) {
+	CView () : m_bitmap(xl::ui::CDIBSection::createDIBSection(333, 333)) {
 		m_id = ID_VIEW;
 		setStyle(_T("margin:5; background-color: #323232; px:left; py:top; width:fill; height:fill; "));
 

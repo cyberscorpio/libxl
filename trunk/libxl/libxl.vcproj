@@ -157,6 +157,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\src\lockable.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\src\placeholder.cpp"
 				>
 			</File>
@@ -216,6 +220,10 @@
 			</File>
 			<File
 				RelativePath=".\include\Language.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\lockable.h"
 				>
 			</File>
 			<File
