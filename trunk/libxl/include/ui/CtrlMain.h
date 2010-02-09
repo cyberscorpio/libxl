@@ -49,7 +49,7 @@ protected:
 	void _CheckMouseMove (); // _CheckMouseMove will get mouse position itself
 	uint _Wparam2KeyStatus (WPARAM wParam);
 
-	uint _SetTimer (CControlPtr ctrl, uint elapse, uint id = 0);
+	uint _SetTimer (CControlPtr ctrl, uint elapse, uint id);
 
 	//////////////////////////////////////////////////////////////////////////
 	// virtual protected methods
