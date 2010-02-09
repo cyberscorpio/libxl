@@ -127,14 +127,15 @@ uint CCtrlMain::_Wparam2KeyStatus (WPARAM wParam) {
 uint CCtrlMain::_SetTimer (CControlPtr ctrl, uint elapse, uint id) {
 	assert(ctrl != NULL);
 	assert(m_pWindow != NULL && m_pWindow->IsWindow());
+	assert (id > 0);
 
-	id = m_pWindow->SetTimer(id, elapse, NULL);
-	if (id != 0) {
+	UINT ret = m_pWindow->SetTimer(id, elapse, NULL);
+	if (ret != 0) {
 		m_timerCtrls[id] = ctrl;
 	} else {
 		assert(false);
 	}
-	return id;
+	return ret;
 }
 
 
