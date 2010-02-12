@@ -188,8 +188,9 @@ CCtrlMain* CControl::_GetMainCtrl () {
 
 
 CControl::CControl (uint id)
-	: m_id (id)
-	, m_target (NULL)
+	: m_id(id)
+	, m_target(NULL)
+	, m_rect(0, 0, 0, 0)
 {
 	if (m_id == 0) {
 		m_id = (uint)this; // this should be unique ?
