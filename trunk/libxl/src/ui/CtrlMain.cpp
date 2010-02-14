@@ -131,6 +131,7 @@ uint CCtrlMain::_SetTimer (CControlPtr ctrl, uint elapse, uint id) {
 
 	UINT ret = m_pWindow->SetTimer(id, elapse, NULL);
 	if (ret != 0) {
+		assert(m_timerCtrls[id] == NULL || m_timerCtrls[id] == ctrl);
 		m_timerCtrls[id] = ctrl;
 	} else {
 		assert(false);
