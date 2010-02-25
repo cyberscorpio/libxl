@@ -110,6 +110,7 @@ public:
 	virtual void onLButtonUp (CPoint pt, uint key) {}
 	virtual void onRButtonDown (CPoint pt, uint key) {}
 	virtual void onRButtonUp (CPoint pt, uint key) {}
+	virtual void onMouseWheel (CPoint pt, int delta, uint key) {}
 	virtual void onLostCapture () {} // called only when lost capture CAUSED BY SYSTEM
 	virtual void onTimer (uint id) {}
 };

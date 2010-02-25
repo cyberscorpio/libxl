@@ -219,17 +219,17 @@ ATL::CWindow* CCtrlMain::getWindow () {
 
 //////////////////////////////////////////////////////////////////////////
 // message handles
-LRESULT CCtrlMain::OnCreate(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) {
+LRESULT CCtrlMain::OnCreate (UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) {
 	bHandled = false;
 	return TRUE;
 }
 
-LRESULT CCtrlMain::OnDestroy(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) {
+LRESULT CCtrlMain::OnDestroy (UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) {
 	bHandled = false;
 	return TRUE;
 }
 
-LRESULT CCtrlMain::OnMouseMove(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) {
+LRESULT CCtrlMain::OnMouseMove (UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) {
 	if (!m_captured) {
 		::SetCapture(m_pWindow->m_hWnd);
 		m_captured = true;
@@ -248,7 +248,7 @@ LRESULT CCtrlMain::OnMouseMove(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bH
 	return 0;
 }
 
-LRESULT CCtrlMain::OnCaptureChanged(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) {
+LRESULT CCtrlMain::OnCaptureChanged (UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) {
 	HWND hWndCaptured = (HWND)lParam;
 	if (hWndCaptured != m_pWindow->m_hWnd) {
 		if (m_captured) {
@@ -269,17 +269,17 @@ LRESULT CCtrlMain::OnCaptureChanged(UINT uMsg, WPARAM wParam, LPARAM lParam, BOO
 	return 0;
 }
 
-LRESULT CCtrlMain::OnEraseBkGnd(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) {
+LRESULT CCtrlMain::OnEraseBkGnd (UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) {
 	return 1;
 }
 
-LRESULT CCtrlMain::OnPaint(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) {
+LRESULT CCtrlMain::OnPaint (UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) {
 	CPaintDC dc(m_pWindow->m_hWnd);
 	draw(dc.m_hDC, dc.m_ps.rcPaint);
 	return 0;
 }
 
-LRESULT CCtrlMain::OnTimer(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) {
+LRESULT CCtrlMain::OnTimer (UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) {
 	assert(m_pWindow != NULL && m_pWindow->IsWindow());
 	uint id = (uint)wParam;
 	m_pWindow->KillTimer(id);
@@ -298,7 +298,7 @@ LRESULT CCtrlMain::OnTimer(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandl
 	return 0;
 }
 
-LRESULT CCtrlMain::OnLButtonDown(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) {
+LRESULT CCtrlMain::OnLButtonDown (UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) {
 	int x = GET_X_LPARAM(lParam);
 	int y = GET_Y_LPARAM(lParam);
 	CPoint pt(x, y);
@@ -310,7 +310,7 @@ LRESULT CCtrlMain::OnLButtonDown(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& 
 	return 0;
 }
 
-LRESULT CCtrlMain::OnLButtonUp(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) {
+LRESULT CCtrlMain::OnLButtonUp (UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) {
 	int x = GET_X_LPARAM(lParam);
 	int y = GET_Y_LPARAM(lParam);
 	CPoint pt(x, y);
@@ -322,7 +322,7 @@ LRESULT CCtrlMain::OnLButtonUp(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bH
 	return 0;
 }
 
-LRESULT CCtrlMain::OnRButtonDown(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) {
+LRESULT CCtrlMain::OnRButtonDown (UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) {
 	int x = GET_X_LPARAM(lParam);
 	int y = GET_Y_LPARAM(lParam);
 	CPoint pt(x, y);
@@ -336,7 +336,7 @@ LRESULT CCtrlMain::OnRButtonDown(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& 
 	return 0;
 }
 
-LRESULT CCtrlMain::OnRButtonUp(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) {
+LRESULT CCtrlMain::OnRButtonUp (UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) {
 	int x = GET_X_LPARAM(lParam);
 	int y = GET_Y_LPARAM(lParam);
 	CPoint pt(x, y);
@@ -348,7 +348,23 @@ LRESULT CCtrlMain::OnRButtonUp(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bH
 	return 0;
 }
 
-LRESULT CCtrlMain::OnWMRemoveControl(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) {
+LRESULT CCtrlMain::OnMouseWheel (UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) {
+	int x = GET_X_LPARAM(lParam);
+	int y = GET_Y_LPARAM(lParam);
+	int delta = GET_WHEEL_DELTA_WPARAM(wParam);
+	delta /= WHEEL_DELTA;
+	CPoint pt(x, y);
+	assert(m_pWindow);
+	m_pWindow->ScreenToClient(&pt);
+	if (m_ctrlCapture != NULL) {
+		m_ctrlCapture->onMouseWheel(pt, delta, _Wparam2KeyStatus(GET_KEYSTATE_WPARAM(wParam)));
+	} else if (m_ctrlHover != NULL) {
+		m_ctrlHover->onMouseWheel(pt, delta, _Wparam2KeyStatus(GET_KEYSTATE_WPARAM(wParam)));
+	}
+	return 0;
+}
+
+LRESULT CCtrlMain::OnWMRemoveControl (UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) {
 
 	removeChild((uint)wParam);
 

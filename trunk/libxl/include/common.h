@@ -51,5 +51,10 @@ XL_END
 	#endif
 #endif
 
+// parameter not used
+#ifndef XL_PARAMETER_NOT_USED
+#define XL_PARAMETER_NOT_USED(x)  (x) = (x)
+#endif
+
 #endif
 
