@@ -8,6 +8,7 @@
 XL_BEGIN
 UI_BEGIN
 
+class CResizeEngine;
 class CDIBSection;
 typedef std::tr1::shared_ptr<CDIBSection>    CDIBSectionPtr;
 
@@ -15,6 +16,7 @@ class CDIBSection
 	: public CUserLock
 	, public std::tr1::enable_shared_from_this<CDIBSection>
 {
+	friend class CResizeEngine;
 protected:
 	HBITMAP                                               m_hBitmap;
 	DIBSECTION                                            m_section;

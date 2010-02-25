@@ -194,6 +194,25 @@
 				<File
 					RelativePath=".\src\ui\DIBResizer.cpp"
 					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							Optimization="0"
+							EnableIntrinsicFunctions="true"
+							FavorSizeOrSpeed="1"
+							BasicRuntimeChecks="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							Optimization="3"
+						/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath=".\src\ui\DIBSection.cpp"
