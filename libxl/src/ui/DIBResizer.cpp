@@ -48,14 +48,16 @@ public:
 
 		m_WindowSize = 2 * (int)ceil(dWidth) + 1; 
 		m_LineLength = uDstSize; 
-		m_WeightTable = (Contribution*)malloc(m_LineLength * sizeof(Contribution));
-		for(u = 0 ; u < m_LineLength ; u++) {
-			m_WeightTable[u].Weights = (double*)malloc(m_WindowSize * sizeof(double));
+		m_WeightTable = (Contribution *)malloc(m_LineLength * sizeof(Contribution));
+		double *weights = (double *)malloc(m_WindowSize * m_LineLength * sizeof(double)); // continuous memory maybe cache friendly
+		for(u = 0; u < m_LineLength; ++ u) {
+			// m_WeightTable[u].Weights = (double *)malloc(m_WindowSize * sizeof(double));
+			m_WeightTable[u].Weights = weights + m_WindowSize * u;
 		}
 
 		double dOffset = (0.5 / dScale) - 0.5;
 
-		for(u = 0; u < m_LineLength; u++) {
+		for(u = 0; u < m_LineLength; ++ u) {
 			double dCenter = (double)u / dScale + dOffset;   // reverse mapping
 			int iLeft = MAX (0, (int)floor (dCenter - dWidth)); 
 			int iRight = MIN ((int)ceil (dCenter + dWidth), int(uSrcSize) - 1); 
@@ -73,7 +75,7 @@ public:
 
 			int iSrc = 0;
 			double dTotalWeight = 0;
-			for(iSrc = iLeft; iSrc <= iRight; iSrc++) {
+			for(iSrc = iLeft; iSrc <= iRight; ++ iSrc) {
 				double weight = dFScale * pFilter->Filter(dFScale * (dCenter - (double)iSrc));
 				m_WeightTable[u].Weights[iSrc-iLeft] = weight;
 				dTotalWeight += weight;
@@ -95,13 +97,14 @@ public:
 	}
 
 	~CWeightsTable() {
-		for(uint u = 0; u < m_LineLength; u++) {
-			free(m_WeightTable[u].Weights);
-		}
+// 		for(uint u = 0; u < m_LineLength; u++) {
+// 			free(m_WeightTable[u].Weights);
+// 		}
+		free(m_WeightTable[0].Weights);
 		free(m_WeightTable);
 	}
 
-	double getWeight(int dst_pos, int src_pos) {
+	inline double getWeight(int dst_pos, int src_pos) {
 		return m_WeightTable[dst_pos].Weights[src_pos];
 	}
 
@@ -153,6 +156,7 @@ CDIBSectionPtr CResizeEngine::scale(CDIBSection *src, uint dst_width, uint dst_h
 
 void CResizeEngine::horizontalFilter(CDIBSection *src, uint src_width, uint src_height,
                                      CDIBSection *dst, uint dst_width, uint dst_height) {
+	assert(src->getBitCounts() == dst->getBitCounts());
 	if (dst_width == src_width) {
 		unsigned char *src_bits = (unsigned char *)src->getData();
 		unsigned char *dst_bits = (unsigned char *)dst->getData();
@@ -166,24 +170,24 @@ void CResizeEngine::horizontalFilter(CDIBSection *src, uint src_width, uint src_
 		uint bytespp = src->getBitCounts() / 8;
 		assert(bytespp == 3 || bytespp == 4);
 		for (uint y = 0; y < dst_height; ++ y) {
-			unsigned char *src_bits = (unsigned char *)src->getLine(y);
-			unsigned char *dst_bits = (unsigned char *)dst->getLine(y);
+			unsigned char *src_bits = (unsigned char *)src->_GetLineNoLock(y);
+			unsigned char *dst_bits = (unsigned char *)dst->_GetLineNoLock(y);
 
-			for(uint x = 0; x < dst_width; x++) {
+			for(uint x = 0; x < dst_width; ++ x) {
 				double value[4] = {0, 0, 0, 0}; // 4 = 32bpp max
 				int iLeft = weightsTable.getLeftBoundary(x);
 				int iRight = weightsTable.getRightBoundary(x);
 
-				for(int i = iLeft; i <= iRight; i++) {
+				for(int i = iLeft; i <= iRight; ++ i) {
 					double weight = weightsTable.getWeight(x, i-iLeft);
 
 					index = i * bytespp;
-					for (unsigned j = 0; j < bytespp; j++) {
+					for (uint j = 0; j < bytespp; ++ j) {
 						value[j] += (weight * (double)src_bits[index++]); 
 					}
 				} 
 
-				for (unsigned j = 0; j < bytespp; j++) {
+				for (uint j = 0; j < bytespp; ++ j) {
 					dst_bits[j] = (unsigned char)MIN(MAX((int)0, (int)(value[j] + 0.5)), (int)255);
 				}
 
@@ -195,6 +199,7 @@ void CResizeEngine::horizontalFilter(CDIBSection *src, uint src_width, uint src_
 
 void CResizeEngine::verticalFilter(CDIBSection *src, uint src_width, uint src_height,
 				   CDIBSection *dst, uint dst_width, uint dst_height) {
+	assert(src->getBitCounts() == dst->getBitCounts());
 	if (src_height == dst_height) {
 		unsigned char *src_bits = (unsigned char *)src->getData();
 		unsigned char *dst_bits = (unsigned char *)dst->getData();
@@ -211,23 +216,23 @@ void CResizeEngine::verticalFilter(CDIBSection *src, uint src_width, uint src_he
 		unsigned src_pitch = src->getStride();
 		unsigned dst_pitch = dst->getStride();
 
-		for(uint x = 0; x < dst_width; x++) {
+		for(uint x = 0; x < dst_width; ++ x) {
 			index = x * bytespp;
 
 			unsigned char *dst_bits = (unsigned char *)dst->getData();
 			dst_bits += index;
 
-			for(uint y = 0; y < dst_height; y++) {
+			for(uint y = 0; y < dst_height; ++ y) {
 				double value[4] = {0, 0, 0, 0}; // 4 = 32bpp max
 				int iLeft = weightsTable.getLeftBoundary(y);
 				int iRight = weightsTable.getRightBoundary(y);
 
-				unsigned char *src_bits = (unsigned char *)src->getLine(iLeft);
+				unsigned char *src_bits = (unsigned char *)src->_GetLineNoLock(iLeft);
 				src_bits += index;
 
-				for(int i = iLeft; i <= iRight; i++) {
-					double weight = weightsTable.getWeight(y, i-iLeft);							
-					for (unsigned j = 0; j < bytespp; j++) {
+				for(int i = iLeft; i <= iRight; ++ i) {
+					double weight = weightsTable.getWeight(y, i - iLeft);							
+					for (uint j = 0; j < bytespp; ++ j) {
 						value[j] += (weight * (double)src_bits[j]);
 					}
 
@@ -235,8 +240,8 @@ void CResizeEngine::verticalFilter(CDIBSection *src, uint src_width, uint src_he
 				}
 
 				// clamp and place result in destination pixel
-				for (unsigned j = 0; j < bytespp; j++) {
-					dst_bits[j] = (BYTE)MIN(MAX((int)0, (int)(value[j] + 0.5)), (int)255);
+				for (unsigned j = 0; j < bytespp; ++ j) {
+					dst_bits[j] = (unsigned char)MIN(MAX((int)0, (int)(value[j] + 0.5)), (int)255);
 				}
 
 				dst_bits += dst_pitch;

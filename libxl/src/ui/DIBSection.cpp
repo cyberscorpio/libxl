@@ -222,6 +222,7 @@ CDIBSectionPtr CDIBSection::clone () {
 	return CDIBSectionPtr(dib);
 }
 
+// #define USE_STRETCHBLT
 CDIBSectionPtr CDIBSection::resize (int w, int h, bool usehalftone, int bitcount, bool usefilemap) {
 	CScopeLock lock(this);
 	GdiFlush();
