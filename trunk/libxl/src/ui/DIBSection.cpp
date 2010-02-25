@@ -2,6 +2,7 @@
 #include <limits>
 #include <map>
 #include "../../include/ui/DIBSection.h"
+#include "../../include/ui/DIBResizer.h"
 #include "../../include/ui/Gdi.h"
 #include "../../include/utilities.h"
 
@@ -226,6 +227,12 @@ CDIBSectionPtr CDIBSection::resize (int w, int h, bool usehalftone, int bitcount
 	GdiFlush();
 	assert(m_hBitmap != NULL);
 	assert(w > 0 && h > 0);
+
+	if (getWidth() == w && getHeight() == h) {
+		return clone();
+	}
+
+#ifdef USE_STRETCHBLT
 	CDIBSectionPtr dib = createDIBSection(w, h, bitcount, usefilemap);
 	if (dib) {
 		assert(w == dib->getWidth());
@@ -249,6 +256,17 @@ CDIBSectionPtr CDIBSection::resize (int w, int h, bool usehalftone, int bitcount
 	}
 
 	return CDIBSectionPtr(dib);
+#else
+	CBoxFilter boxFilter;
+	CBicubicFilter bicubicFilter;
+	CGenericFilter *pFilter = &bicubicFilter;
+	if (!usehalftone) {
+		pFilter = &boxFilter;
+	}
+	CResizeEngine engine(pFilter);
+
+	return engine.scale(this, w, h);
+#endif
 }
 
 
