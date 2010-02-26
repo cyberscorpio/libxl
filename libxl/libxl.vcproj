@@ -305,6 +305,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\include\ui\DIBResizerFilter.h"
+					>
+				</File>
+				<File
 					RelativePath=".\include\ui\DIBSection.h"
 					>
 				</File>

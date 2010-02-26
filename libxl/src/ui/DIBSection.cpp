@@ -1,5 +1,6 @@
 #include <assert.h>
 #include <limits>
+#include <memory>
 #include <map>
 #include "../../include/ui/DIBSection.h"
 #include "../../include/ui/DIBResizer.h"
@@ -223,7 +224,7 @@ CDIBSectionPtr CDIBSection::clone () {
 }
 
 // #define USE_STRETCHBLT
-CDIBSectionPtr CDIBSection::resize (int w, int h, bool usehalftone, int bitcount, bool usefilemap) {
+CDIBSectionPtr CDIBSection::resize_ (int w, int h, RESIZE_TYPE rt, bool usefilemap) {
 	CScopeLock lock(this);
 	GdiFlush();
 	assert(m_hBitmap != NULL);
@@ -233,9 +234,9 @@ CDIBSectionPtr CDIBSection::resize (int w, int h, bool usehalftone, int bitcount
 		return clone();
 	}
 
-#ifdef USE_STRETCHBLT
-	CDIBSectionPtr dib = createDIBSection(w, h, bitcount, usefilemap);
+	CDIBSectionPtr dib = createDIBSection(w, h, getBitCounts(), usefilemap);
 	if (dib) {
+#ifdef USE_STRETCHBLT
 		assert(w == dib->getWidth());
 		assert(h == dib->getHeight());
 		CDC dc;
@@ -247,27 +248,54 @@ CDIBSectionPtr CDIBSection::resize (int w, int h, bool usehalftone, int bitcount
 		CDC mdc;
 		mdc.CreateCompatibleDC(dc);
 		attachToDC(mdc);
-		int oldMode = dc.SetStretchBltMode(usehalftone ? HALFTONE : COLORONCOLOR);
+		int oldMode = dc.SetStretchBltMode(rt != RT_FAST ? HALFTONE : COLORONCOLOR);
 
 		dc.StretchBlt(0, 0, w, h, mdc, 0, 0, getWidth(), getHeight(), SRCCOPY);
 
 		dc.SetStretchBltMode(oldMode);
 		detachFromDC(mdc);
 		dib->detachFromDC(dc);
-	}
-
-	return CDIBSectionPtr(dib);
 #else
-	CBoxFilter boxFilter;
-	CBicubicFilter bicubicFilter;
-	CGenericFilter *pFilter = &bicubicFilter;
-	if (!usehalftone) {
-		pFilter = &boxFilter;
-	}
-	CResizeEngine engine(pFilter);
-
-	return engine.scale(this, w, h);
+		if (!resize(dib.get(), rt)) {
+			dib.reset();
+		}
 #endif
+	}
+
+	return dib;
+}
+
+bool CDIBSection::resize (CDIBSection *dib, RESIZE_TYPE rt) {
+	assert(dib != NULL);
+
+	std::auto_ptr<CGenericFilter> pFilter;
+	switch (rt) {
+		case RT_FAST:
+			break;
+		case RT_BOX:
+			pFilter.reset(new CBoxFilter());
+			break;
+		case RT_BICUBIC:
+			pFilter.reset(new CBicubicFilter());
+			break;
+		case RT_BILINEAR:
+			pFilter.reset(new CBilinearFilter());
+			break;
+		case RT_BSPLINE:
+			pFilter.reset(new CBSplineFilter());
+			break;
+		case RT_CATMULLROM:
+			pFilter.reset(new CCatmullRomFilter());
+			break;
+		case RT_LANCZOS3:
+			pFilter.reset(new CLanczos3Filter());
+			break;
+		default:
+			assert(false);
+	}
+
+	CResizeEngine engine(pFilter.get());
+	return engine.scale(this, dib);
 }
 
 
