@@ -61,9 +61,12 @@ public:
 	void attachToDC (HDC hdc);
 	bool tryAttachToDC (HDC hdc);
 	void detachFromDC (HDC hdc);
+	void stretchBlt (HDC hdc, int xDest, int yDest, int nDestWidth, int nDestHeight,
+		int xSrc, int ySrc, int nSrcWidth, int nSrcHeight, DWORD dwRop,
+		bool highQuality = true);
 
 	CDIBSectionPtr clone ();
-	CDIBSectionPtr resize_ (int w, int h, RESIZE_TYPE rt = RT_BOX, bool usefilemap = false);
+	CDIBSectionPtr cloneAndResize (int w, int h, RESIZE_TYPE rt = RT_BOX, bool usefilemap = false);
 	bool resize (CDIBSection *dib, RESIZE_TYPE rt = RT_BOX);
 
 	static CDIBSectionPtr createDIBSection (int w, int h, int bitcount = 24, bool usefilemap = false);

@@ -200,6 +200,42 @@ void CDIBSection::detachFromDC (HDC hdc) {
 	unlock();
 }
 
+void CDIBSection::stretchBlt (HDC hdc, int xDest, int yDest, int nDestWidth, int nDestHeight,
+                              int xSrc, int ySrc, int nSrcWidth, int nSrcHeight, DWORD dwRop,
+			      bool highQuality) {
+	assert(false); // it seems doesn't work!!!
+	assert(m_hBitmap != NULL);
+	assert(getBitCounts() >= 16);
+
+	xl::ui::CDCHandle dc(hdc);
+	CScopeLock lock(this);
+
+	BITMAPINFO info;
+	// memcpy(&info.bmiHeader, &m_section.dsBmih, sizeof(m_section.dsBmih));
+	// xl::trace(_T("biHeight = %d\n"), info.bmiHeader.biHeight);
+	memset(&info, 0, sizeof(info));
+	BITMAPINFOHEADER &bih = info.bmiHeader;
+	bih.biSize = sizeof(BITMAPINFOHEADER);
+	bih.biWidth = _GetWidthNoLock();
+	bih.biHeight = -_GetHeightNoLock();
+	bih.biPlanes = 1;
+	bih.biBitCount = _GetBitCountsNoLock();
+	bih.biCompression = BI_RGB;
+	bih.biSizeImage = 0;
+
+	void *data = _GetDataNoLock();
+	assert(data != NULL);
+
+	int mode = highQuality ? HALFTONE : COLORONCOLOR;
+	int oldMode = dc.SetStretchBltMode(mode);
+	dc.StretchDIBits(xDest, yDest, nDestWidth, nDestHeight, 
+		xSrc, ySrc, nSrcWidth, nSrcHeight, 
+		data, &info, DIB_RGB_COLORS, 
+		dwRop);
+	dc.SetStretchBltMode(oldMode);
+}
+
+
 
 CDIBSectionPtr CDIBSection::clone () {
 	CScopeLock lock(this);
@@ -224,7 +260,7 @@ CDIBSectionPtr CDIBSection::clone () {
 }
 
 // #define USE_STRETCHBLT
-CDIBSectionPtr CDIBSection::resize_ (int w, int h, RESIZE_TYPE rt, bool usefilemap) {
+CDIBSectionPtr CDIBSection::cloneAndResize (int w, int h, RESIZE_TYPE rt, bool usefilemap) {
 	CScopeLock lock(this);
 	GdiFlush();
 	assert(m_hBitmap != NULL);
