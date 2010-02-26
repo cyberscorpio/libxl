@@ -3,6 +3,7 @@
  * (Filters.h, Resize.h, Resize.cpp and Rescale.cpp)
  */
 #include <math.h>
+#include "../../include/utilities.h"
 #include "../../include/ui/DIBResizer.h"
 
 XL_BEGIN
@@ -18,110 +19,84 @@ template <class T> T MIN(T a, T b) {
 
 //////////////////////////////////////////////////////////////////////////
 // Weight Table
-class CWeightsTable
-{
-	typedef struct {
-		double *Weights;
-		int Left, Right;   
-	} Contribution;  
+CWeightsTable::CWeightsTable(CGenericFilter *pFilter, uint uDstSize, uint uSrcSize) {
+	uint u;
+	double dWidth;
+	double dFScale = 1.0;
+	double dFilterWidth = pFilter->GetWidth();
 
-private:
-	Contribution *m_WeightTable;
-	uint m_WindowSize;
-	uint m_LineLength;
+	double dScale = double(uDstSize) / double(uSrcSize);
 
-public:
-	CWeightsTable(CGenericFilter *pFilter, uint uDstSize, uint uSrcSize) {
-		uint u;
-		double dWidth;
-		double dFScale = 1.0;
-		double dFilterWidth = pFilter->GetWidth();
+	if(dScale < 1.0) {
+		dWidth = dFilterWidth / dScale; 
+		dFScale = dScale; 
+	} else {
+		dWidth= dFilterWidth; 
+	}
+	// xl::trace(_T("scale: %.4f, width: %.4f\n"), dScale, dWidth);
 
-		double dScale = double(uDstSize) / double(uSrcSize);
+	m_WindowSize = 2 * (int)ceil(dWidth) + 1; 
+	m_LineLength = uDstSize; 
+	m_WeightTable = (Contribution *)malloc(m_LineLength * sizeof(Contribution));
+	double *weights = (double *)malloc(m_WindowSize * m_LineLength * sizeof(double)); // continuous memory maybe cache friendly
+	for(u = 0; u < m_LineLength; ++ u) {
+		m_WeightTable[u].Weights = weights + m_WindowSize * u;
+	}
 
-		if(dScale < 1.0) {
-			dWidth = dFilterWidth / dScale; 
-			dFScale = dScale; 
-		} else {
-			dWidth= dFilterWidth; 
+	double dOffset = (0.5 / dScale) - 0.5;
+
+	for(u = 0; u < m_LineLength; ++ u) {
+		double dCenter = (double)u / dScale + dOffset;   // reverse mapping
+		int iLeft = MAX (0, (int)floor (dCenter - dWidth)); 
+		int iRight = MIN ((int)ceil (dCenter + dWidth), int(uSrcSize) - 1); 
+
+		if((iRight - iLeft + 1) > int(m_WindowSize)) {
+			if(iLeft < (int(uSrcSize) - 1 / 2)) {
+				iLeft++; 
+			} else {
+				iRight--; 
+			}
 		}
 
-		m_WindowSize = 2 * (int)ceil(dWidth) + 1; 
-		m_LineLength = uDstSize; 
-		m_WeightTable = (Contribution *)malloc(m_LineLength * sizeof(Contribution));
-		double *weights = (double *)malloc(m_WindowSize * m_LineLength * sizeof(double)); // continuous memory maybe cache friendly
-		for(u = 0; u < m_LineLength; ++ u) {
-			// m_WeightTable[u].Weights = (double *)malloc(m_WindowSize * sizeof(double));
-			m_WeightTable[u].Weights = weights + m_WindowSize * u;
+		m_WeightTable[u].Left = iLeft; 
+		m_WeightTable[u].Right = iRight;
+
+		int iSrc = 0;
+		double dTotalWeight = 0;
+		for(iSrc = iLeft; iSrc <= iRight; ++ iSrc) {
+			double weight = dFScale * pFilter->Filter(dFScale * (dCenter - (double)iSrc));
+			m_WeightTable[u].Weights[iSrc-iLeft] = weight;
+			dTotalWeight += weight;
 		}
-
-		double dOffset = (0.5 / dScale) - 0.5;
-
-		for(u = 0; u < m_LineLength; ++ u) {
-			double dCenter = (double)u / dScale + dOffset;   // reverse mapping
-			int iLeft = MAX (0, (int)floor (dCenter - dWidth)); 
-			int iRight = MIN ((int)ceil (dCenter + dWidth), int(uSrcSize) - 1); 
-
-			if((iRight - iLeft + 1) > int(m_WindowSize)) {
-				if(iLeft < (int(uSrcSize) - 1 / 2)) {
-					iLeft++; 
-				} else {
-					iRight--; 
-				}
+		if((dTotalWeight > 0) && (dTotalWeight != 1)) {
+			for(iSrc = iLeft; iSrc <= iRight; iSrc++) {
+				m_WeightTable[u].Weights[iSrc-iLeft] /= dTotalWeight; 
+			}
+			iSrc = iRight - iLeft;
+			while(m_WeightTable[u].Weights[iSrc] == 0){
+				m_WeightTable[u].Right--;
+				iSrc--;
+				if(m_WeightTable[u].Right == m_WeightTable[u].Left)
+					break;
 			}
 
-			m_WeightTable[u].Left = iLeft; 
-			m_WeightTable[u].Right = iRight;
+		}
+	} 
+}
 
-			int iSrc = 0;
-			double dTotalWeight = 0;
-			for(iSrc = iLeft; iSrc <= iRight; ++ iSrc) {
-				double weight = dFScale * pFilter->Filter(dFScale * (dCenter - (double)iSrc));
-				m_WeightTable[u].Weights[iSrc-iLeft] = weight;
-				dTotalWeight += weight;
-			}
-			if((dTotalWeight > 0) && (dTotalWeight != 1)) {
-				for(iSrc = iLeft; iSrc <= iRight; iSrc++) {
-					m_WeightTable[u].Weights[iSrc-iLeft] /= dTotalWeight; 
-				}
-				iSrc = iRight - iLeft;
-				while(m_WeightTable[u].Weights[iSrc] == 0){
-					m_WeightTable[u].Right--;
-					iSrc--;
-					if(m_WeightTable[u].Right == m_WeightTable[u].Left)
-						break;
-				}
-
-			}
-		} 
-	}
-
-	~CWeightsTable() {
-// 		for(uint u = 0; u < m_LineLength; u++) {
-// 			free(m_WeightTable[u].Weights);
-// 		}
-		free(m_WeightTable[0].Weights);
-		free(m_WeightTable);
-	}
-
-	inline double getWeight(int dst_pos, int src_pos) {
-		return m_WeightTable[dst_pos].Weights[src_pos];
-	}
-
-	int getLeftBoundary(int dst_pos) {
-		return m_WeightTable[dst_pos].Left;
-	}
-
-	int getRightBoundary(int dst_pos) {
-		return m_WeightTable[dst_pos].Right;
-	}
-};
+CWeightsTable::~CWeightsTable() {
+	free(m_WeightTable[0].Weights);
+	free(m_WeightTable);
+}
 
 
 
 //////////////////////////////////////////////////////////////////////////
 // Resize Engine
+#if 0
 CDIBSectionPtr CResizeEngine::scale(CDIBSection *src, uint dst_width, uint dst_height) {
+	assert(src != NULL);
+	assert(dst_width > 0 && dst_height > 0);
 	uint src_width  = (uint)src->getWidth();
 	uint src_height = (uint)src->getHeight();
 	int bitcount = src->getBitCounts();
@@ -131,30 +106,49 @@ CDIBSectionPtr CResizeEngine::scale(CDIBSection *src, uint dst_width, uint dst_h
 		return dib;
 	}
 
+	scale(src, dib.get());
+
+	return dib;
+}
+#endif
+
+bool CResizeEngine::scale (CDIBSection *src, CDIBSection *dst) {
+	assert(src != NULL && dst != NULL);
+	uint src_width  = (uint)src->getWidth();
+	uint src_height = (uint)src->getHeight();
+	uint dst_width = (uint)dst->getWidth();
+	uint dst_height = (uint)dst->getHeight();
+	int bitcount = src->getBitCounts();
+	assert(dst_width > 0 && dst_height > 0);
+	assert(bitcount == 24 || bitcount == 32);
+
+	if (m_pFilter == NULL) {
+		_FastScale(src, dst);
+		return true;
+	}
+
 	if(dst_width * src_height <= dst_height * src_width) {
 		CDIBSectionPtr tmp = CDIBSection::createDIBSection(dst_width, src_height, bitcount, false);
 		if (!tmp) {
-			dib.reset();
-			return CDIBSectionPtr();
+			return false;
 		}
 
-		horizontalFilter(src, src_width, src_height, tmp.get(), dst_width, src_height);
-		verticalFilter(tmp.get(), dst_width, src_height, dib.get(), dst_width, dst_height);
+		_HorizontalFilter(src, src_width, src_height, tmp.get(), dst_width, src_height);
+		_VerticalFilter(tmp.get(), dst_width, src_height, dst, dst_width, dst_height);
 
 	} else {
 		CDIBSectionPtr tmp = CDIBSection::createDIBSection(src_width, dst_height, bitcount, false);
 		if (!tmp) {
-			dib.reset();
-			return CDIBSectionPtr();
+			return false;
 		}
-		verticalFilter(src, src_width, src_height, tmp.get(), src_width, dst_height);
-		horizontalFilter(tmp.get(), src_width, dst_height, dib.get(), dst_width, dst_height);
+		_VerticalFilter(src, src_width, src_height, tmp.get(), src_width, dst_height);
+		_HorizontalFilter(tmp.get(), src_width, dst_height, dst, dst_width, dst_height);
 	}
 
-	return dib;
+	return true;
 }
 
-void CResizeEngine::horizontalFilter(CDIBSection *src, uint src_width, uint src_height,
+void CResizeEngine::_HorizontalFilter(CDIBSection *src, uint src_width, uint src_height,
                                      CDIBSection *dst, uint dst_width, uint dst_height) {
 	assert(src->getBitCounts() == dst->getBitCounts());
 	if (dst_width == src_width) {
@@ -197,7 +191,7 @@ void CResizeEngine::horizontalFilter(CDIBSection *src, uint src_width, uint src_
 	}
 }
 
-void CResizeEngine::verticalFilter(CDIBSection *src, uint src_width, uint src_height,
+void CResizeEngine::_VerticalFilter(CDIBSection *src, uint src_width, uint src_height,
 				   CDIBSection *dst, uint dst_width, uint dst_height) {
 	assert(src->getBitCounts() == dst->getBitCounts());
 	if (src_height == dst_height) {
@@ -245,6 +239,44 @@ void CResizeEngine::verticalFilter(CDIBSection *src, uint src_width, uint src_he
 				}
 
 				dst_bits += dst_pitch;
+			}
+		}
+	}
+}
+
+void CResizeEngine::_FastScale (CDIBSection *src, CDIBSection *dst) {
+	assert(src != NULL && dst != NULL);
+	assert(src->getBitCounts() == dst->getBitCounts());
+	uint bitcount = src->getBitCounts();
+	assert(bitcount == 24 || bitcount == 32);
+	uint src_width = src->getWidth();
+	uint src_height = src->getHeight();
+	uint dst_width = dst->getWidth();
+	uint dst_height = dst->getHeight();
+	double ratio_w = (double)src_width / (double)dst_width;
+	double ratio_h = (double)src_height / (double)dst_height;
+
+	uint bytespp = bitcount / 8;
+	uint src_stride = src->getStride();
+	uint dst_stride = dst->getStride();
+
+	for (uint y = 0; y < dst_height; ++ y) {
+		uint sy = (uint)(y * ratio_h + 0.5);
+		if (sy >= src_height) {
+			sy = src_height - 1;
+		}
+		uint8 *dst_data = (uint8 *)dst->getLine(y);
+		uint8 *src_line = (uint8 *)src->getLine(sy);
+
+		for (uint x = 0; x < dst_width; ++ x) {
+			uint sx = (uint)(x * ratio_w + 0.5);
+			if (sx >= src_width) {
+				sx = src_width - 1;
+			}
+
+			uint8 *src_data = src_line + sx * bytespp;
+			for (uint i = 0; i < bytespp; ++ i) {
+				*dst_data ++ = *src_data ++;
 			}
 		}
 	}

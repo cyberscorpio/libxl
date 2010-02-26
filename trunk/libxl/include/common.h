@@ -25,6 +25,7 @@ XL_BEGIN
 
 typedef TCHAR tchar;
 
+typedef unsigned char       uint8;
 typedef unsigned int        uint;
 typedef unsigned short      ushort;
 typedef __int64             int64;

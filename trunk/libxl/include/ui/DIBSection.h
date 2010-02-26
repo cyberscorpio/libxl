@@ -4,6 +4,7 @@
 #include <Windows.h>
 #include "../common.h"
 #include "../lockable.h"
+#include "DIBResizerFilter.h"
 
 XL_BEGIN
 UI_BEGIN
@@ -35,6 +36,17 @@ protected:
 	void _Clear ();
 
 public:
+	enum RESIZE_TYPE {
+		RT_FAST = 0,
+		RT_BOX,
+		RT_BICUBIC,
+		RT_BILINEAR,
+		RT_BSPLINE,
+		RT_CATMULLROM,
+		RT_LANCZOS3,
+		RT_COUNT
+	};
+
 	CDIBSection ();
 	virtual ~CDIBSection ();
 
@@ -51,7 +63,8 @@ public:
 	void detachFromDC (HDC hdc);
 
 	CDIBSectionPtr clone ();
-	CDIBSectionPtr resize (int w, int h, bool usehalftone = true, int bitcount = 24, bool usefilemap = false);
+	CDIBSectionPtr resize_ (int w, int h, RESIZE_TYPE rt = RT_BOX, bool usefilemap = false);
+	bool resize (CDIBSection *dib, RESIZE_TYPE rt = RT_BOX);
 
 	static CDIBSectionPtr createDIBSection (int w, int h, int bitcount = 24, bool usefilemap = false);
 };
