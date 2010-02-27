@@ -133,11 +133,11 @@ bool CResizeEngine::scale (CDIBSection *src, CDIBSection *dst, ILongTimeRunCallb
 			return false;
 		}
 
-		if (!_HorizontalFilter(src, src_width, src_height, tmp.get(), dst_width, src_height, pCallback)) {
+		if (!horizontalFilter(src, src_height, tmp.get(), 0, src_height, pCallback)) {
 			assert(pCallback && pCallback->shouldStop());
 			return false;
 		}
-		if (!_VerticalFilter(tmp.get(), dst_width, src_height, dst, dst_width, dst_height, pCallback)) {
+		if (!verticalFilter(tmp.get(), dst_width, src_height, dst, dst_width, dst_height, pCallback)) {
 			assert(pCallback && pCallback->shouldStop());
 			return false;
 		}
@@ -147,11 +147,11 @@ bool CResizeEngine::scale (CDIBSection *src, CDIBSection *dst, ILongTimeRunCallb
 		if (!tmp) {
 			return false;
 		}
-		if (!_VerticalFilter(src, src_width, src_height, tmp.get(), src_width, dst_height, pCallback)) {
+		if (!verticalFilter(src, src_width, src_height, tmp.get(), src_width, dst_height, pCallback)) {
 			assert(pCallback && pCallback->shouldStop());
 			return false;
 		}
-		if (!_HorizontalFilter(tmp.get(), src_width, dst_height, dst, dst_width, dst_height, pCallback)) {
+		if (!horizontalFilter(tmp.get(), dst_height, dst, 0, dst_height, pCallback)) {
 			assert(pCallback && pCallback->shouldStop());
 			return false;
 		}
@@ -160,32 +160,39 @@ bool CResizeEngine::scale (CDIBSection *src, CDIBSection *dst, ILongTimeRunCallb
 	return true;
 }
 
-bool CResizeEngine::_HorizontalFilter(CDIBSection *src, uint src_width, uint src_height,
-                                      CDIBSection *dst, uint dst_width, uint dst_height,
+bool CResizeEngine::horizontalFilter(CDIBSection *src, uint src_height,
+                                      CDIBSection *dst, uint dst_offset_y, uint dst_height,
                                       ILongTimeRunCallback *pCallback) {
+	assert(m_pFilter != NULL);
 	assert(src->getBitCounts() == dst->getBitCounts());
+	assert((int)src_height <= src->_GetHeightNoLock());
+	uint dst_ymax = dst_offset_y + dst_height;
+	assert((int)dst_ymax <= dst->getHeight());
+	uint src_width = src->_GetWidthNoLock();
+	uint dst_width = dst->getWidth();
 	if (dst_width == src_width) {
-		unsigned char *src_bits = (unsigned char *)src->getData();
-		unsigned char *dst_bits = (unsigned char *)dst->getData();
+		unsigned char *src_bits = (unsigned char *)src->_GetDataNoLock();
+		unsigned char *dst_bits = (unsigned char *)dst->getLine(dst_offset_y);
 		assert(src_bits && dst_bits);
 
-		memcpy(dst_bits, src_bits, dst_height * dst->getStride());
+		uint height = min(dst_height, src_height);
+		memcpy(dst_bits, src_bits, height * dst->getStride());
 	} else {
 		uint index; // pixel index
 		CWeightsTable weightsTable(m_pFilter, dst_width, src_width);
 
 		uint bytespp = src->getBitCounts() / 8;
 		assert(bytespp == 3 || bytespp == 4);
-		for (uint y = 0; y < dst_height; ++ y) {
+		for (uint dsty = dst_offset_y, srcy = 0; dsty < dst_ymax; ++ dsty, ++ srcy) {
 			// test for stop
-			if (y % 16 == 0) {
+			if (srcy % 32 == 0) {
 				if (pCallback && pCallback->shouldStop()) {
 					return false;
 				}
 			}
 
-			unsigned char *src_bits = (unsigned char *)src->_GetLineNoLock(y);
-			unsigned char *dst_bits = (unsigned char *)dst->_GetLineNoLock(y);
+			unsigned char *src_bits = (unsigned char *)src->_GetLineNoLock(srcy);
+			unsigned char *dst_bits = (unsigned char *)dst->_GetLineNoLock(dsty);
 
 			for(uint x = 0; x < dst_width; ++ x) {
 				double value[4] = {0, 0, 0, 0}; // 4 = 32bpp max
@@ -212,9 +219,10 @@ bool CResizeEngine::_HorizontalFilter(CDIBSection *src, uint src_width, uint src
 	return true;
 }
 
-bool CResizeEngine::_VerticalFilter(CDIBSection *src, uint src_width, uint src_height,
+bool CResizeEngine::verticalFilter(CDIBSection *src, uint src_width, uint src_height,
                                     CDIBSection *dst, uint dst_width, uint dst_height,
                                     ILongTimeRunCallback *pCallback) {
+	assert(m_pFilter != NULL);
 	assert(src->getBitCounts() == dst->getBitCounts());
 	if (src_height == dst_height) {
 		unsigned char *src_bits = (unsigned char *)src->getData();
