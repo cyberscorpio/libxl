@@ -59,10 +59,14 @@ public:
 	// CDIBSectionPtr scale(CDIBSection *src, uint dst_width, uint dst_height);
 	bool scale(CDIBSection *src, CDIBSection *dst, ILongTimeRunCallback *pCallback = NULL);
 
-protected:
-	bool _HorizontalFilter(CDIBSection *src, uint src_width, uint src_height, CDIBSection *dst, uint dst_width, uint dst_height, ILongTimeRunCallback *pCallback);
-	bool _VerticalFilter(CDIBSection *src, uint src_width, uint src_height, CDIBSection *dst, uint dst_width, uint dst_height, ILongTimeRunCallback *pCallback);
+	bool horizontalFilter(CDIBSection *src, uint src_height,
+		CDIBSection *dst, uint dst_offset, uint dst_height,
+		ILongTimeRunCallback *pCallback);
+	bool verticalFilter(CDIBSection *src, uint src_width, uint src_height,
+		CDIBSection *dst, uint dst_width, uint dst_height,
+		ILongTimeRunCallback *pCallback);
 
+protected:
 	void _FastScale (CDIBSection *src, CDIBSection *dst);
 };
 
