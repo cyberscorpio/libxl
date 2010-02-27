@@ -242,6 +242,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\include\interfaces.h"
+				>
+			</File>
+			<File
 				RelativePath=".\include\Language.h"
 				>
 			</File>

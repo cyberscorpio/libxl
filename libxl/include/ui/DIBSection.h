@@ -3,6 +3,7 @@
 #include <memory>
 #include <Windows.h>
 #include "../common.h"
+#include "../interfaces.h"
 #include "../lockable.h"
 #include "DIBResizerFilter.h"
 
@@ -66,8 +67,8 @@ public:
 		bool highQuality = true);
 
 	CDIBSectionPtr clone ();
-	CDIBSectionPtr cloneAndResize (int w, int h, RESIZE_TYPE rt = RT_BOX, bool usefilemap = false);
-	bool resize (CDIBSection *dib, RESIZE_TYPE rt = RT_BOX);
+	CDIBSectionPtr cloneAndResize (int w, int h, RESIZE_TYPE rt = RT_BOX, ILongTimeRunCallback *pCallback = NULL, bool usefilemap = false);
+	bool resize (CDIBSection *dib, RESIZE_TYPE rt = RT_BOX, ILongTimeRunCallback *pCallback = NULL);
 
 	static CDIBSectionPtr createDIBSection (int w, int h, int bitcount = 24, bool usefilemap = false);
 };

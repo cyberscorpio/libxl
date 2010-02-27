@@ -1,19 +1,13 @@
 #ifndef XL_LOCKABLE_H
 #define XL_LOCKABLE_H
+/**
+ * implements the ILockable interface
+ */
 #include <assert.h>
 #include <Windows.h>
 #include "common.h"
+#include "interfaces.h"
 XL_BEGIN
-
-//////////////////////////////////////////////////////////////////////////
-/// interface
-class ILockable {
-public:
-	virtual ~ILockable () {}
-	virtual void lock () const = 0;
-	virtual void unlock () const = 0;
-	virtual bool tryLock () const = 0;
-};
 
 
 //////////////////////////////////////////////////////////////////////////
