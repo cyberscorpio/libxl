@@ -112,7 +112,7 @@ CDIBSectionPtr CResizeEngine::scale(CDIBSection *src, uint dst_width, uint dst_h
 }
 #endif
 
-bool CResizeEngine::scale (CDIBSection *src, CDIBSection *dst) {
+bool CResizeEngine::scale (CDIBSection *src, CDIBSection *dst, ILongTimeRunCallback *pCallback) {
 	assert(src != NULL && dst != NULL);
 	uint src_width  = (uint)src->getWidth();
 	uint src_height = (uint)src->getHeight();
@@ -133,23 +133,36 @@ bool CResizeEngine::scale (CDIBSection *src, CDIBSection *dst) {
 			return false;
 		}
 
-		_HorizontalFilter(src, src_width, src_height, tmp.get(), dst_width, src_height);
-		_VerticalFilter(tmp.get(), dst_width, src_height, dst, dst_width, dst_height);
+		if (!_HorizontalFilter(src, src_width, src_height, tmp.get(), dst_width, src_height, pCallback)) {
+			assert(pCallback && pCallback->shouldStop());
+			return false;
+		}
+		if (!_VerticalFilter(tmp.get(), dst_width, src_height, dst, dst_width, dst_height, pCallback)) {
+			assert(pCallback && pCallback->shouldStop());
+			return false;
+		}
 
 	} else {
 		CDIBSectionPtr tmp = CDIBSection::createDIBSection(src_width, dst_height, bitcount, false);
 		if (!tmp) {
 			return false;
 		}
-		_VerticalFilter(src, src_width, src_height, tmp.get(), src_width, dst_height);
-		_HorizontalFilter(tmp.get(), src_width, dst_height, dst, dst_width, dst_height);
+		if (!_VerticalFilter(src, src_width, src_height, tmp.get(), src_width, dst_height, pCallback)) {
+			assert(pCallback && pCallback->shouldStop());
+			return false;
+		}
+		if (!_HorizontalFilter(tmp.get(), src_width, dst_height, dst, dst_width, dst_height, pCallback)) {
+			assert(pCallback && pCallback->shouldStop());
+			return false;
+		}
 	}
 
 	return true;
 }
 
-void CResizeEngine::_HorizontalFilter(CDIBSection *src, uint src_width, uint src_height,
-                                     CDIBSection *dst, uint dst_width, uint dst_height) {
+bool CResizeEngine::_HorizontalFilter(CDIBSection *src, uint src_width, uint src_height,
+                                      CDIBSection *dst, uint dst_width, uint dst_height,
+                                      ILongTimeRunCallback *pCallback) {
 	assert(src->getBitCounts() == dst->getBitCounts());
 	if (dst_width == src_width) {
 		unsigned char *src_bits = (unsigned char *)src->getData();
@@ -164,6 +177,13 @@ void CResizeEngine::_HorizontalFilter(CDIBSection *src, uint src_width, uint src
 		uint bytespp = src->getBitCounts() / 8;
 		assert(bytespp == 3 || bytespp == 4);
 		for (uint y = 0; y < dst_height; ++ y) {
+			// test for stop
+			if (y % 16 == 0) {
+				if (pCallback && pCallback->shouldStop()) {
+					return false;
+				}
+			}
+
 			unsigned char *src_bits = (unsigned char *)src->_GetLineNoLock(y);
 			unsigned char *dst_bits = (unsigned char *)dst->_GetLineNoLock(y);
 
@@ -189,10 +209,12 @@ void CResizeEngine::_HorizontalFilter(CDIBSection *src, uint src_width, uint src
 			}
 		}
 	}
+	return true;
 }
 
-void CResizeEngine::_VerticalFilter(CDIBSection *src, uint src_width, uint src_height,
-				   CDIBSection *dst, uint dst_width, uint dst_height) {
+bool CResizeEngine::_VerticalFilter(CDIBSection *src, uint src_width, uint src_height,
+                                    CDIBSection *dst, uint dst_width, uint dst_height,
+                                    ILongTimeRunCallback *pCallback) {
 	assert(src->getBitCounts() == dst->getBitCounts());
 	if (src_height == dst_height) {
 		unsigned char *src_bits = (unsigned char *)src->getData();
@@ -211,6 +233,12 @@ void CResizeEngine::_VerticalFilter(CDIBSection *src, uint src_width, uint src_h
 		unsigned dst_pitch = dst->getStride();
 
 		for(uint x = 0; x < dst_width; ++ x) {
+			// test for stop
+			if (x % 16 == 0) {
+				if (pCallback && pCallback->shouldStop()) {
+					return false;
+				}
+			}
 			index = x * bytespp;
 
 			unsigned char *dst_bits = (unsigned char *)dst->getData();
@@ -242,6 +270,7 @@ void CResizeEngine::_VerticalFilter(CDIBSection *src, uint src_width, uint src_h
 			}
 		}
 	}
+	return true;
 }
 
 void CResizeEngine::_FastScale (CDIBSection *src, CDIBSection *dst) {

@@ -260,7 +260,9 @@ CDIBSectionPtr CDIBSection::clone () {
 }
 
 // #define USE_STRETCHBLT
-CDIBSectionPtr CDIBSection::cloneAndResize (int w, int h, RESIZE_TYPE rt, bool usefilemap) {
+CDIBSectionPtr CDIBSection::cloneAndResize (int w, int h, RESIZE_TYPE rt,
+                                            ILongTimeRunCallback *pCallback, bool usefilemap
+                                           ) {
 	CScopeLock lock(this);
 	GdiFlush();
 	assert(m_hBitmap != NULL);
@@ -292,7 +294,7 @@ CDIBSectionPtr CDIBSection::cloneAndResize (int w, int h, RESIZE_TYPE rt, bool u
 		detachFromDC(mdc);
 		dib->detachFromDC(dc);
 #else
-		if (!resize(dib.get(), rt)) {
+		if (!resize(dib.get(), rt, pCallback)) {
 			dib.reset();
 		}
 #endif
@@ -301,7 +303,7 @@ CDIBSectionPtr CDIBSection::cloneAndResize (int w, int h, RESIZE_TYPE rt, bool u
 	return dib;
 }
 
-bool CDIBSection::resize (CDIBSection *dib, RESIZE_TYPE rt) {
+bool CDIBSection::resize (CDIBSection *dib, RESIZE_TYPE rt, ILongTimeRunCallback *pCallback) {
 	assert(dib != NULL);
 
 	std::auto_ptr<CGenericFilter> pFilter;
@@ -331,7 +333,7 @@ bool CDIBSection::resize (CDIBSection *dib, RESIZE_TYPE rt) {
 	}
 
 	CResizeEngine engine(pFilter.get());
-	return engine.scale(this, dib);
+	return engine.scale(this, dib, pCallback);
 }
 
 

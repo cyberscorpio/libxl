@@ -1,5 +1,6 @@
 #ifndef XL_UI_DIBRESIZER_H
 #define XL_UI_DIBRESIZER_H
+#include "../interfaces.h"
 #include "DIBResizerFilter.h"
 #include "DIBSection.h"
 
@@ -56,11 +57,11 @@ public:
 	 * @return Returns the scaled image if successful, returns NULL otherwise
 	*/
 	// CDIBSectionPtr scale(CDIBSection *src, uint dst_width, uint dst_height);
-	bool scale(CDIBSection *src, CDIBSection *dst);
+	bool scale(CDIBSection *src, CDIBSection *dst, ILongTimeRunCallback *pCallback = NULL);
 
 protected:
-	void _HorizontalFilter(CDIBSection *src, uint src_width, uint src_height, CDIBSection *dst, uint dst_width, uint dst_height);
-	void _VerticalFilter(CDIBSection *src, uint src_width, uint src_height, CDIBSection *dst, uint dst_width, uint dst_height);
+	bool _HorizontalFilter(CDIBSection *src, uint src_width, uint src_height, CDIBSection *dst, uint dst_width, uint dst_height, ILongTimeRunCallback *pCallback);
+	bool _VerticalFilter(CDIBSection *src, uint src_width, uint src_height, CDIBSection *dst, uint dst_width, uint dst_height, ILongTimeRunCallback *pCallback);
 
 	void _FastScale (CDIBSection *src, CDIBSection *dst);
 };
