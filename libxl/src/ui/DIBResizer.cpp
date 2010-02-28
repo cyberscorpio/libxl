@@ -104,10 +104,10 @@ bool CResizeEngine::scale (CDIBSection *src, CDIBSection *dst, ILongTimeRunCallb
 	assert(dst_width > 0 && dst_height > 0);
 	assert(bitcount == 24 || bitcount == 32);
 
-// 	if (m_pFilter == NULL) {
-// 		_FastScale(src, dst);
-// 		return true;
-// 	}
+	if (m_pFilter == NULL) {
+		_FastScale(src, dst);
+		return true;
+	}
 
 	if(dst_width * src_height <= dst_height * src_width) {
 		CDIBSectionPtr tmp = CDIBSection::createDIBSection(dst_width, src_height, bitcount, false);
