@@ -93,24 +93,6 @@ CWeightsTable::~CWeightsTable() {
 
 //////////////////////////////////////////////////////////////////////////
 // Resize Engine
-#if 0
-CDIBSectionPtr CResizeEngine::scale(CDIBSection *src, uint dst_width, uint dst_height) {
-	assert(src != NULL);
-	assert(dst_width > 0 && dst_height > 0);
-	uint src_width  = (uint)src->getWidth();
-	uint src_height = (uint)src->getHeight();
-	int bitcount = src->getBitCounts();
-	assert(bitcount == 24 || bitcount == 32);
-	CDIBSectionPtr dib = CDIBSection::createDIBSection(dst_width, dst_height, bitcount, false);
-	if (!dib) {
-		return dib;
-	}
-
-	scale(src, dib.get());
-
-	return dib;
-}
-#endif
 
 bool CResizeEngine::scale (CDIBSection *src, CDIBSection *dst, ILongTimeRunCallback *pCallback) {
 	assert(src != NULL && dst != NULL);
@@ -122,10 +104,10 @@ bool CResizeEngine::scale (CDIBSection *src, CDIBSection *dst, ILongTimeRunCallb
 	assert(dst_width > 0 && dst_height > 0);
 	assert(bitcount == 24 || bitcount == 32);
 
-	if (m_pFilter == NULL) {
-		_FastScale(src, dst);
-		return true;
-	}
+// 	if (m_pFilter == NULL) {
+// 		_FastScale(src, dst);
+// 		return true;
+// 	}
 
 	if(dst_width * src_height <= dst_height * src_width) {
 		CDIBSectionPtr tmp = CDIBSection::createDIBSection(dst_width, src_height, bitcount, false);
@@ -137,7 +119,7 @@ bool CResizeEngine::scale (CDIBSection *src, CDIBSection *dst, ILongTimeRunCallb
 			assert(pCallback && pCallback->shouldStop());
 			return false;
 		}
-		if (!verticalFilter(tmp.get(), dst_width, src_height, dst, dst_width, dst_height, pCallback)) {
+		if (!verticalFilter(tmp.get(), dst, pCallback)) {
 			assert(pCallback && pCallback->shouldStop());
 			return false;
 		}
@@ -147,7 +129,7 @@ bool CResizeEngine::scale (CDIBSection *src, CDIBSection *dst, ILongTimeRunCallb
 		if (!tmp) {
 			return false;
 		}
-		if (!verticalFilter(src, src_width, src_height, tmp.get(), src_width, dst_height, pCallback)) {
+		if (!verticalFilter(src, tmp.get(), pCallback)) {
 			assert(pCallback && pCallback->shouldStop());
 			return false;
 		}
@@ -161,29 +143,54 @@ bool CResizeEngine::scale (CDIBSection *src, CDIBSection *dst, ILongTimeRunCallb
 }
 
 bool CResizeEngine::horizontalFilter(CDIBSection *src, uint src_height,
-                                      CDIBSection *dst, uint dst_offset_y, uint dst_height,
-                                      ILongTimeRunCallback *pCallback) {
-	assert(m_pFilter != NULL);
+                                     CDIBSection *dst, uint dst_yoffset, uint dst_height,
+                                     ILongTimeRunCallback *pCallback) {
 	assert(src->getBitCounts() == dst->getBitCounts());
+	int bitcount = src->getBitCounts();
 	assert((int)src_height <= src->_GetHeightNoLock());
-	uint dst_ymax = dst_offset_y + dst_height;
+	assert(src_height >= dst_height);
+	uint dst_ymax = dst_yoffset + dst_height;
 	assert((int)dst_ymax <= dst->getHeight());
 	uint src_width = src->_GetWidthNoLock();
 	uint dst_width = dst->getWidth();
+
 	if (dst_width == src_width) {
+
 		unsigned char *src_bits = (unsigned char *)src->_GetDataNoLock();
-		unsigned char *dst_bits = (unsigned char *)dst->getLine(dst_offset_y);
+		unsigned char *dst_bits = (unsigned char *)dst->getLine(dst_yoffset);
 		assert(src_bits && dst_bits);
 
 		uint height = min(dst_height, src_height);
 		memcpy(dst_bits, src_bits, height * dst->getStride());
-	} else {
+
+	} else if (!m_pFilter) { // fast (COLORONCOLOR)
+		double ratio_w = (double)src_width / (double)dst_width;
+		uint bytespp = bitcount / 8;
+
+		for (uint y = dst_yoffset, sy = 0; y < dst_ymax; ++ y, ++ sy) {
+			uint8 *dst_data = (uint8 *)dst->getLine(y);
+			uint8 *src_line = (uint8 *)src->getLine(sy);
+
+			for (uint x = 0; x < dst_width; ++ x) {
+				uint sx = (uint)(x * ratio_w + 0.5);
+				if (sx >= src_width) {
+					sx = src_width - 1;
+				}
+
+				uint8 *src_data = src_line + sx * bytespp;
+				for (uint i = 0; i < bytespp; ++ i) {
+					*dst_data ++ = *src_data ++;
+				}
+			}
+		}
+
+	} else { // use m_pFilter
 		uint index; // pixel index
 		CWeightsTable weightsTable(m_pFilter, dst_width, src_width);
 
 		uint bytespp = src->getBitCounts() / 8;
 		assert(bytespp == 3 || bytespp == 4);
-		for (uint dsty = dst_offset_y, srcy = 0; dsty < dst_ymax; ++ dsty, ++ srcy) {
+		for (uint dsty = dst_yoffset, srcy = 0; dsty < dst_ymax; ++ dsty, ++ srcy) {
 			// test for stop
 			if (srcy % 32 == 0) {
 				if (pCallback && pCallback->shouldStop()) {
@@ -219,17 +226,44 @@ bool CResizeEngine::horizontalFilter(CDIBSection *src, uint src_height,
 	return true;
 }
 
-bool CResizeEngine::verticalFilter(CDIBSection *src, uint src_width, uint src_height,
-                                    CDIBSection *dst, uint dst_width, uint dst_height,
-                                    ILongTimeRunCallback *pCallback) {
-	assert(m_pFilter != NULL);
+bool CResizeEngine::verticalFilter(CDIBSection *src, CDIBSection *dst, ILongTimeRunCallback *pCallback) {
 	assert(src->getBitCounts() == dst->getBitCounts());
+	int bitcount = src->getBitCounts();
+	uint src_width = src->getWidth();
+	uint src_height = src->getHeight();
+	uint dst_width = dst->getWidth();
+	uint dst_height = dst->getHeight();
+	assert(src_width == dst_width);
 	if (src_height == dst_height) {
+
 		unsigned char *src_bits = (unsigned char *)src->getData();
 		unsigned char *dst_bits = (unsigned char *)dst->getData();
 		assert(src_bits && dst_bits);
 
 		memcpy(dst_bits, src_bits, dst_height * dst->getStride());
+
+	} else if (!m_pFilter) { // fast (COLOR ON COLOR)
+
+		double ratio_w = (double)src_width / (double)dst_width;
+		double ratio_h = (double)src_height / (double)dst_height;
+
+		uint bytespp = bitcount / 8;
+		for (uint y = 0; y < dst_height; ++ y) {
+			uint sy = (uint)(y * ratio_h + 0.5);
+			if (sy >= src_height) {
+				sy = src_height - 1;
+			}
+			uint8 *dst_data = (uint8 *)dst->getLine(y);
+			uint8 *src_line = (uint8 *)src->getLine(sy);
+
+			for (uint x = 0; x < dst_width; ++ x) {
+				uint8 *src_data = src_line + x * bytespp;
+				for (uint i = 0; i < bytespp; ++ i) {
+					*dst_data ++ = *src_data ++;
+				}
+			}
+		}
+
 	} else {
 		uint index; // pixel index
 		CWeightsTable weightsTable(m_pFilter, dst_height, src_height);
@@ -294,9 +328,6 @@ void CResizeEngine::_FastScale (CDIBSection *src, CDIBSection *dst) {
 	double ratio_h = (double)src_height / (double)dst_height;
 
 	uint bytespp = bitcount / 8;
-	uint src_stride = src->getStride();
-	uint dst_stride = dst->getStride();
-
 	for (uint y = 0; y < dst_height; ++ y) {
 		uint sy = (uint)(y * ratio_h + 0.5);
 		if (sy >= src_height) {
