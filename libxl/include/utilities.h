@@ -1,6 +1,7 @@
 #ifndef XL_UTLITIES_H
 #define XL_UTLITIES_H
 #include "common.h"
+#include <stdarg.h>
 #include "string.h"
 #include "lockable.h"
 
@@ -21,17 +22,18 @@ void trace (const tchar *format, ...);
 // TimeLogger
 class CTimerLogger
 {
-	bool m_useMsgBox;
 	bool m_logged;
 	tstring m_msg;
 	uint m_tick;
+
+	void _Init (const tchar *, va_list);
+
 public:
-	CTimerLogger (const tstring &msg, bool useMsgBox = false);
-	CTimerLogger (bool useMsgBox, const tchar *format, ...);
+	CTimerLogger (const tchar *format, ...);
 	~CTimerLogger ();
 
 	void log ();
-	void restart (const tstring &msg, bool useMsgBox = false);
+	void restart (const tchar *format, ...);
 };
 
 
