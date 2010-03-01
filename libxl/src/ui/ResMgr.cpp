@@ -12,18 +12,18 @@ UI_BEGIN
 // private
 
 CResMgr::CResMgr() {
-	Gdiplus::GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
 }
 
 CResMgr::~CResMgr() {
 	reset();
-	Gdiplus::GdiplusShutdown(gdiplusToken);
 }
 
 void CResMgr::_Lock() {
+	lock();
 }
 
 void CResMgr::_Unlock() {
+	unlock();
 }
 
 
@@ -58,38 +58,23 @@ HGDIOBJ CResMgr::_CreateSysFont(int height, uint style) {
 	return font;
 }
 
-void CResMgr::_MakeBitmaGray (GpBmpPtr bitmap) {
+void CResMgr::_MakeBitmaGray (CBitmapPtr bitmap) {
 	assert (bitmap != NULL);
-	Gdiplus::Bitmap *pBitmap = bitmap.get();
-	UINT w = pBitmap->GetWidth();
-	UINT h = pBitmap->GetHeight();
-	Gdiplus::PixelFormat pf = pBitmap->GetPixelFormat();
-
-	Gdiplus::BitmapData bd;
-	Gdiplus::Rect rc(0, 0, w, h);
-	Gdiplus::Status res = pBitmap->LockBits(&rc,
-		Gdiplus::ImageLockModeWrite,
-		PixelFormat32bppARGB,
-		&bd);
-	assert (res == Gdiplus::Ok);
-	if (res != Gdiplus::Ok) {
-		return;
-	}
-
-	UINT len = w * h;
-	for (UINT y = 0; y < h; ++ y) {
-		unsigned char *pixels = (unsigned char *)bd.Scan0 + y * bd.Stride;
-		for (UINT x = 0; x < w; ++ x) {
-			UINT v = pixels[0];
-			v += pixels[1];
-			v += pixels[2];
+	CBitmap *pBitmap = bitmap.get();
+	UINT w = pBitmap->getWidth();
+	UINT h = pBitmap->getHeight();
+	int bitcount = bitmap->getBitCounts();
+	int bytespp = bitcount / 8;
+	assert(bytespp > 2); // 3, 4
+	for (uint y = 0; y < h; ++ y) {
+		uint8 *data_line = (uint8 *)pBitmap->getLine(y);
+		for (uint x = 0; x < w; ++ x) {
+			uint v = (uint)data_line[0] + (uint)data_line[1] + (uint)data_line[2];
 			v /= 3;
-			pixels[0] = pixels[1] = pixels[2] = v;
-			pixels += 4;
+			data_line[0] = data_line[1] = data_line[2] = v;
+			data_line += bytespp;
 		}
 	}
-
-	pBitmap->UnlockBits(&bd);
 }
 
 
@@ -106,66 +91,6 @@ void CResMgr::reset () {
 		::DeleteObject(it->second);
 	}
 	m_sysFonts.clear();
-
-	m_gpBmpsById.clear();
-	m_gpBmpsByFile.clear();
-	m_gpGrayBmpsByFile.clear();
-}
-
-CResMgr::GpBmpPtr CResMgr::loadBitmapFromResource (uint id, const tstring &type, HINSTANCE hInst) {
-	if (hInst == NULL) {
-		hInst = (HINSTANCE)::GetModuleHandle(NULL);
-	}
-
-	HRSRC hRes = ::FindResource(hInst, MAKEINTRESOURCE(id), type.c_str());
-	assert (hRes != NULL);
-	if (hRes == NULL) {
-		return GpBmpPtr();
-	}
-
-	DWORD reslen = ::SizeofResource(hInst, hRes);
-	if (reslen == 0) {
-		assert (false);
-		return GpBmpPtr();
-	}
-
-	const void* pResourceData = ::LockResource(::LoadResource(hInst, hRes));
-	if (!pResourceData) {
-		assert (false);
-		return GpBmpPtr();
-	}
-
-	Gdiplus::Bitmap *pBitmap = NULL;
-	HGLOBAL hBuffer  = ::GlobalAlloc(GMEM_MOVEABLE, reslen);
-	if (hBuffer)
-	{
-		void* pBuffer = ::GlobalLock(hBuffer);
-		if (pBuffer)
-		{
-			CopyMemory(pBuffer, pResourceData, reslen);
-
-			IStream* pStream = NULL;
-			if (::CreateStreamOnHGlobal(hBuffer, FALSE, &pStream) == S_OK)
-			{
-				pBitmap = Gdiplus::Bitmap::FromStream(pStream);
-				pStream->Release();
-			}
-			::GlobalUnlock(hBuffer);
-		}
-		::GlobalFree(hBuffer);
-		hBuffer = NULL;
-	}
-
-	if (pBitmap) { 
-		if (pBitmap->GetLastStatus() == Gdiplus::Ok) {
-			return GpBmpPtr(pBitmap);
-		} else {
-			delete pBitmap;
-			pBitmap = NULL;
-		}
-	}
-
-	return GpBmpPtr();
 }
 
 HFONT CResMgr::getSysFont (int height, uint style) {
@@ -191,57 +116,6 @@ HFONT CResMgr::getSysFont (int height, uint style) {
 	return (HFONT)font;
 }
 
-CResMgr::GpBmpPtr CResMgr::getBitmap (ushort id, const tstring &type, bool grayscale)
-{
-	assert (id != NULL);
-
-	uint realid = id;
-	if (grayscale) {
-		realid = (1 << (sizeof(id) * 8)) | id;
-	}
-
-	_GpBmpIdMapIter it = m_gpBmpsById.find(realid);
-	if (it != m_gpBmpsById.end()) {
-		return it->second;
-	}
-
-	GpBmpPtr bitmap = loadBitmapFromResource(id, type, NULL);
-	if (bitmap != NULL) {
-		if (grayscale) {
-			_MakeBitmaGray(bitmap);
-		}
-		m_gpBmpsById[realid] = bitmap;
-		return bitmap;
-	}
-	return GpBmpPtr();
-}
-
-CResMgr::GpBmpPtr CResMgr::getBitmap (const tstring &file, bool grayscale) {
-	_GpBmpFileMapType *pContainer = &m_gpBmpsByFile;
-	if (grayscale) {
-		pContainer = &m_gpGrayBmpsByFile;
-	}
-
-	_GpBmpFileMapIter it = pContainer->find(file);
-	if (it != pContainer->end()) {
-		return it->second;
-	}
-
-	// TODO: make ANSI work
-	Gdiplus::Bitmap *pBitmap = new Gdiplus::Bitmap(file);
-	if (pBitmap->GetLastStatus() != Gdiplus::Ok) {
-		delete pBitmap;
-		return GpBmpPtr();
-	}
-
-	GpBmpPtr bitmap(pBitmap);
-	if (grayscale) {
-		_MakeBitmaGray(bitmap);
-	}
-
-	(*pContainer)[file] = bitmap;
-	return bitmap;
-}
 
 UI_END
 XL_END

@@ -172,6 +172,10 @@
 				Name="ui"
 				>
 				<File
+					RelativePath=".\src\ui\Bitmap.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\src\ui\Control.cpp"
 					>
 				</File>
@@ -278,6 +282,10 @@
 				>
 				<File
 					RelativePath=".\include\ui\Application.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\ui\Bitmap.h"
 					>
 				</File>
 				<File

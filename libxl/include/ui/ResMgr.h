@@ -4,9 +4,10 @@
 #include <map>
 #include <memory>
 #include <Windows.h>
-#include <gdiplus.h>
 #include "../common.h"
 #include "../string.h"
+#include "../lockable.h"
+#include "Bitmap.h"
 
 XL_BEGIN
 UI_BEGIN
@@ -14,18 +15,13 @@ UI_BEGIN
 /**
  * Manage resources such as fonts, icons, cursors, and so on.
  */
-class CResMgr
+class CResMgr : private CUserLock
 {
 public:
 	//////////////////////////////////////////////////////////////////////////
 	// public typedefs
-	typedef std::tr1::shared_ptr<Gdiplus::Bitmap>  GpBmpPtr;
 
 private:
-	// gdi+
-	Gdiplus::GdiplusStartupInput  gdiplusStartupInput;
-	ULONG_PTR                     gdiplusToken;
-
 	CResMgr ();
 	~CResMgr ();
 	typedef std::map<uint, HGDIOBJ>       _GdiObjMapType;
@@ -33,26 +29,14 @@ private:
 	typedef std::map<uint64, HGDIOBJ>     _GdiObjBigMapType;
 	typedef _GdiObjBigMapType::iterator   _GdiObjBigMapIter;
 
-	typedef std::map<uint, GpBmpPtr>      _GpBmpIdMapType;
-	typedef _GpBmpIdMapType::iterator     _GpBmpIdMapIter;
-
-	typedef std::map<
-	                 tstring,
-	                 GpBmpPtr,
-	                 tstring_iless<tstring>
-	                >                     _GpBmpFileMapType;
-	typedef _GpBmpFileMapType::iterator   _GpBmpFileMapIter;
 
 	_GdiObjMapType                        m_sysFonts;
-	_GpBmpIdMapType                       m_gpBmpsById;
-	_GpBmpFileMapType                     m_gpBmpsByFile;
-	_GpBmpFileMapType                     m_gpGrayBmpsByFile;
 
 	void _Lock ();
 	void _Unlock ();
 
 	HGDIOBJ _CreateSysFont(int height, uint style);
-	void _MakeBitmaGray (GpBmpPtr bitmap);
+	void _MakeBitmaGray (CBitmapPtr bitmap);
 
 public:
 	static const uint FS_BOLD = 0x01;
@@ -65,29 +49,11 @@ public:
 	void reset ();
 
 
-	/**
-	 * Load an image (bitmap) from the resource of hInst
-	 * @note CResMgr doesn't manager the return bitmap, if you want CResMgr cache it,
-	 *   use getBitmap() instead.
-	 */
-	GpBmpPtr loadBitmapFromResource (uint id, const tstring &type, HINSTANCE hInst = NULL);
-
 
 	/**
 	 * @param height The height of the font
 	 */
 	HFONT getSysFont (int height = 0, uint style = 0);
-
-	/**
-	 * get shared_ptr<Gdiplus::Bitmap> from process resource (not DLL)
-	 */
-	GpBmpPtr getBitmap (ushort id, const tstring &type, bool grayscale = false);
-
-	/**
-	 * get shared_ptr<Gdiplus::Bitmap> from file
-	 */
-	GpBmpPtr getBitmap (const tstring &file, bool grayscale = false);
-
 };
 
 UI_END

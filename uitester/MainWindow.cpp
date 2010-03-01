@@ -136,7 +136,7 @@ public:
 		}
 
 		m_bitmap = m_bitmap->clone();
-		m_bitmap = m_bitmap->resize(400, 200, true);
+		m_bitmap = m_bitmap->cloneAndResize(400, 200, xl::ui::CDIBSection::RT_BICUBIC);
 	}
 
 	virtual void onAttach () {

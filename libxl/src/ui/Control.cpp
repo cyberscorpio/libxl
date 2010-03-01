@@ -90,58 +90,7 @@ void CControl::_DrawBackground (HDC hdc) {
 		return;
 	}
 
-	CResMgr *pResMgr = CResMgr::getInstance();
-	CResMgr::GpBmpPtr bitmap;
-	if (background.type == BGT_IMAGE_ID) {
-		bitmap = pResMgr->getBitmap(background.id, background.url_or_idtype, disable);
-	} else if (background.type == BGT_IMAGE_URL) {
-		bitmap = pResMgr->getBitmap(background.url_or_idtype, disable);
-	} else {
-		assert(false);
-	}
-	if (bitmap == NULL) {
-		return;
-	}
-
-	int w = rc.Width() > (int)bitmap->GetWidth() ? (int)bitmap->GetWidth() : rc.Width();
-	int h = rc.Height() > (int)bitmap->GetHeight() ? (int)bitmap->GetHeight() : rc.Height();
-
-	Gdiplus::Graphics g(hdc);
-	Gdiplus::RectF dst((float)rc.left, (float)rc.top, (float)rc.Width(), (float)rc.Height());
-	if (background.x == BGIPX_FILL && background.y == BGIPY_FILL) {
-		g.DrawImage(bitmap.get(), dst, 0, 0, (float)bitmap->GetWidth(), (float)bitmap->GetHeight(), Gdiplus::UnitPixel);
-		return;
-	}
-
-	if (background.x == BGIPX_LEFT && background.y == BGIPY_TOP) {
-		g.DrawImage(bitmap.get(), rc.left, rc.top, 0, 0, w, h, Gdiplus::UnitPixel);
-		return;
-	}
-#if 0 // TODO
-	int x = rc.left;
-	int y = rc.top;
-	int ix = 0;
-	int iy = 0;
-	switch (background.x) {
-	case BGIPX_LEFT:
-		x = rc.left;
-		break;
-	case BGIPX_CENTER:
-		x = (rc.Width() - bitmap->GetWidth()) / 2;
-		if (x < 0) {
-			x = 0;
-		}
-		x += rc.left;
-		break;
-	case BGIPX_RIGHT:
-		x = rc.Width() - bitmap->GetWidth();
-		if (x < 0) {
-			x = 0;
-		}
-		x += rc.left;
-		break;
-	}
-#endif
+	assert(false); // to be implement later
 }
 
 bool CControl::_Capture (bool capture) {

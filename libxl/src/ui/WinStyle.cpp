@@ -242,6 +242,7 @@ void CWinStyle::_ParseBackground (tstring key, tstring value) {
 		background.type = BGT_RGB;
 		background.color = _ParseColor(value);
 	} else if (key == _T("background-image-id")) {
+		assert(false); // not supported now
 		background.type = BGT_IMAGE_ID;
 		background.x = BGIPX_FILL;
 		background.y = BGIPY_FILL;
@@ -257,6 +258,7 @@ void CWinStyle::_ParseBackground (tstring key, tstring value) {
 		}
 
 	} else if (key == _T("background-image-url")) {
+		assert(false); // not supported now
 		background.type = BGT_IMAGE_URL;
 		background.x = BGIPX_FILL;
 		background.y = BGIPY_FILL;
