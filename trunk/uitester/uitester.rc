@@ -49,14 +49,14 @@ END
 
 /////////////////////////////////////////////////////////////////////////////
 //
-// PNG
+// BMP
 //
 
-IDB_PNG1                PNG                     "resource\\button1.png"
-IDB_PNG2                PNG                     "resource\\button2.png"
-IDB_PNG3                PNG                     "resource\\button3.png"
-IDB_PNG4                PNG                     "resource\\button4.png"
-IDB_PNG5                PNG                     "resource\\buttonimg.png"
+IDB_BMP1                BITMAP                     "resource\\button1.bmp"
+IDB_BMP2                BITMAP                     "resource\\button2.bmp"
+IDB_BMP3                BITMAP                     "resource\\button3.bmp"
+IDB_BMP4                BITMAP                     "resource\\button4.bmp"
+IDB_BMP5                BITMAP                     "resource\\buttonimg.bmp"
 #endif    // Chinese (P.R.C.) resources
 /////////////////////////////////////////////////////////////////////////////
 

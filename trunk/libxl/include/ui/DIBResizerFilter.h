@@ -1,5 +1,6 @@
 #ifndef XL_UI_DIBRESIZERFILTER_H
 #define XL_UI_DIBRESIZERFILTER_H
+#include <math.h>
 #include "../common.h"
 XL_BEGIN
 UI_BEGIN

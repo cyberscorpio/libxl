@@ -2,11 +2,11 @@
 // Microsoft Visual C++ generated include file.
 // Used by uitester.rc
 //
-#define IDB_PNG1                        101
-#define IDB_PNG2                        102
-#define IDB_PNG3                        103
-#define IDB_PNG4                        104
-#define IDB_PNG5                        105
+#define IDB_BMP1                        101
+#define IDB_BMP2                        102
+#define IDB_BMP3                        103
+#define IDB_BMP4                        104
+#define IDB_BMP5                        105
 
 // Next default values for new objects
 // 
