@@ -3,6 +3,7 @@
 #include "../libxl/include/ui/CtrlButton.h"
 #include "../libxl/include/ui/CtrlSlider.h"
 #include "../libxl/include/ui/DIBSection.h"
+#include "../libxl/include/ui/Bitmap.h"
 #include "MainWindow.h"
 #include "resource.h"
 
@@ -110,17 +111,21 @@ public:
 class CView : public xl::ui::CControl
 {
 	CPoint m_pt;
-	xl::ui::CDIBSectionPtr m_bitmap;
+	xl::ui::CDIBSectionPtr m_dib;
+	xl::ui::CBitmapPtr m_bitmap;
 public:
 
-	CView () : m_bitmap(xl::ui::CDIBSection::createDIBSection(333, 333)) {
+	CView () 
+		: m_dib(xl::ui::CDIBSection::createDIBSection(333, 333))
+		, m_bitmap(new xl::ui::CBitmap())
+	{
 		m_id = ID_VIEW;
 		setStyle(_T("margin:5; background-color: #323232; px:left; py:top; width:fill; height:fill; "));
 
-		int w = m_bitmap->getWidth();
-		int h = m_bitmap->getHeight();
+		int w = m_dib->getWidth();
+		int h = m_dib->getHeight();
 		for (int y = 0; y < h; ++ y) {
-			unsigned char *data = (unsigned char *)m_bitmap->getLine(y);
+			unsigned char *data = (unsigned char *)m_dib->getLine(y);
 			if (y % 2) {
 				for (int x = 0; x < w; ++ x) {
 					*data ++ = 0xff;
@@ -135,42 +140,44 @@ public:
 			}
 		}
 
-		m_bitmap = m_bitmap->clone();
-		m_bitmap = m_bitmap->cloneAndResize(400, 200, xl::ui::CDIBSection::RT_BICUBIC);
+		m_dib = m_dib->clone();
+		m_dib = m_dib->cloneAndResize(400, 200, xl::ui::CDIBSection::RT_BICUBIC);
+
+		m_bitmap->load(IDB_BMP1);
 	}
 
 	virtual void onAttach () {
 		xl::ui::CCtrlButton *pButton = new xl::ui::CCtrlImageButton(1);
 		TCHAR buf[256];
-		_stprintf_s(buf, 256, _T("button-image: %d PNG;button-image-text-padding:4"), IDB_PNG5);
-		pButton->setStyle(buf);
-		_stprintf_s(buf, 256, _T("imagebutton-image: %d %d %d PNG"), IDB_PNG1, IDB_PNG2, IDB_PNG3);
-		pButton->setStyle(buf);
+// 		_stprintf_s(buf, 256, _T("button-image: %d BMP;button-image-text-padding:4"), IDB_BMP5);
+// 		pButton->setStyle(buf);
+// 		_stprintf_s(buf, 256, _T("imagebutton-image: %d %d %d BMP"), IDB_BMP1, IDB_BMP2, IDB_BMP3);
+// 		pButton->setStyle(buf);
 		xl::ui::CControlPtr button (pButton);
 		button->setStyle(_T("margin:10;width:100;height:40;border:0;font-weight:bold;"));
 		// button->setStyle(_T("opacity:50"));
 		insertChild(button);
 
 		pButton->setText(_T("Prompt"));
-		pButton = new xl::ui::CCtrlImageButton(2, IDB_PNG1, IDB_PNG2, IDB_PNG3);
+		pButton = new xl::ui::CCtrlImageButton(2);//, IDB_BMP1, IDB_BMP2, IDB_BMP3);
 		button.reset(pButton);
 		button->setStyle(_T("margin:10;width:100;height:40;border:0;")); 
 		pButton->setText(_T("Hide"));
 		insertChild(button);
 
-		pButton = new xl::ui::CCtrlImageButton(3, IDB_PNG1, IDB_PNG2, IDB_PNG3);
+		pButton = new xl::ui::CCtrlImageButton(3);//, IDB_BMP1, IDB_BMP2, IDB_BMP3);
 		button.reset(pButton);
 		button->setStyle(_T("margin:10;width:100;height:40;border:0;")); 
 		pButton->setText(_T("Disable"));
 		insertChild(button);
 
-		pButton = new xl::ui::CCtrlImageButton(4, IDB_PNG1, IDB_PNG2, IDB_PNG3);
+		pButton = new xl::ui::CCtrlImageButton(4);//, IDB_BMP1, IDB_BMP2, IDB_BMP3);
 		button.reset(pButton);
 		button->setStyle(_T("margin:10;width:100;height:40;border:0;")); 
 		pButton->setText(_T("Enlarge"));
 		insertChild(button);
 
-		pButton = new xl::ui::CCtrlImageButton(5, IDB_PNG4, IDB_PNG4, IDB_PNG4);
+		pButton = new xl::ui::CCtrlImageButton(5);//, IDB_BMP4, IDB_BMP4, IDB_BMP4);
 		button.reset(pButton);
 		button->setStyle(_T("margin:10;width:40;height:40;border:0;")); 
 		insertChild(button);
@@ -219,9 +226,9 @@ public:
 
 		xl::ui::CDC mdc;
 		mdc.CreateCompatibleDC(hdc);
-		m_bitmap->attachToDC(mdc);
-		int w = m_bitmap->getWidth();
-		int h = m_bitmap->getHeight();
+		m_dib->attachToDC(mdc);
+		int w = m_dib->getWidth();
+		int h = m_dib->getHeight();
 		int x = rc.left + (rc.Width() - w) / 2;
 		int y = rc.top + (rc.Height() - h) / 2;
 		if (x < rc.left) {
@@ -238,13 +245,16 @@ public:
 		}
 		dc.BitBlt(x, y, w, h, mdc, 0, 0, SRCCOPY);
 
-		m_bitmap->detachFromDC(mdc);
+		m_dib->detachFromDC(mdc);
 
 		if (_GetMainCtrl()->getHoverCtrl() == shared_from_this()) {
 			TCHAR buf[1024];
 			_stprintf_s(buf, 1024, _T("Mouse: %d - %d"), m_pt.x - m_rect.left, m_pt.y - m_rect.top);
 			dc.drawTransparentText(buf, -1, rc, DT_SINGLELINE | DT_CENTER | DT_VCENTER);
 		}
+
+		rc = getClientRect();
+		m_bitmap->draw(hdc, rc.left, rc.bottom - m_bitmap->getHeight(), m_bitmap->getWidth(), m_bitmap->getHeight(), 0, 0);
 	}
 };
 

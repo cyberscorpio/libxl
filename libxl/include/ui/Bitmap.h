@@ -11,6 +11,10 @@ typedef std::tr1::shared_ptr<CBitmap>  CBitmapPtr;
 
 class CBitmap : public CDIBSection {
 public:
+	bool load (HBITMAP);
+	bool load (int id); // load from resource
+
+	void draw (HDC hdc, int toX, int toY, int toW, int toH, int fromX, int fromY, uint op = SRCCOPY);
 };
 
 UI_END

@@ -220,8 +220,6 @@ void CDIBSection::stretchBlt (HDC hdc, int xDest, int yDest, int nDestWidth, int
 	CScopeLock lock(this);
 
 	BITMAPINFO info;
-	// memcpy(&info.bmiHeader, &m_section.dsBmih, sizeof(m_section.dsBmih));
-	// xl::trace(_T("biHeight = %d\n"), info.bmiHeader.biHeight);
 	memset(&info, 0, sizeof(info));
 	BITMAPINFOHEADER &bih = info.bmiHeader;
 	bih.biSize = sizeof(BITMAPINFOHEADER);
