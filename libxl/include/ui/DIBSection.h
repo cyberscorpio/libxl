@@ -62,6 +62,9 @@ public:
 	void attachToDC (HDC hdc);
 	bool tryAttachToDC (HDC hdc);
 	void detachFromDC (HDC hdc);
+	// attach & detach no lock version, use them with your own risk
+	void attachToDCNoLock (HDC hdc);
+	void detachFromDCNoLock (HDC hdc);
 	void stretchBlt (HDC hdc, int xDest, int yDest, int nDestWidth, int nDestHeight,
 		int xSrc, int ySrc, int nSrcWidth, int nSrcHeight, DWORD dwRop,
 		bool highQuality = true);

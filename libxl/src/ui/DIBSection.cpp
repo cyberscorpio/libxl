@@ -61,7 +61,7 @@ int CDIBSection::_GetStrideNoLock () const {
 
 void* CDIBSection::_GetLineNoLock (int line) {
 	CScopeLock lock(this);
-	assert(m_hOldBitmap == INVALID_HANDLE_VALUE);
+	// assert(m_hOldBitmap == INVALID_HANDLE_VALUE);
 	if (m_hBitmap == NULL) {
 		return NULL;
 	} else {
@@ -75,7 +75,7 @@ void* CDIBSection::_GetLineNoLock (int line) {
 
 void* CDIBSection::_GetDataNoLock () {
 	CScopeLock lock(this);
-	assert(m_hOldBitmap == INVALID_HANDLE_VALUE);
+	// assert(m_hOldBitmap == INVALID_HANDLE_VALUE);
 	if (m_hBitmap == NULL) {
 		assert(false);
 		return NULL;
@@ -176,10 +176,7 @@ void* CDIBSection::getData () {
 
 void CDIBSection::attachToDC (HDC hdc) {
 	lock();
-	assert(m_hBitmap != NULL);
-	assert(INVALID_HANDLE_VALUE == m_hOldBitmap);
-	m_hOldBitmap = (HBITMAP)::SelectObject(hdc, m_hBitmap);
-	assert(INVALID_HANDLE_VALUE != m_hOldBitmap);
+	attachToDCNoLock(hdc);
 }
 
 bool CDIBSection::tryAttachToDC (HDC hdc) {
@@ -192,13 +189,25 @@ bool CDIBSection::tryAttachToDC (HDC hdc) {
 }
 
 void CDIBSection::detachFromDC (HDC hdc) {
+	detachFromDCNoLock(hdc);
+	unlock();
+}
+
+void CDIBSection::attachToDCNoLock (HDC hdc) {
+	assert(m_hBitmap != NULL);
+	assert(INVALID_HANDLE_VALUE == m_hOldBitmap);
+	m_hOldBitmap = (HBITMAP)::SelectObject(hdc, m_hBitmap);
+	assert(INVALID_HANDLE_VALUE != m_hOldBitmap);
+}
+
+void CDIBSection::detachFromDCNoLock (HDC hdc) {
 	assert(m_hBitmap != NULL);
 	assert(INVALID_HANDLE_VALUE != m_hOldBitmap);
 	HBITMAP bitmap = (HBITMAP)::SelectObject(hdc, m_hOldBitmap);
 	m_hOldBitmap = (HBITMAP)INVALID_HANDLE_VALUE;
 	assert(bitmap == m_hBitmap);
-	unlock();
 }
+
 
 void CDIBSection::stretchBlt (HDC hdc, int xDest, int yDest, int nDestWidth, int nDestHeight,
                               int xSrc, int ySrc, int nSrcWidth, int nSrcHeight, DWORD dwRop,
