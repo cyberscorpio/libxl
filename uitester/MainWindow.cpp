@@ -147,34 +147,34 @@ public:
 		TCHAR buf[256];
 		_stprintf_s(buf, 256, _T("button-image: %d #ff00ff;button-image-text-padding:4"), IDB_BMP5);
  		pButton->setStyle(buf);
-// 		_stprintf_s(buf, 256, _T("imagebutton-image: %d %d %d #ff00ff"), IDB_BMP1, IDB_BMP2, IDB_BMP3);
-// 		pButton->setStyle(buf);
+ 		_stprintf_s(buf, 256, _T("imagebutton-image: %d %d %d #ff00ff"), IDB_BMP1, IDB_BMP2, IDB_BMP3);
+ 		pButton->setStyle(buf);
 		xl::ui::CControlPtr button (pButton);
 		button->setStyle(_T("margin:10;width:100;height:40;border:0;font-weight:bold;font-size:20px;"));
 		// button->setStyle(_T("opacity:50"));
-		pButton->setStyle(_T("border:1 #00ff00;background-color:#ffffff;"));
+		pButton->setStyle(_T("border:1 #00ff00;background-color:#ffff00;"));
 		insertChild(button);
 
 		pButton->setText(_T("Prompt"));
-		pButton = new xl::ui::CCtrlImageButton(2);//, IDB_BMP1, IDB_BMP2, IDB_BMP3);
+		pButton = new xl::ui::CCtrlImageButton(2, IDB_BMP1, IDB_BMP2, IDB_BMP3, true);
 		button.reset(pButton);
 		button->setStyle(_T("margin:10;width:100;height:40;border:0;")); 
 		pButton->setText(_T("Hide"));
 		insertChild(button);
 
-		pButton = new xl::ui::CCtrlImageButton(3);//, IDB_BMP1, IDB_BMP2, IDB_BMP3);
+		pButton = new xl::ui::CCtrlImageButton(3, IDB_BMP1, IDB_BMP2, IDB_BMP3, true);
 		button.reset(pButton);
 		button->setStyle(_T("margin:10;width:100;height:40;border:0;")); 
 		pButton->setText(_T("Disable"));
 		insertChild(button);
 
-		pButton = new xl::ui::CCtrlImageButton(4);//, IDB_BMP1, IDB_BMP2, IDB_BMP3);
+		pButton = new xl::ui::CCtrlImageButton(4, IDB_BMP1, IDB_BMP2, IDB_BMP3, true);
 		button.reset(pButton);
 		button->setStyle(_T("margin:10;width:100;height:40;border:0;")); 
 		pButton->setText(_T("Enlarge"));
 		insertChild(button);
 
-		pButton = new xl::ui::CCtrlImageButton(5);//, IDB_BMP4, IDB_BMP4, IDB_BMP4);
+		pButton = new xl::ui::CCtrlImageButton(5, IDB_BMP4, IDB_BMP4, IDB_BMP4, true, RGB(255, 0, 255));
 		button.reset(pButton);
 		button->setStyle(_T("margin:10;width:40;height:40;border:0;")); 
 		insertChild(button);
@@ -331,7 +331,7 @@ void CMainWindow::onCommand (xl::uint id, xl::ui::CControlPtr ctrl) {
 		// 	s_removed = ctrl;
 		// }
 		xl::ui::CControlPtr ctrl = m_ctrlMain->getControlByID(ID_SLIDER);
-		ctrl->setStyle(_T("disable:false;slider:0 255 50;"));
+		ctrl->setStyle(_T("disable:false;slider:0 50 50;"));
 	}
 }
 
@@ -339,14 +339,15 @@ void CMainWindow::onSlider (xl::uint id, int _min, int _max, int _curr, bool tra
 	xl::ui::CCtrlMain *pCtrlMain = (xl::ui::CCtrlMain *)m_ctrlMain.get();
 	xl::ui::CControlPtr view = pCtrlMain->getControlByID(ID_VIEW);
 	CView *pView = (CView *)view.get();
-	if (_curr == 255) {
+	if (_curr == _max) {
 		pView->setStyle(_T("background-color: #ffff00"));
 	} else if (_curr == 0) {
 		// pView->setStyle(_T("background-color: #00ffff"));
 		pView->setStyle(_T("background: none"));
 	} else {
 		TCHAR buf[64];
-		_stprintf_s(buf, 64, _T("background-color: #%02x%02x%02x"), _curr, _curr, _curr);
+		int r = _curr * 31, g = _curr * 23, b = _curr * 107;
+		_stprintf_s(buf, 64, _T("background-color: #%02x%02x%02x"), r % 256, g % 256, b % 256);
 		pView->setStyle(buf);
 	}
 }
