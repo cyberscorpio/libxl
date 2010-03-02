@@ -27,8 +27,8 @@ void CResMgr::_Unlock() {
 }
 
 
-HGDIOBJ CResMgr::_CreateSysFont(int height, uint style) {
-	HGDIOBJ font = ::GetStockObject(DEFAULT_GUI_FONT);
+HFONT CResMgr::_CreateSysFont(int height, uint style) {
+	HFONT font = (HFONT)::GetStockObject(DEFAULT_GUI_FONT);
 	assert (font != NULL);
 	LOGFONT lf;
 	VERIFY(::GetObject(font, sizeof(lf), &lf) == sizeof(lf));
@@ -54,27 +54,8 @@ HGDIOBJ CResMgr::_CreateSysFont(int height, uint style) {
 		lf.lfStrikeOut = TRUE;
 	}
 
-	font = (HGDIOBJ)::CreateFontIndirect(&lf);
+	font = ::CreateFontIndirect(&lf);
 	return font;
-}
-
-void CResMgr::_MakeBitmaGray (CBitmapPtr bitmap) {
-	assert (bitmap != NULL);
-	CBitmap *pBitmap = bitmap.get();
-	UINT w = pBitmap->getWidth();
-	UINT h = pBitmap->getHeight();
-	int bitcount = bitmap->getBitCounts();
-	int bytespp = bitcount / 8;
-	assert(bytespp > 2); // 3, 4
-	for (uint y = 0; y < h; ++ y) {
-		uint8 *data_line = (uint8 *)pBitmap->getLine(y);
-		for (uint x = 0; x < w; ++ x) {
-			uint v = (uint)data_line[0] + (uint)data_line[1] + (uint)data_line[2];
-			v /= 3;
-			data_line[0] = data_line[1] = data_line[2] = v;
-			data_line += bytespp;
-		}
-	}
 }
 
 
@@ -87,7 +68,7 @@ CResMgr* CResMgr::getInstance() {
 }
 
 void CResMgr::reset () {
-	for (_GdiObjMapIter it = m_sysFonts.begin(); it != m_sysFonts.end(); ++ it) {
+	for (_FontMapType::iterator it = m_sysFonts.begin(); it != m_sysFonts.end(); ++ it) {
 		::DeleteObject(it->second);
 	}
 	m_sysFonts.clear();
@@ -99,10 +80,10 @@ HFONT CResMgr::getSysFont (int height, uint style) {
 	uint key = height << 16;
 	key |= style;
 
-	HGDIOBJ font = NULL;
+	HFONT font = NULL;
 	_Lock();
 	// find font
-	_GdiObjMapIter it = m_sysFonts.find(key);
+	_FontMapType::iterator it = m_sysFonts.find(key);
 	if (it == m_sysFonts.end()) {
 		// create font
 		font = _CreateSysFont(height, style);
@@ -113,7 +94,58 @@ HFONT CResMgr::getSysFont (int height, uint style) {
 		font = it->second;
 	}
 	_Unlock();
-	return (HFONT)font;
+	return font;
+}
+
+CBitmapPtr CResMgr::getBitmap (ushort bmpid, bool grayscale) {
+	uint64 id = bmpid;
+	if (grayscale) {
+		id |= BMP_GRAY;
+	}
+
+	_BitmapBigMapType::iterator it = m_bitmaps.find(id);
+	if (it != m_bitmaps.end()) {
+		return it->second;
+	} else {
+		CBitmapPtr bitmap(new CBitmap());
+		if (bitmap->load(bmpid)) {
+			if (grayscale) {
+				bitmap->gray();
+			}
+
+			m_bitmaps[id] = bitmap;
+			return bitmap;
+		}
+	}
+
+	return CBitmapPtr();
+}
+
+CBitmapPtr CResMgr::getTransBitmap (ushort bmpid, COLORREF colorKey, bool grayscale) {
+	uint64 id = (uint)colorKey;
+	id <<= 32;
+	id |= (uint64)bmpid;
+	if (grayscale) {
+		id |= BMP_GRAY;
+	}
+
+	_BitmapBigMapType::iterator it = m_transBitmaps.find(id);
+	if (it != m_transBitmaps.end()) {
+		return it->second;
+	} else {
+		CBitmapPtr bitmap(new CBitmap());
+		if (bitmap->load(bmpid)) {
+			bitmap->setColorKey(colorKey);
+			if (grayscale) {
+				bitmap->gray();
+			}
+
+			m_transBitmaps[id] = bitmap;
+			return bitmap;
+		}
+	}
+
+	return CBitmapPtr();
 }
 
 

@@ -199,26 +199,6 @@
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
 			<File
-				RelativePath=".\resource\button1.png"
-				>
-			</File>
-			<File
-				RelativePath=".\resource\button2.png"
-				>
-			</File>
-			<File
-				RelativePath=".\resource\button3.png"
-				>
-			</File>
-			<File
-				RelativePath=".\resource\button4.png"
-				>
-			</File>
-			<File
-				RelativePath=".\resource\buttonimg.png"
-				>
-			</File>
-			<File
 				RelativePath=".\uitester.rc"
 				>
 			</File>

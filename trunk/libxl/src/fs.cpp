@@ -8,6 +8,7 @@
 #undef min
 #endif
 #include "../include/fs.h"
+#include "../include/utilities.h"
 
 #if (_MSC_VER >= 1500)
 #pragma warning (disable:4996)
@@ -17,11 +18,12 @@
 // static variables
 static const char dirsepA = '\\';
 static const wchar_t dirsepW = '\\';
+static const int FILE_READ_BLOCK_SIZE = 8192;
 
 
 //////////////////////////////////////////////////////////////////////////
 // static functions
-static bool _file_get_contents(FILE *file, std::string &data, size_t offset) {
+static bool _file_get_contents(FILE *file, std::string &data, size_t offset, xl::ILongTimeRunCallback *callback) {
 	assert (file != NULL);
 
 	bool result = false;
@@ -34,10 +36,29 @@ static bool _file_get_contents(FILE *file, std::string &data, size_t offset) {
 				fseek(file, offset, SEEK_SET);
 			}
 
-			if (fread(p, 1, size, file) == size) {
-				std::string tmp(p, size);
-				std::swap(tmp, data);
-				result = true;
+			if (callback != NULL) {
+				int bytes_read = 0;
+				do {
+					int round_read = fread(p + bytes_read, 1, size - bytes_read, file);
+					if (round_read == 0) {
+						assert(false);
+						break; // error
+					}
+					bytes_read += round_read;
+				} while (bytes_read < size && !callback->shouldStop());
+
+				if (!callback->shouldStop()) {
+					std::string tmp(p, size);
+					std::swap(tmp, data);
+					result = true;
+				}
+
+			} else {
+				if (fread(p, 1, size, file) == size) {
+					std::string tmp(p, size);
+					std::swap(tmp, data);
+					result = true;
+				}
 			}
 			delete []p;
 		}
@@ -235,26 +256,27 @@ int file_put_contentsW(const wstring &filename, const std::string &data) {
 }
 
 
-bool file_get_contentsA (const string &filename, std::string &data, size_t offset) {
+bool file_get_contentsA (const string &filename, std::string &data, size_t offset, ILongTimeRunCallback *callback) {
 	FILE *file = fopen(filename, "rb");
 	if (!file) {
 		return false;
 	}
 
-	bool result = _file_get_contents(file, data, offset);
+	bool result = _file_get_contents(file, data, offset, callback);
 
 	fclose(file);
 
 	return result;
 }
 
-bool file_get_contentsW (const wstring &filename, std::string &data, size_t offset) {
+bool file_get_contentsW (const wstring &filename, std::string &data, size_t offset, ILongTimeRunCallback *callback) {
+	// CTimerLogger logger(_T("read %s cost"), filename.c_str());
 	FILE *file = _wfopen(filename, L"rb");
 	if (!file) {
 		return false;
 	}
 
-	bool result = _file_get_contents(file, data, offset);
+	bool result = _file_get_contents(file, data, offset, callback);
 
 	fclose(file);
 

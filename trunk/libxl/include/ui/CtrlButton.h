@@ -3,6 +3,7 @@
 #include "../common.h"
 #include "../string.h"
 #include "Control.h"
+#include "Bitmap.h"
 
 XL_BEGIN
 UI_BEGIN
@@ -10,11 +11,12 @@ UI_BEGIN
 class CCtrlButton : public CControl 
 {
 protected:
-	bool m_pushAndCapture;
-	tstring m_text;
-	int m_text_image_pading;
-	uint m_idImg;
-	tstring m_imgType;
+	bool               m_pushAndCapture;
+	tstring            m_text;
+	int                m_text_image_pading;
+	uint               m_imgId;
+	bool               m_imgTrans;
+	COLORREF           m_imgClrKey;
 
 	void _DrawImageAndText (HDC);
 
@@ -23,7 +25,7 @@ protected:
 	virtual void _ParseProperty (const tstring &key, const tstring &value, bool &relayout, bool &redraw);
 
 public:
-	CCtrlButton (uint id, const tstring &text = _T(""), uint idImg = 0, const tstring &imgType = _T("PNG"));
+	CCtrlButton (uint id, const tstring &text = _T(""), uint idImg = 0, bool imgTrans = false, COLORREF clrKey = RGB(255, 0, 255));
 	virtual ~CCtrlButton ();
 	void setText (const tstring &text);
 
