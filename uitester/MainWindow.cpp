@@ -112,12 +112,10 @@ class CView : public xl::ui::CControl
 {
 	CPoint m_pt;
 	xl::ui::CDIBSectionPtr m_dib;
-	xl::ui::CBitmapPtr m_bitmap;
 public:
 
 	CView () 
 		: m_dib(xl::ui::CDIBSection::createDIBSection(333, 333))
-		, m_bitmap(new xl::ui::CBitmap())
 	{
 		m_id = ID_VIEW;
 		setStyle(_T("margin:5; background-color: #323232; px:left; py:top; width:fill; height:fill; "));
@@ -142,20 +140,19 @@ public:
 
 		m_dib = m_dib->clone();
 		m_dib = m_dib->cloneAndResize(400, 200, xl::ui::CDIBSection::RT_BICUBIC);
-
-		m_bitmap->load(IDB_BMP1);
 	}
 
 	virtual void onAttach () {
 		xl::ui::CCtrlButton *pButton = new xl::ui::CCtrlImageButton(1);
 		TCHAR buf[256];
-// 		_stprintf_s(buf, 256, _T("button-image: %d BMP;button-image-text-padding:4"), IDB_BMP5);
-// 		pButton->setStyle(buf);
-// 		_stprintf_s(buf, 256, _T("imagebutton-image: %d %d %d BMP"), IDB_BMP1, IDB_BMP2, IDB_BMP3);
+		_stprintf_s(buf, 256, _T("button-image: %d #ff00ff;button-image-text-padding:4"), IDB_BMP5);
+ 		pButton->setStyle(buf);
+// 		_stprintf_s(buf, 256, _T("imagebutton-image: %d %d %d #ff00ff"), IDB_BMP1, IDB_BMP2, IDB_BMP3);
 // 		pButton->setStyle(buf);
 		xl::ui::CControlPtr button (pButton);
-		button->setStyle(_T("margin:10;width:100;height:40;border:0;font-weight:bold;"));
+		button->setStyle(_T("margin:10;width:100;height:40;border:0;font-weight:bold;font-size:20px;"));
 		// button->setStyle(_T("opacity:50"));
+		pButton->setStyle(_T("border:1 #00ff00;background-color:#ffffff;"));
 		insertChild(button);
 
 		pButton->setText(_T("Prompt"));
@@ -253,8 +250,32 @@ public:
 			dc.drawTransparentText(buf, -1, rc, DT_SINGLELINE | DT_CENTER | DT_VCENTER);
 		}
 
+		xl::ui::CResMgr *pResMgr = xl::ui::CResMgr::getInstance();
+		xl::ui::CBitmapPtr bmp1 = pResMgr->getBitmap(IDB_BMP1)
+			, bmp2 = pResMgr->getTransBitmap(IDB_BMP2, RGB(255, 0, 255))
+			, bmp3 = pResMgr->getTransBitmap(IDB_BMP3, RGB(255, 0, 255), true)
+			, bmp4 = pResMgr->getTransBitmap(IDB_BMP3, RGB(255, 0, 255), false);
 		rc = getClientRect();
-		m_bitmap->draw(hdc, rc.left, rc.bottom - m_bitmap->getHeight(), m_bitmap->getWidth(), m_bitmap->getHeight(), 0, 0);
+		w = bmp1->getWidth();
+		h = bmp1->getHeight();
+		x = rc.left + 20;
+		y = rc.bottom - h - 20;
+		bmp1->draw(hdc, x, y, w, h, 0, 0);
+
+		x += w + 10;
+		w = bmp2->getWidth();
+		h = bmp2->getHeight();
+		bmp2->draw(hdc, x, y, w * 3 / 4, h * 3 / 4, 0, 0, w, h);
+
+		x += w * 3 / 4 + 10;
+		w = bmp3->getWidth();
+		h = bmp3->getHeight();
+		bmp3->draw(hdc, x, y, w * 2, h * 2, 0, 0, w, h);
+
+		x += w * 2 + 10;
+		w = bmp4->getWidth();
+		h = bmp4->getHeight();
+		bmp4->draw(hdc, x, y, w * 2, h * 2, 0, 0, w, h);
 	}
 };
 

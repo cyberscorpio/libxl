@@ -9,7 +9,7 @@
  * setStyle:
  *
  * CCtrlButton:
- * button-image: int type
+ * button-image: id[ colorkey]
  * button-image-text-padding: int
  *
  * CCtrlImageButton:
@@ -33,17 +33,23 @@ void CCtrlButton::_DrawImageAndText (HDC hdc) {
 	COLORREF rgbOld = dc.SetTextColor(_GetColor());
 	HFONT font = _GetFont();
 	HFONT oldFont = dc.SelectFont(font);
-	if (m_idImg == 0) {
+	if (m_imgId == 0) {
 		dc.drawTransparentText(m_text, m_text.length(), rc, format);
 	} else {
 		CRect rcTmp = rc;
 		int textHeight = dc.drawTransparentText(m_text, m_text.length(), rcTmp, format | DT_CALCRECT);
 		int textWidth = rcTmp.Width();
 
-		int imgWidth = 0;
-		int imgHeight = 0;
+ 		CResMgr *pResMgr = CResMgr::getInstance();
+		CBitmapPtr image = m_imgTrans ? pResMgr->getTransBitmap(m_imgId, m_imgClrKey, disable) : pResMgr->getBitmap(m_imgId, disable);
+		assert(image != NULL);
+		int imgWidth = image->getWidth();
+		int imgHeight = image->getHeight();
 		int imgX = rc.left + (rc.Width() - imgWidth - textWidth - m_text_image_pading) / 2;
 		int imgY = rc.top + (rc.Height() - imgHeight) / 2;
+
+		image->draw(dc, imgX, imgY, imgWidth, imgHeight, 0, 0, SRCCOPY);
+
 		rcTmp = rc;
 		rcTmp.left = imgX + imgWidth + m_text_image_pading;
 		rcTmp.right = rcTmp.left + textWidth;
@@ -59,13 +65,13 @@ void CCtrlButton::_ParseProperty (const tstring &key, const tstring &value, bool
 		assert(values.size() == 1 || values.size() == 2);
 		uint id = _tstoi(values[0]);
 		if (values.size() == 1) {
-			assert(id == 0);
-			m_imgType.clear();
+			m_imgTrans = false;
 		} else {
-			m_imgType = values[1];
+			m_imgTrans = true;
+			m_imgClrKey = _ParseColor(values[1]);
 		}
-		if (id != m_idImg) {
-			m_idImg = id;
+		if (id != m_imgId) {
+			m_imgId = id;
 			redraw = true;
 		}
 	} else if (key == _T("button-image-text-padding")) {
@@ -79,13 +85,14 @@ void CCtrlButton::_ParseProperty (const tstring &key, const tstring &value, bool
 	}
 }
 
-CCtrlButton::CCtrlButton (uint id, const tstring &text, uint idImg, const tstring &imgType)
+CCtrlButton::CCtrlButton (uint id, const tstring &text, uint idImg, bool imgTrans, COLORREF clrKey)
 	: CControl(id)
 	, m_pushAndCapture(false)
 	, m_text(text)
 	, m_text_image_pading(4)
-	, m_idImg(idImg)
-	, m_imgType(imgType)
+	, m_imgId(idImg)
+	, m_imgTrans(imgTrans)
+	, m_imgClrKey(clrKey)
 {
 	assert (id != 0);
 }
@@ -197,11 +204,7 @@ void CCtrlImageButton::onMouseIn (CPoint pt) {
 	CCtrlButton::onMouseIn(pt);
 
 	if (m_idImageHover != 0) {
-		TCHAR buf[256];
-		_stprintf_s(buf, 256, _T("background-image-id: %d %s"), m_idImageHover, m_imgType.c_str());
-		setStyle(buf);
 	} else {
-		setStyle(_T("background:none;"));
 	}
 }
 
@@ -212,11 +215,7 @@ void CCtrlImageButton::onMouseOut (CPoint pt) {
 	CCtrlButton::onMouseOut(pt);
 
 	if (m_idImageNormal != 0) {
-		TCHAR buf[256];
-		_stprintf_s(buf, 256, _T("background-image-id: %d %s"), m_idImageNormal, m_imgType.c_str());
-		setStyle(buf);
 	} else {
-		setStyle(_T("background:none;"));
 	}
 }
 
@@ -224,11 +223,7 @@ void CCtrlImageButton::onLostCapture () {
 	CCtrlButton::onLostCapture();
 
 	if (m_idImageNormal != 0) {
-		TCHAR buf[256];
-		_stprintf_s(buf, 256, _T("background-image-id: %d %s"), m_idImageNormal, m_imgType.c_str());
-		setStyle(buf);
 	} else {
-		setStyle(_T("background:none"));
 	}
 }
 
@@ -239,11 +234,7 @@ void CCtrlImageButton::onLButtonDown (CPoint pt, uint key) {
 	CCtrlButton::onLButtonDown(pt, key);
 
 	if (m_idImagePush != 0) {
-		TCHAR buf[256];
-		_stprintf_s(buf, 256, _T("background-image-id: %d %s"), m_idImagePush, m_imgType.c_str());
-		setStyle(buf);
 	} else {
-		setStyle(_T("background:none"));
 	}
 }
 
@@ -257,12 +248,7 @@ void CCtrlImageButton::onLButtonUp (CPoint pt, uint key) {
 	CCtrlButton::onLButtonUp(pt, key);
 
 	if (m_idImageHover != 0 && m_idImageHover != 0) {
-		TCHAR buf[256];
-		_stprintf_s(buf, 256, _T("background-image-id: %d %s"), 
-			isPointIn(pt) ? m_idImageHover : m_idImageNormal, m_imgType.c_str());
-		setStyle(buf);
 	} else {
-		setStyle(_T("background:none"));
 	}
 }
 

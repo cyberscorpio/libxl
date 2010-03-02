@@ -5,6 +5,7 @@
 #define XL_FS_H
 #include "common.h"
 #include "string.h"
+#include "interfaces.h"
 
 XL_BEGIN
 
@@ -85,13 +86,13 @@ inline int file_put_contents (const tstring &filename, const std::string &data) 
  * @param offset if set offset, read the file content from offset.
  * @note don't get content of a very large file.
  */
-bool file_get_contentsA (const string &filename, std::string &data, size_t offset = 0);
-bool file_get_contentsW (const wstring &filename, std::string &data, size_t offset = 0);
-inline bool file_get_contents (const tstring &filename, std::string &data, size_t offset = 0) {
+bool file_get_contentsA (const string &filename, std::string &data, size_t offset = 0, ILongTimeRunCallback *callback = NULL);
+bool file_get_contentsW (const wstring &filename, std::string &data, size_t offset = 0, ILongTimeRunCallback *callback = NULL);
+inline bool file_get_contents (const tstring &filename, std::string &data, size_t offset = 0, ILongTimeRunCallback *callback = NULL) {
 #ifdef UNICODE
-	return file_get_contentsW(filename, data, offset);
+	return file_get_contentsW(filename, data, offset, callback);
 #else
-	return file_get_contentsA(filename, data, offset);
+	return file_get_contentsA(filename, data, offset, callback);
 #endif
 }
 

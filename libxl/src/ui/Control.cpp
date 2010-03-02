@@ -48,7 +48,7 @@ HFONT CControl::_GetFont () {
 	if (fontweight == FONTW_BOLD) {
 		style |= CResMgr::FS_BOLD;
 	}
-	return pResMgr->getSysFont(0, style);
+	return pResMgr->getSysFont(fontsize, style);
 }
 
 void CControl::_DrawBorder (HDC hdc) {

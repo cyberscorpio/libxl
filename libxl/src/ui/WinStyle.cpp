@@ -19,6 +19,7 @@
  * width: int | "fill"
  * height: int | "fill"
  * font-weight: normal | bold
+ * font-size: int
  * color: #hex*6
  * opacity: [0-100]
  * display: true | false | none
@@ -101,6 +102,7 @@ void CWinStyle::_Reset () {
 	isfloat = false;
 	width = SIZE_FILL;
 	height = SIZE_FILL;
+	fontsize = 0;
 	fontweight = FONTW_NORMAL;
 	color = RGB(0,0,0);
 	opacity = 100;
@@ -358,6 +360,12 @@ void CWinStyle::_ParseProperty (const tstring &key, const tstring &value, bool &
 			assert(false);
 		}
 		redraw = true;
+	} else if (key == _T("font-size")) {
+		int fs = _tstoi(value);
+		if (fs != fontsize) {
+			fontsize = fs;
+			redraw = true;
+		}
 	} else if (key == _T("color")) {
 		color = _ParseColor(value);
 		redraw = true;

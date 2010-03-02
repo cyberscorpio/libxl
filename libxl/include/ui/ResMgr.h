@@ -24,19 +24,17 @@ public:
 private:
 	CResMgr ();
 	~CResMgr ();
-	typedef std::map<uint, HGDIOBJ>       _GdiObjMapType;
-	typedef _GdiObjMapType::iterator      _GdiObjMapIter;
-	typedef std::map<uint64, HGDIOBJ>     _GdiObjBigMapType;
-	typedef _GdiObjBigMapType::iterator   _GdiObjBigMapIter;
+	typedef std::map<uint, HFONT>                  _FontMapType;
+	typedef std::map<uint64, CBitmapPtr>           _BitmapBigMapType;
 
-
-	_GdiObjMapType                        m_sysFonts;
+	_FontMapType                                   m_sysFonts;
+	_BitmapBigMapType                              m_bitmaps;
+	_BitmapBigMapType                              m_transBitmaps;
 
 	void _Lock ();
 	void _Unlock ();
 
-	HGDIOBJ _CreateSysFont(int height, uint style);
-	void _MakeBitmaGray (CBitmapPtr bitmap);
+	HFONT _CreateSysFont(int height, uint style);
 
 public:
 	static const uint FS_BOLD = 0x01;
@@ -45,15 +43,18 @@ public:
 	static const uint FS_STRIKEOUT = 0x08;
 	static const uint FS_MASK = 0xffff;
 
+	static const uint64 BMP_GRAY = 0x10000000;
+
 	static CResMgr* getInstance ();
 	void reset ();
-
-
 
 	/**
 	 * @param height The height of the font
 	 */
 	HFONT getSysFont (int height = 0, uint style = 0);
+
+	CBitmapPtr getBitmap (ushort id, bool grayscale = false);
+	CBitmapPtr getTransBitmap (ushort id, COLORREF colorKey, bool grayscale = false);
 };
 
 UI_END

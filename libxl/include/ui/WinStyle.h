@@ -182,6 +182,7 @@ public:
 	int width;
 	int height;
 
+	int fontsize;
 	FONTWEIGHT fontweight;
 	COLORREF color;
 	int opacity; // alpha = 100 - opacity

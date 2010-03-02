@@ -59,21 +59,21 @@ int CDIBSection::_GetStrideNoLock () const {
 	}
 }
 
-void* CDIBSection::_GetLineNoLock (int line) {
+uint8* CDIBSection::_GetLineNoLock (int line) {
 	CScopeLock lock(this);
 	// assert(m_hOldBitmap == INVALID_HANDLE_VALUE);
 	if (m_hBitmap == NULL) {
 		return NULL;
 	} else {
 		assert(line >= 0 && line < getHeight());
-		unsigned char *data = (unsigned char *)m_section.dsBm.bmBits;
+		uint8 *data = (uint8 *)m_section.dsBm.bmBits;
 		assert(data != NULL);
 		data += line * getStride();
 		return data;
 	}
 }
 
-void* CDIBSection::_GetDataNoLock () {
+uint8* CDIBSection::_GetDataNoLock () {
 	CScopeLock lock(this);
 	// assert(m_hOldBitmap == INVALID_HANDLE_VALUE);
 	if (m_hBitmap == NULL) {
@@ -84,7 +84,7 @@ void* CDIBSection::_GetDataNoLock () {
 	void *p = m_section.dsBm.bmBits;
 	::GetObject(m_hBitmap, sizeof(m_section), &m_section);
 	assert(p == (void *)m_section.dsBm.bmBits);
-	return m_hBitmap == NULL ? NULL : m_section.dsBm.bmBits;
+	return m_hBitmap == NULL ? NULL : (uint8 *)m_section.dsBm.bmBits;
 }
 
 
@@ -164,12 +164,12 @@ int CDIBSection::getStride () const {
 	return _GetStrideNoLock();
 }
 
-void* CDIBSection::getLine (int line) {
+uint8* CDIBSection::getLine (int line) {
 	CScopeLock lock(this);
 	return _GetLineNoLock(line);
 }
 
-void* CDIBSection::getData () {
+uint8* CDIBSection::getData () {
 	CScopeLock lock(this);
 	return _GetDataNoLock();
 }

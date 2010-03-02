@@ -31,8 +31,8 @@ protected:
 	int _GetHeightNoLock () const;
 	int _GetBitCountsNoLock () const;
 	int _GetStrideNoLock () const;
-	void* _GetLineNoLock (int line);
-	void* _GetDataNoLock ();
+	uint8* _GetLineNoLock (int line);
+	uint8* _GetDataNoLock ();
 
 	void _Clear ();
 
@@ -56,8 +56,8 @@ public:
 	int getHeight () const;
 	int getBitCounts () const;
 	int getStride () const;
-	void* getLine (int line);
-	void* getData ();
+	uint8* getLine (int line);
+	uint8* getData ();
 
 	void attachToDC (HDC hdc);
 	bool tryAttachToDC (HDC hdc);
