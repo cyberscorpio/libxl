@@ -13,7 +13,7 @@
  * button-image-text-padding: int
  *
  * CCtrlImageButton:
- * imagebutton-image: int int int type
+ * imagebutton-image: int int int[ colorkey]
  */
 
 XL_BEGIN
@@ -47,12 +47,21 @@ void CCtrlButton::_DrawImageAndText (HDC hdc) {
 		int imgHeight = image->getHeight();
 		int imgX = rc.left + (rc.Width() - imgWidth - textWidth - m_text_image_pading) / 2;
 		int imgY = rc.top + (rc.Height() - imgHeight) / 2;
+		if (imgX < rc.left) {
+			imgX = rc.left;
+		}
+		if (imgY < rc.top) {
+			imgY = rc.top;
+		}
 
 		image->draw(dc, imgX, imgY, imgWidth, imgHeight, 0, 0, SRCCOPY);
 
 		rcTmp = rc;
 		rcTmp.left = imgX + imgWidth + m_text_image_pading;
 		rcTmp.right = rcTmp.left + textWidth;
+		if (rcTmp.right > rc.right) {
+			rcTmp.right = rc.right;
+		}
 		dc.drawTransparentText(m_text, m_text.length(), rcTmp, format);
 	}
 	dc.SelectFont(oldFont);
@@ -154,26 +163,42 @@ void CCtrlButton::onLButtonUp (CPoint pt, uint key) {
 
 //////////////////////////////////////////////////////////////////////////
 
+CBitmapPtr CCtrlImageButton::_GetImage() {
+	uint id = m_imageIds[0];
+	if (m_pushAndCapture) {
+		id = m_imageIds[2];
+	} else if (_GetMainCtrl()->getHoverCtrl() == shared_from_this()) {
+		id = m_imageIds[1];
+	}
+
+	if (disable) {
+		id = m_imageIds[0];
+	}
+
+	if (id != 0) {
+		CResMgr *pResMgr = CResMgr::getInstance();
+		if (m_pColorKey != NULL) {
+			return pResMgr->getTransBitmap(id, m_colorKey, disable);
+		} else {
+			return pResMgr->getBitmap(id, disable);
+		}
+	}
+	return CBitmapPtr();
+}
+
 
 void CCtrlImageButton::_ParseProperty (const tstring &key, const tstring &value, bool &relayout, bool &redraw) {
 	if (key == _T("imagebutton-image")) { // id id id type
 		ExplodeT<TCHAR>::ValueT values = explode(_T(" "), value);
 		assert(values.size() == 3 || values.size() == 4);
-		m_idImageNormal = _tstoi(values[0]);
-		m_idImageHover = _tstoi(values[1]);
-		m_idImagePush = _tstoi(values[2]);
-		if (values.size() == 3) {
-			assert(m_idImageNormal == 0 && m_idImageHover == 0 && m_idImagePush == 0);
-			setStyle(_T("background:none"));
+		m_imageIds[0] = _tstoi(values[0]);
+		m_imageIds[1] = _tstoi(values[1]);
+		m_imageIds[2] = _tstoi(values[2]);
+		if (values.size() == 4) {
+			m_pColorKey = &m_colorKey;
+			m_colorKey = _ParseColor(values[3]);
 		} else {
-			m_imgType = values[3];
-			if (m_idImageNormal != 0) {
-				TCHAR buf[256];
-				_stprintf_s(buf, 256, _T("background-image-id: %d %s"), m_idImageNormal, m_imgType.c_str());
-				setStyle(buf);
-			} else {
-				setStyle(_T("background:none;"));
-			}
+			m_pColorKey = NULL;
 		}
 		redraw = true;
 	} else {
@@ -182,30 +207,32 @@ void CCtrlImageButton::_ParseProperty (const tstring &key, const tstring &value,
 }
 
 
-CCtrlImageButton::CCtrlImageButton (uint id, uint n, uint h, uint p, const tstring &imgType)
+CCtrlImageButton::CCtrlImageButton (uint id, uint n, uint h, uint p, bool bitmapTrans, COLORREF colorKey)
 	: CCtrlButton(id)
-	, m_idImageNormal(n), m_idImageHover(h), m_idImagePush(p)
-	, m_imgType(imgType)
+	, m_colorKey(colorKey)
+	, m_pColorKey(bitmapTrans ? &m_colorKey : NULL)
 {
-	TCHAR buf[256];
-	if (m_idImageNormal != 0) {
-		_stprintf_s(buf, 256, _T("background-image-id: %d %s"), m_idImageNormal, m_imgType.c_str());
-		setStyle(buf);
-	} else {
-		setStyle(_T("background:none;"));
-	}
+	m_imageIds[0] = n;
+	m_imageIds[1] = h;
+	m_imageIds[2] = p;
 }
 
+void CCtrlImageButton::drawMe (HDC hdc) {
+
+	CBitmapPtr image = _GetImage();
+	if (image != NULL) {
+		CRect rc = getClientRect();
+		image->draw(hdc, rc.left, rc.top, rc.Width(), rc.Height(), 0, 0);
+	}
+
+	CCtrlButton::drawMe(hdc);
+}
 
 void CCtrlImageButton::onMouseIn (CPoint pt) {
 	if (disable) {
 		return;
 	}
 	CCtrlButton::onMouseIn(pt);
-
-	if (m_idImageHover != 0) {
-	} else {
-	}
 }
 
 void CCtrlImageButton::onMouseOut (CPoint pt) {
@@ -213,18 +240,10 @@ void CCtrlImageButton::onMouseOut (CPoint pt) {
 		return;
 	}
 	CCtrlButton::onMouseOut(pt);
-
-	if (m_idImageNormal != 0) {
-	} else {
-	}
 }
 
 void CCtrlImageButton::onLostCapture () {
 	CCtrlButton::onLostCapture();
-
-	if (m_idImageNormal != 0) {
-	} else {
-	}
 }
 
 void CCtrlImageButton::onLButtonDown (CPoint pt, uint key) {
@@ -232,10 +251,6 @@ void CCtrlImageButton::onLButtonDown (CPoint pt, uint key) {
 		return;
 	}
 	CCtrlButton::onLButtonDown(pt, key);
-
-	if (m_idImagePush != 0) {
-	} else {
-	}
 }
 
 void CCtrlImageButton::onLButtonUp (CPoint pt, uint key) {
@@ -246,10 +261,6 @@ void CCtrlImageButton::onLButtonUp (CPoint pt, uint key) {
 		return;
 	}
 	CCtrlButton::onLButtonUp(pt, key);
-
-	if (m_idImageHover != 0 && m_idImageHover != 0) {
-	} else {
-	}
 }
 
 

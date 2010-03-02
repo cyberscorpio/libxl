@@ -13,18 +13,42 @@
 XL_BEGIN
 UI_BEGIN
 
-CRect CCtrlSlider::_GetThumbRect (int thumbWidth) const {
+static const int THUMB_WIDTH = 16;
+
+int CCtrlSlider::_GetThumbWidth () const {
 	CRect rc = getClientRect();
-	if (m_max > m_min) {
-		rc.left += m_curr * (rc.Width() - thumbWidth) / (m_max - m_min);
+	int range = m_max - m_min;
+	if (rc.Width() <= 0 || range <= 0) {
+		return 0;
+	} else {
+		int w = (int)((double)rc.Width() / (double)range + 0.5);
+		if (w < THUMB_WIDTH) {
+			w = THUMB_WIDTH;
+		}
+		return w;
 	}
-	rc.right = rc.left + thumbWidth;
-	return rc;
 }
 
-int CCtrlSlider::_ValueByPoint (CPoint pt, int thumbWidth) const {
+CRect CCtrlSlider::_GetThumbRect () const {
 	CRect rc = getClientRect();
-	int v = m_min + (pt.x - m_mouseOffset - rc.left) * (m_max - m_min) / (rc.Width() - thumbWidth);
+	int range = m_max - m_min;
+	if (rc.Width() <= 0 || range <= 0) {
+		return CRect(rc.left, rc.top, rc.left, rc.top);
+	} else {
+		int w = (int)((double)rc.Width() / (double)range + 0.5);
+		if (w < THUMB_WIDTH) {
+			w = THUMB_WIDTH;
+		}
+
+		rc.left += m_curr * (rc.Width() - w) / range;
+		rc.right = rc.left + w;
+		return rc;
+	}
+}
+
+int CCtrlSlider::_ValueByPoint (CPoint pt) const {
+	CRect rc = getClientRect();
+	int v = m_min + (pt.x - m_mouseOffset - rc.left) * (m_max - m_min) / (rc.Width() - _GetThumbWidth());
 	if (v < m_min) {
 		v = m_min;
 	} else if (v > m_max) {
@@ -55,7 +79,6 @@ CCtrlSlider::CCtrlSlider (int _min, int _max, int _curr)
 	: m_min(_min), m_max(_max), m_curr(_curr)
 	, m_hoverThumb(false), m_pushAndCapture(false)
 	, m_barHeight(4)
-	, m_thumbWidth(16)
 	, m_mouseOffset(0)
 {
 	assert(m_curr >= m_min && m_curr <= m_max);
@@ -78,12 +101,16 @@ void CCtrlSlider::drawMe (HDC hdc) {
 	// dc.FillSolidRect(rcBar, RGB(127,127,127));
 	dc.Draw3dRect(rcBar, RGB(127,127,127), RGB(212,212,212));
 
-	rc = _GetThumbRect(m_thumbWidth);
+	rc = _GetThumbRect();
 	if (m_hoverThumb) {
 		dc.FillSolidRect(rc, RGB(0, 0, 0));
 	} else {
 		dc.FillSolidRect(rc, RGB(96, 96, 96));
 	}
+}
+
+void CCtrlSlider::onSize () {
+
 }
 
 void CCtrlSlider::onMouseIn (CPoint pt) {
@@ -98,9 +125,9 @@ void CCtrlSlider::onMouseMove (CPoint pt, uint key) {
 	if (disable) {
 		return;
 	}
-	CRect rc = _GetThumbRect(m_thumbWidth);
+	CRect rc = _GetThumbRect();
 	if (m_pushAndCapture) {
-		int v = _ValueByPoint(pt, m_thumbWidth);
+		int v = _ValueByPoint(pt);
 		if (v != m_curr) {
 			m_curr = v;
 			invalidate();
@@ -128,15 +155,15 @@ void CCtrlSlider::onLButtonDown (CPoint pt, uint key) {
 	if (disable) {
 		return;
 	}
-	CRect rc = _GetThumbRect(m_thumbWidth);
+	CRect rc = _GetThumbRect();
 	if (!rc.PtInRect(pt)) {
-		int v = _ValueByPoint(pt, m_thumbWidth);
+		int v = _ValueByPoint(pt);
 		if (v != m_curr) {
 			m_curr = v;
 			m_target->onSlider(m_id, m_min, m_max, m_curr, false, shared_from_this());
 
 			// check for hover
-			rc = _GetThumbRect(m_thumbWidth);
+			rc = _GetThumbRect();
 			if (rc.PtInRect(pt)) {
 				m_hoverThumb = true;
 			}

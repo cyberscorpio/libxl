@@ -17,11 +17,11 @@ protected:
 	bool m_hoverThumb;
 	bool m_pushAndCapture;
 	int m_barHeight;
-	int m_thumbWidth;
 	int m_mouseOffset;
 
-	CRect _GetThumbRect (int thumbWidth) const;
-	int _ValueByPoint (CPoint pt, int thumbWidth) const;
+	int _GetThumbWidth () const;
+	CRect _GetThumbRect () const;
+	int _ValueByPoint (CPoint pt) const;
 
 protected:
 	//////////////////////////////////////////////////////////////////////////
@@ -40,10 +40,11 @@ public:
 	// virtual methods
 	virtual void drawMe (HDC hdc);
 
+	virtual void onSize ();
 	virtual void onMouseIn (CPoint pt);
 	virtual void onMouseOut (CPoint pt);
 	virtual void onMouseMove (CPoint pt, uint key);
-	virtual void onLostCapture();
+	virtual void onLostCapture ();
 	virtual void onLButtonDown (CPoint pt, uint key);
 	virtual void onLButtonUp (CPoint pt, uint key);
 };

@@ -42,19 +42,21 @@ public:
 
 class CCtrlImageButton : public CCtrlButton
 {
-	uint m_idImageNormal;
-	uint m_idImageHover;
-	uint m_idImagePush;
-	tstring m_imgType;
-
+	uint               m_imageIds[3]; // normal, hover, pushed
+	COLORREF           m_colorKey;
+	COLORREF          *m_pColorKey;
 protected:
+
+	CBitmapPtr _GetImage();
+
 	//////////////////////////////////////////////////////////////////////////
 	// protected virtual methods
 	virtual void _ParseProperty (const tstring &key, const tstring &value, bool &relayout, bool &redraw);
 
 public:
-	CCtrlImageButton (uint id, uint n = 0, uint h = 0, uint p = 0, const tstring &imgType = _T("PNG"));
+	CCtrlImageButton (uint id, uint normalId = 0, uint hoverId = 0, uint pushId = 0, bool bitmapTrans = false, COLORREF colorKey = RGB(255, 0, 255));
 
+	virtual void drawMe (HDC hdc);
 	virtual void onMouseIn (CPoint pt);
 	virtual void onMouseOut (CPoint pt);
 	virtual void onLostCapture ();
