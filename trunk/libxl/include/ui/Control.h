@@ -18,12 +18,12 @@ class CCtrlTarget;
 //////////////////////////////////////////////////////////////////////////
 // typedef(s)
 class CControl;
-typedef std::tr1::shared_ptr<CControl>       CControlPtr;
-typedef std::tr1::weak_ptr<CControl>         CControlWeakPtr;
-typedef CControl                             *CControlRawPtr;
+typedef std::tr1::shared_ptr<CControl>                 CControlPtr;
+typedef std::tr1::weak_ptr<CControl>                   CControlWeakPtr;
+typedef CControl                                      *CControlRawPtr;
 
-typedef std::tr1::shared_ptr<CCtrlTarget>    CCtrlTargetPtr;
-typedef CCtrlTarget                          *CCtrlTargetRawPtr;
+typedef std::tr1::shared_ptr<CCtrlTarget>              CCtrlTargetPtr;
+typedef CCtrlTarget                                   *CCtrlTargetRawPtr;
 
 //////////////////////////////////////////////////////////////////////////
 // consts
@@ -60,6 +60,7 @@ protected:
 
 	void _SetParent (CControlPtr parent);
 	void _SetTarget (CCtrlTargetRawPtr target);
+	virtual CCtrlTargetRawPtr _GetTarget ();
 
 	COLORREF _GetColor ();
 	HFONT _GetFont ();

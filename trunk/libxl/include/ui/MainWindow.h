@@ -29,7 +29,7 @@ protected:
 	xl::ui::CCtrlMainPtr m_ctrlMain;
 
 public:
-	CMainWindowT (CCtrlMain *pCtrlMain = NULL) : m_ctrlMain(pCtrlMain) {
+	CMainWindowT () {
 	}
 
 	virtual ~CMainWindowT (void) {
