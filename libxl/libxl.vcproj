@@ -223,6 +223,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\ui\Menu.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\src\ui\ResMgr.cpp"
 					>
 				</File>
@@ -330,6 +334,10 @@
 				</File>
 				<File
 					RelativePath=".\include\ui\MainWindow.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\ui\Menu.h"
 					>
 				</File>
 				<File

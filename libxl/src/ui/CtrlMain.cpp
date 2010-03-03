@@ -301,6 +301,9 @@ LRESULT CCtrlMain::OnTimer (UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHand
 LRESULT CCtrlMain::OnLButtonDown (UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) {
 	int x = GET_X_LPARAM(lParam);
 	int y = GET_Y_LPARAM(lParam);
+	assert(m_pWindow);
+	// m_pWindow->SetFocus();
+	m_pWindow->SetActiveWindow();
 	CPoint pt(x, y);
 	if (m_ctrlCapture != NULL) {
 		m_ctrlCapture->onLButtonDown(pt, _Wparam2KeyStatus(wParam));

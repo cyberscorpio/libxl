@@ -2,6 +2,7 @@
 #include "../libxl/include/ui/ResMgr.h"
 #include "../libxl/include/ui/CtrlButton.h"
 #include "../libxl/include/ui/CtrlSlider.h"
+#include "../libxl/include/ui/Menu.h"
 #include "../libxl/include/ui/DIBSection.h"
 #include "../libxl/include/ui/Bitmap.h"
 #include "MainWindow.h"
@@ -210,7 +211,14 @@ public:
 	}
 
 	virtual void onRButtonUp (CPoint pt, xl::uint) {
-		::MessageBox(_GetMainCtrl()->getHWND(), _T("RButton up!"), _T(""), 0);
+		// ::MessageBox(_GetMainCtrl()->getHWND(), _T("RButton up!"), _T(""), 0);
+		CPoint ptScreen = pt;
+		_GetMainCtrl()->getWindow()->ClientToScreen(&ptScreen);
+		xl::ui::CMenu menu;
+		xl::uint id = menu.show(ptScreen);
+		xl::tchar buf[128];
+		_stprintf_s(buf, 128, _T("you select menu: %d"), id);
+		// ::MessageBox(_GetMainCtrl()->getHWND(), buf, _T(""), 0);
 	}
 
 	virtual void onLostCapture () {

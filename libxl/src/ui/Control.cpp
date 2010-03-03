@@ -38,6 +38,18 @@ void CControl::_SetTarget (CCtrlTargetRawPtr target) {
 	}
 }
 
+CCtrlTargetRawPtr CControl::_GetTarget () {
+	if (m_target) {
+		return m_target;
+	} else {
+		if (_GetMainCtrl() != NULL) {
+			return ((CControl *)_GetMainCtrl())->_GetTarget();
+		} else {
+			return CCtrlTargetRawPtr(NULL);
+		}
+	}
+}
+
 COLORREF CControl::_GetColor () {
 	return disable ? ::GetSysColor(COLOR_GRAYTEXT) : color;
 }
