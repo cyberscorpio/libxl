@@ -133,6 +133,7 @@ void CBitmap::draw (
 	CDC mdc;
 	mdc.CreateCompatibleDC(hdc);
 	HBITMAP oldBitmap = mdc.SelectBitmap(m_hBitmap);
+	int oldMode = ::SetStretchBltMode(hdc, HALFTONE);
 	if (m_pTransColor == NULL) {
 		if (toW == fromW && toH == fromH) {
 			::BitBlt(hdc, toX, toY, toW, toH, mdc, fromX, fromY, op);
@@ -142,6 +143,7 @@ void CBitmap::draw (
 	} else {
 		::TransparentBlt(hdc, toX, toY, toW, toH, mdc, fromX, fromY, fromW, fromH, *m_pTransColor);
 	}
+	::SetStretchBltMode(hdc, oldMode);
 	mdc.SelectBitmap(oldBitmap);
 }
 
