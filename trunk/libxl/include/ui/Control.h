@@ -47,19 +47,17 @@ protected:
 	typedef CControlContainer::iterator            CControlIter;
 	typedef CControlContainer::const_iterator      CControlConstIter;
 	typedef CControlContainer::reverse_iterator    CControlIterR;
-	// typedef CControlContainer::const_iterator      CControlConstIter;
 
 	uint               m_id;
 
 	CControlWeakPtr    m_parent;
-	CCtrlTargetRawPtr  m_target;
 	CControlContainer  m_controls;
 	CRect              m_rect;
 
 	void _LayoutChildren ();
 
 	void _SetParent (CControlPtr parent);
-	void _SetTarget (CCtrlTargetRawPtr target);
+	// void _SetTarget (CCtrlTargetRawPtr target);
 	virtual CCtrlTargetRawPtr _GetTarget ();
 
 	COLORREF _GetColor ();

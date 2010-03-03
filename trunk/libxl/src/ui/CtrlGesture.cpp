@@ -78,6 +78,8 @@ void CCtrlGesture::onRButtonUp (CPoint pt, uint key) {
 	bool pass2background = m_points.size() == 1;
 	tstring gesture = m_gesture;
 	bool isTimeout = m_isTimeout;
+	CCtrlTarget *pTarget = _GetTarget(); // save it before removed from control main
+	assert(pTarget != NULL);
 	
 	_Capture(false);
 	m_pCtrlMain->removeChild(m_id);
@@ -86,8 +88,7 @@ void CCtrlGesture::onRButtonUp (CPoint pt, uint key) {
 	m_isTimeout = false;
 
 	if (::GetTickCount() - m_lastMove < m_gestureTimeout && !isTimeout) {
-		assert(m_target);
-		m_target->onGesture(gesture, ptDown, true);
+		pTarget->onGesture(gesture, ptDown, true);
 		m_lastMove = 0;
 	} else if (pass2background && !isTimeout) {
 		CControlPtr ctrl = m_pCtrlMain->getControlByPoint(ptDown);
@@ -166,10 +167,10 @@ void CCtrlGesture::drawMe (HDC hdc) {
 		::DeleteObject(pen);
 	}
 
-	assert(m_target);
+	assert(_GetTarget() != NULL);
 	tstring text = m_gesture;
 	text += _T(" (");
-	text += m_target->onGesture(m_isTimeout ? _T("canceled") : m_gesture, m_points[0], false);
+	text += _GetTarget()->onGesture(m_isTimeout ? _T("canceled") : m_gesture, m_points[0], false);
 	text += _T(")");
 
 	rc.top = rc.bottom - 20;

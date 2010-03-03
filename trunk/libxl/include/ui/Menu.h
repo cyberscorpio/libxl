@@ -37,7 +37,7 @@ public:
 
 typedef CWinTraits<
                    WS_POPUP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS,
-                   WS_EX_TOOLWINDOW
+                   0//WS_EX_TOOLWINDOW
                   > CMenuTraits;
 
 class CMenu
@@ -59,7 +59,7 @@ protected:
 	HWND _Create (CRect rc);
 
 public:
-	CMenu ();
+	CMenu (HWND hWndOwner);
 	virtual ~CMenu ();
 
 	void addItem (CMenuItem &);

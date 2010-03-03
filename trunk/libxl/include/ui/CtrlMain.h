@@ -28,6 +28,7 @@ protected:
 	typedef _TimerControls::iterator               _TimerControlIter;
 
 	ATL::CWindow      *m_pWindow;
+	CCtrlTargetRawPtr  m_target;
 
 	/**
 	 * inner properties
@@ -54,6 +55,7 @@ protected:
 	//////////////////////////////////////////////////////////////////////////
 	// virtual protected methods
 	virtual CCtrlMain* _GetMainCtrl () { return this; }
+	virtual CCtrlTargetRawPtr _GetTarget () { return m_target; }
 
 public:
 	CCtrlMain (ATL::CWindow *, CCtrlTargetRawPtr target);
