@@ -154,9 +154,9 @@ void CCtrlButton::onLButtonUp (CPoint pt, uint key) {
 	m_pushAndCapture = false;
 	invalidate();
 
-	assert (m_target != NULL);
+	assert (_GetTarget() != NULL);
 	if (isPointIn(pt)) {
-		m_target->onCommand(m_id, shared_from_this());
+		_GetTarget()->onCommand(m_id, shared_from_this());
 	}
 }
 

@@ -4,6 +4,7 @@
 #include "../../include/ui/Menu.h"
 #include "../../include/ui/CtrlTarget.h"
 #include "../../include/ui/Gdi.h"
+#include "../../include/utilities.h"
 
 static const int PADDING = 4;
 static const int MINWIDTH = 100;
@@ -12,9 +13,12 @@ namespace {
 
 class CMenuItemControl : public xl::ui::CControl {
 	xl::ui::CMenuItem m_item;
-
+	bool              m_hover;
 public:
-	CMenuItemControl (xl::ui::CMenuItem item) : m_item(item) {
+	CMenuItemControl (xl::ui::CMenuItem item)
+		: m_item(item)
+		, m_hover(false)
+	{
 
 	}
 
@@ -35,6 +39,11 @@ public:
 	virtual void drawMe (HDC hdc) {
 		xl::ui::CDCHandle dc(hdc);
 		CRect rc = getClientRect();
+
+		if (m_hover) {
+			dc.FillSolidRect(rc, RGB(0, 0, 255));
+		}
+
 		rc.DeflateRect(PADDING, PADDING, PADDING, PADDING);
 
 		xl::uint fmt = DT_VCENTER | DT_SINGLELINE | DT_LEFT;
@@ -44,6 +53,16 @@ public:
 	virtual void onLButtonDown (CPoint pt, xl::uint key) {
 		assert(_GetTarget() != NULL);
 		_GetTarget()->onCommand(m_item.getId(), shared_from_this());
+	}
+
+	virtual void onMouseIn (CPoint pt) {
+		m_hover = true;
+		invalidate();
+	}
+
+	virtual void onMouseOut (CPoint pt) {
+		m_hover = false;
+		invalidate();
 	}
 };
 
@@ -96,10 +115,16 @@ public:
 		_CreateChildren();
 	}
 
-	virtual void onMouseIn () {
+	virtual void onMouseOutChild (CPoint pt) {
+		if (!m_rect.PtInRect(pt)) {
+			assert(_GetTarget() != NULL);
+			_GetTarget()->onCommand(0, shared_from_this());
+		}
 	}
 
 	virtual void onLostCapture () {
+		assert(_GetTarget() != NULL);
+		_GetTarget()->onCommand(0, shared_from_this());
 	}
 };
 
@@ -118,14 +143,14 @@ HWND CMenu::_Create(CRect rc)
 	dwStyle |= GetWndStyle(0);
 	dwExStyle |= GetWndExStyle(0);
 
-	return Create(NULL, rc, _T("xl::ui::menu"), dwStyle, dwExStyle, (HMENU)0, atom, NULL);
+	return Create(m_hWndOwner, rc, _T("xl::ui::menu"), dwStyle, dwExStyle, (HMENU)0, atom, NULL);
 }
 
 
 
-CMenu::CMenu ()
+CMenu::CMenu (HWND hWndOwner)
 	: m_cmdId(0)
-	, m_hWndOwner(::GetFocus())
+	, m_hWndOwner(hWndOwner)
 {
 	assert(m_hWndOwner != NULL);
 	for (int i = 100; i < 110; ++ i) {
@@ -153,7 +178,7 @@ uint CMenu::show (CPoint ptPos) {
 	if (!hWnd) {
 		return 0;
 	}
-	::SetFocus(hWnd);
+	assert(m_hWnd == hWnd);
 
 	// 3. the message loop
 	MSG msg;
@@ -203,13 +228,12 @@ LRESULT CMenu::OnCreate (UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled
 	rcWindow.right = x + size.cx;
 	rcWindow.bottom = y + size.cy;
 
-	SetWindowPos(NULL, rcWindow, SWP_NOZORDER);
+	SetWindowPos(NULL, rcWindow, SWP_NOZORDER | SWP_NOACTIVATE);
 
 	return 0;
 }
 
 LRESULT CMenu::OnDestroy (UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) {
-	::SetFocus(m_hWndOwner);
 	return 0;
 }
 
@@ -217,6 +241,8 @@ LRESULT CMenu::OnSize (UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) 
 	CRect rc;
 	GetClientRect(rc);
 	m_ctrlMain->layout(rc);
+
+	xl::trace(_T("** 0x%08x 0x%08x **\n"), ::GetCapture(), m_hWnd);
 	return 0;
 }
 

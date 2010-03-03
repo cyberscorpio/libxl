@@ -214,7 +214,7 @@ public:
 		// ::MessageBox(_GetMainCtrl()->getHWND(), _T("RButton up!"), _T(""), 0);
 		CPoint ptScreen = pt;
 		_GetMainCtrl()->getWindow()->ClientToScreen(&ptScreen);
-		xl::ui::CMenu menu;
+		xl::ui::CMenu menu(_GetMainCtrl()->getHWND());
 		xl::uint id = menu.show(ptScreen);
 		xl::tchar buf[128];
 		_stprintf_s(buf, 128, _T("you select menu: %d"), id);

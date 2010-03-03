@@ -17,6 +17,7 @@ protected:
 	bool m_hoverThumb;
 	bool m_pushAndCapture;
 	int m_barHeight;
+	int m_thumbMinWidth;
 	int m_mouseOffset;
 
 	int _GetThumbWidth () const;

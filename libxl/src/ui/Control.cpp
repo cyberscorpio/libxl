@@ -31,22 +31,19 @@ void CControl::_SetParent (CControlPtr parent) {
 	}
 }
 
-void CControl::_SetTarget (CCtrlTargetRawPtr target) {
-	m_target = target;
-	for (CControlIter it = m_controls.begin(); it != m_controls.end(); ++ it) {
-		(*it)->_SetTarget(target);
-	}
-}
+// void CControl::_SetTarget (CCtrlTargetRawPtr target) {
+// 	m_target = target;
+// 	for (CControlIter it = m_controls.begin(); it != m_controls.end(); ++ it) {
+// 		(*it)->_SetTarget(target);
+// 	}
+// }
 
 CCtrlTargetRawPtr CControl::_GetTarget () {
-	if (m_target) {
-		return m_target;
+	CCtrlMain *pCtrlMain = _GetMainCtrl();
+	if (pCtrlMain != NULL) {
+		return pCtrlMain->_GetTarget();
 	} else {
-		if (_GetMainCtrl() != NULL) {
-			return ((CControl *)_GetMainCtrl())->_GetTarget();
-		} else {
-			return CCtrlTargetRawPtr(NULL);
-		}
+		return CCtrlTargetRawPtr(NULL);
 	}
 }
 
@@ -150,7 +147,6 @@ CCtrlMain* CControl::_GetMainCtrl () {
 
 CControl::CControl (uint id)
 	: m_id(id)
-	, m_target(NULL)
 	, m_rect(0, 0, 0, 0)
 {
 	if (m_id == 0) {
@@ -181,10 +177,9 @@ CRect CControl::getClientRect () const {
 
 
 bool CControl::insertChild (CControlPtr child) {
-	child->_SetParent(shared_from_this());
-	child->_SetTarget(m_target);
-
 	m_controls.push_back(child);
+	child->_SetParent(shared_from_this());
+
 	CCtrlMain *pCtrlMain = _GetMainCtrl();
 	if (pCtrlMain) {
 		pCtrlMain->reLayout();

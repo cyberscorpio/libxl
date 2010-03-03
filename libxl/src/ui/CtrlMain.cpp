@@ -143,12 +143,13 @@ uint CCtrlMain::_SetTimer (CControlPtr ctrl, uint elapse, uint id) {
 CCtrlMain::CCtrlMain (ATL::CWindow *pWindow, CCtrlTargetRawPtr target) 
 	: CControl(0)
 	, m_pWindow(pWindow)
+	, m_target(target)
 	, m_captured(false)
 	, m_rcLayout(0, 0, 0, 0)
 {
 	assert (m_pWindow != NULL);
-	assert (target != NULL);
-	_SetTarget(target);
+	assert (m_target != NULL);
+	// _SetTarget(target);
 }
 
 CCtrlMain::~CCtrlMain () {
