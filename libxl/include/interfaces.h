@@ -35,7 +35,7 @@ public:
 	 * to notify the callback object the progress
 	 * @param progress range [0, 100]
 	 */
-	virtual void onProgress (uint progress) {}
+	virtual void onProgress (uint /*progress*/) {}
 };
 
 

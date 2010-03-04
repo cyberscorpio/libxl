@@ -37,11 +37,12 @@ void CCtrlButton::_DrawImageAndText (HDC hdc) {
 		dc.drawTransparentText(m_text, m_text.length(), rc, format);
 	} else {
 		CRect rcTmp = rc;
-		int textHeight = dc.drawTransparentText(m_text, m_text.length(), rcTmp, format | DT_CALCRECT);
 		int textWidth = rcTmp.Width();
 
  		CResMgr *pResMgr = CResMgr::getInstance();
-		CBitmapPtr image = m_imgTrans ? pResMgr->getTransBitmap(m_imgId, m_imgClrKey, disable) : pResMgr->getBitmap(m_imgId, disable);
+		CBitmapPtr image = m_imgTrans 
+			? pResMgr->getTransBitmap((ushort)m_imgId, m_imgClrKey, disable) 
+			: pResMgr->getBitmap((ushort)m_imgId, disable);
 		assert(image != NULL);
 		int imgWidth = image->getWidth();
 		int imgHeight = image->getHeight();
@@ -121,11 +122,11 @@ void CCtrlButton::drawMe (HDC hdc) {
 	_DrawImageAndText(hdc);
 }
 
-void CCtrlButton::onMouseIn (CPoint pt) {
+void CCtrlButton::onMouseIn (CPoint /*pt*/) {
 	invalidate();
 }
 
-void CCtrlButton::onMouseOut (CPoint pt) {
+void CCtrlButton::onMouseOut (CPoint /*pt*/) {
 	invalidate();
 }
 
@@ -134,7 +135,7 @@ void CCtrlButton::onLostCapture () {
 	invalidate();
 }
 
-void CCtrlButton::onLButtonDown (CPoint pt, uint key) {
+void CCtrlButton::onLButtonDown (CPoint /*pt*/, uint /*key*/) {
 	if (disable) {
 		return;
 	}
@@ -143,7 +144,7 @@ void CCtrlButton::onLButtonDown (CPoint pt, uint key) {
 	invalidate();
 }
 
-void CCtrlButton::onLButtonUp (CPoint pt, uint key) {
+void CCtrlButton::onLButtonUp (CPoint pt, uint /*key*/) {
 	if (disable) {
 		if (_GetMainCtrl()->getCaptureCtrl() == shared_from_this()) {
 			_Capture(false);
@@ -178,9 +179,9 @@ CBitmapPtr CCtrlImageButton::_GetImage() {
 	if (id != 0) {
 		CResMgr *pResMgr = CResMgr::getInstance();
 		if (m_pColorKey != NULL) {
-			return pResMgr->getTransBitmap(id, m_colorKey, disable);
+			return pResMgr->getTransBitmap((ushort)id, m_colorKey, disable);
 		} else {
-			return pResMgr->getBitmap(id, disable);
+			return pResMgr->getBitmap((ushort)id, disable);
 		}
 	}
 	return CBitmapPtr();

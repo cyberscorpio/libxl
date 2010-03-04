@@ -121,15 +121,7 @@ void CCtrlSlider::onSize () {
 
 }
 
-void CCtrlSlider::onMouseIn (CPoint pt) {
-
-}
-
-void CCtrlSlider::onMouseOut (CPoint pt) {
-
-}
-
-void CCtrlSlider::onMouseMove (CPoint pt, uint key) {
+void CCtrlSlider::onMouseMove (CPoint pt, uint /*key*/) {
 	if (disable) {
 		return;
 	}
@@ -160,7 +152,7 @@ void CCtrlSlider::onLostCapture() {
 	m_mouseOffset = 0;
 }
 
-void CCtrlSlider::onLButtonDown (CPoint pt, uint key) {
+void CCtrlSlider::onLButtonDown (CPoint pt, uint /*key*/) {
 	if (disable) {
 		return;
 	}
@@ -188,7 +180,7 @@ void CCtrlSlider::onLButtonDown (CPoint pt, uint key) {
 	}
 }
 
-void CCtrlSlider::onLButtonUp (CPoint pt, uint key) {
+void CCtrlSlider::onLButtonUp (CPoint /*pt*/, uint /*key*/) {
 	if (disable) {
 		return;
 	}

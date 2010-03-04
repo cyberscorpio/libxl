@@ -42,8 +42,6 @@ public:
 	virtual void drawMe (HDC hdc);
 
 	virtual void onSize ();
-	virtual void onMouseIn (CPoint pt);
-	virtual void onMouseOut (CPoint pt);
 	virtual void onMouseMove (CPoint pt, uint key);
 	virtual void onLostCapture ();
 	virtual void onLButtonDown (CPoint pt, uint key);

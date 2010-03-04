@@ -40,7 +40,7 @@ public:
 
 	//////////////////////////////////////////////////////////////////////////
 	// virtual 
-	virtual BOOL PreTranslateMessage(MSG* pMsg) {
+	virtual BOOL PreTranslateMessage(MSG* /*pMsg*/) {
 		return FALSE;
 	}
 
@@ -80,11 +80,11 @@ public:
 		MESSAGE_HANDLER(WM_DESTROY, OnDestroy)
 	END_MSG_MAP()
 
-	LRESULT OnCreate(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) {
+	LRESULT OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/) {
 		return TRUE;
 	}
 
-	LRESULT OnDestroy(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) {
+	LRESULT OnDestroy(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/) {
 		::PostQuitMessage(0);
 		return TRUE;
 	}

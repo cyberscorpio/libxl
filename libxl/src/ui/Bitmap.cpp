@@ -45,7 +45,7 @@ void CBitmap::gray () {
 				if (rr != r || gg != g || bb != b) {
 					uint v = r + g + b;
 					v /= 3;
-					data_line[0] = data_line[1] = data_line[2] = v;
+					data_line[0] = data_line[1] = data_line[2] = (uint8)v;
 				}
 				data_line += bytespp;
 			}
@@ -53,7 +53,7 @@ void CBitmap::gray () {
 			for (int x = 0; x < w; ++ x) {
 				uint v = (uint)data_line[0] + (uint)data_line[1] + (uint)data_line[2];
 				v /= 3;
-				data_line[0] = data_line[1] = data_line[2] = v;
+				data_line[0] = data_line[1] = data_line[2] = (uint8)v;
 				data_line += bytespp;
 			}
 		}
@@ -75,6 +75,7 @@ bool CBitmap::load (HBITMAP hSrc) {
 			return false;
 		}
 		assert(stride == _GetStrideNoLock());
+		stride = stride;
 
 		// use GetDIBits() to get the data
 		BITMAPINFO info;
@@ -84,7 +85,7 @@ bool CBitmap::load (HBITMAP hSrc) {
 		header.biWidth = w;
 		header.biHeight = -h;
 		header.biPlanes = 1;
-		header.biBitCount = bitcount;
+		header.biBitCount = (WORD)bitcount;
 		header.biCompression = BI_RGB;
 
 		uint8 *data = (uint8 *)_GetDataNoLock();

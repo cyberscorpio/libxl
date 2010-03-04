@@ -54,7 +54,7 @@ static bool _file_get_contents(FILE *file, std::string &data, size_t offset, xl:
 				}
 
 			} else {
-				if (fread(p, 1, size, file) == size) {
+				if ((int)fread(p, 1, size, file) == size) {
 					std::string tmp(p, size);
 					std::swap(tmp, data);
 					result = true;
@@ -173,6 +173,7 @@ __int64 file_get_lengthW (const wstring &filename) {
 
 
 string file_get_directoryA (const string &filename, bool mustExist) {
+	XL_PARAMETER_NOT_USED(mustExist);
 	assert (!mustExist || file_existsA(filename));
 	string fullname = file_get_absolute_nameA(filename);
 	size_t offset = fullname.find_last_of(dirsepA);
@@ -188,6 +189,7 @@ string file_get_directoryA (const string &filename, bool mustExist) {
 }
 
 wstring file_get_directoryW (const wstring &filename, bool mustExist) {
+	XL_PARAMETER_NOT_USED(mustExist);
 	assert (!mustExist || file_existsW(filename));
 	wstring fullname = file_get_absolute_nameW(filename);
 	size_t offset = fullname.find_last_of(dirsepW);
@@ -203,6 +205,7 @@ wstring file_get_directoryW (const wstring &filename, bool mustExist) {
 }
 
 string file_get_nameA (const string &filename, bool mustExist) {
+	XL_PARAMETER_NOT_USED(mustExist);
 	assert (!mustExist || file_existsA(filename));
 	size_t offset = filename.find_last_of(dirsepA);
 	if (offset == filename.npos) {
@@ -216,6 +219,7 @@ string file_get_nameA (const string &filename, bool mustExist) {
 }
 
 wstring file_get_nameW (const wstring &filename, bool mustExist) {
+	XL_PARAMETER_NOT_USED(mustExist);
 	assert (!mustExist || file_existsW(filename));
 	size_t offset = filename.find_last_of(dirsepW);
 	if (offset == filename.npos) {

@@ -87,6 +87,7 @@ public:
 
 	void resetStyle ();
 	void setStyle (const tstring &style);
+	void setOpacity (int opacity);
 
 
 	//////////////////////////////////////////////////////////////////////////
@@ -100,18 +101,18 @@ public:
 	virtual void onDetach () {} // called only when detached from CCtrlMain (no matter directly or not)
 
 	virtual void onSize () {}
-	virtual void onMouseIn (CPoint pt) {} // called when mouse moved in
-	virtual void onMouseInChild (CPoint pt) {} // called when mouse moved in some child
-	virtual void onMouseOut (CPoint pt) {} // called when mouse moved out (note maybe in its children)
-	virtual void onMouseOutChild (CPoint pt) {} // called when mouse moved out its child
-	virtual void onMouseMove (CPoint pt, xl::uint key) {} // called when mouse moved (in or has capture)
-	virtual void onLButtonDown (CPoint pt, xl::uint key) {}
-	virtual void onLButtonUp (CPoint pt, xl::uint key) {}
-	virtual void onRButtonDown (CPoint pt, xl::uint key) {}
-	virtual void onRButtonUp (CPoint pt, xl::uint key) {}
-	virtual void onMouseWheel (CPoint pt, int delta, xl::uint key) {}
+	virtual void onMouseIn (CPoint /*pt*/) {} // called when mouse moved in
+	virtual void onMouseInChild (CPoint /*pt*/) {} // called when mouse moved in some child
+	virtual void onMouseOut (CPoint /*pt*/) {} // called when mouse moved out (note maybe in its children)
+	virtual void onMouseOutChild (CPoint /*pt*/) {} // called when mouse moved out its child
+	virtual void onMouseMove (CPoint /*pt*/, xl::uint /*key*/) {} // called when mouse moved (in or has capture)
+	virtual void onLButtonDown (CPoint /*pt*/, xl::uint /*key*/) {}
+	virtual void onLButtonUp (CPoint /*pt*/, xl::uint /*key*/) {}
+	virtual void onRButtonDown (CPoint /*pt*/, xl::uint /*key*/) {}
+	virtual void onRButtonUp (CPoint /*pt*/, xl::uint /*key*/) {}
+	virtual void onMouseWheel (CPoint /*pt*/, int /*delta*/, xl::uint /*key*/) {}
 	virtual void onLostCapture () {} // called only when lost capture CAUSED BY SYSTEM
-	virtual void onTimer (xl::uint id) {}
+	virtual void onTimer (xl::uint /*id*/) {}
 };
 
 UI_END

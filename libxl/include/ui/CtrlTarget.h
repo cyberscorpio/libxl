@@ -10,13 +10,13 @@ UI_BEGIN
 class CCtrlTarget
 {
 public:
-	virtual void onCommand (uint id, CControlPtr ctrl) {}
-	virtual void onSlider (uint id, int _min, int _max, int _curr, bool tracking, CControlPtr ctrl) {}
+	virtual void onCommand (uint /*id*/, CControlPtr /*ctrl*/) {}
+	virtual void onSlider (uint /*id*/, int /*_min*/, int /*_max*/, int /*_curr*/, bool /*tracking*/, CControlPtr /*ctrl*/) {}
 
 	// if timeout, gesture = _T("canceled")
-	virtual tstring onGesture (const tstring &gesture, CPoint ptDown, bool release) { return _T("Unknown"); }
+	virtual tstring onGesture (const tstring &/*gesture*/, CPoint /*ptDown*/, bool /*release*/) { return _T("Unknown"); }
 
-	virtual void onUserEvent (uint evt, void *param, CControlPtr ctrl) {}
+	virtual void onUserEvent (uint /*evt*/, void * /*param*/, CControlPtr /*ctrl*/) {}
 };
 
 UI_END

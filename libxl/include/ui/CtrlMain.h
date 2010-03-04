@@ -74,6 +74,7 @@ public:
 
 	HWND getHWND ();
 	ATL::CWindow* getWindow ();
+	void exit ();
 
 	BEGIN_MSG_MAP(CCtrlMain)
 		MESSAGE_HANDLER(WM_MOUSEMOVE, OnMouseMove)

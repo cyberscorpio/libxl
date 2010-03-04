@@ -14,7 +14,7 @@ class CMenuItemControl : public xl::ui::CControl {
 	xl::ui::CMenuCustomizer                       *m_pCustomizer;
 	bool                                           m_hover;
 public:
-	CMenuItemControl (xl::ui::CMenuItem &item, xl::ui::CMenuCustomizer *pCustomizer, HDC hdc)
+	CMenuItemControl (xl::ui::CMenuItem &item, xl::ui::CMenuCustomizer *pCustomizer)
 		: m_item(item)
 		, m_pCustomizer(pCustomizer)
 		, m_hover(false)
@@ -32,14 +32,14 @@ public:
 		m_pCustomizer->drawItem(hdc, getClientRect(), m_item, m_hover);
 	}
 
-	virtual void onLButtonDown (CPoint pt, xl::uint key) {
+	virtual void onLButtonDown (CPoint /*pt*/, xl::uint /*key*/) {
 		if (m_item.disable() || m_item.getType() == xl::ui::CMenuItem::TYPE_SEPERATE) {
 			return;
 		}
 		_Capture(true);
 	}
 
-	virtual void onLButtonUp (CPoint pt, xl::uint key) {
+	virtual void onLButtonUp (CPoint pt, xl::uint /*key*/) {
 		if (m_item.disable() || m_item.getType() == xl::ui::CMenuItem::TYPE_SEPERATE) {
 			return;
 		}
@@ -50,12 +50,12 @@ public:
 		}
 	}
 
-	virtual void onMouseIn (CPoint pt) {
+	virtual void onMouseIn (CPoint /*pt*/) {
 		m_hover = true;
 		invalidate();
 	}
 
-	virtual void onMouseOut (CPoint pt) {
+	virtual void onMouseOut (CPoint /*pt*/) {
 		m_hover = false;
 		invalidate();
 	}
@@ -78,7 +78,7 @@ class CMenuControl
 		xl::ui::CMenu::MenuItems::iterator it, end = m_pItems->end();
 		for (it = m_pItems->begin(); it != end; ++ it) {
 			xl::ui::CControlPtr child;
-			CMenuItemControl *pItemCtrl = new CMenuItemControl(*it, m_pCustomizer, hdc);
+			CMenuItemControl *pItemCtrl = new CMenuItemControl(*it, m_pCustomizer);
 			child.reset(pItemCtrl);
 			insertChild(child);
 			CSize sz = m_pCustomizer->getItemSize(hdc, *it);
@@ -138,7 +138,7 @@ public:
 		}
 	}
 
-	virtual void onTimer (xl::uint id) {
+	virtual void onTimer (xl::uint /*id*/) {
 		assert(_GetMainCtrl() && _GetMainCtrl()->getWindow());
 		CPoint pt;
 		::GetCursorPos(&pt);
@@ -344,14 +344,14 @@ void CMenu::onCommand (uint id, CControlPtr ctrl) {
 	DestroyWindow();
 }
 
-LRESULT CMenu::OnKillFocus (UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) {
+LRESULT CMenu::OnKillFocus (UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/) {
 	if (!m_initializing) {
 		DestroyWindow();
 	}
 	return 0;
 }
 
-LRESULT CMenu::OnCreate (UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) {
+LRESULT CMenu::OnCreate (UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/) {
 	m_ctrlMain.reset(new xl::ui::CCtrlMain(this, this));
 	CMenuControl *pMenuCtrl = new CMenuControl(&m_items, m_pCustomizer);
 	CControlPtr control(pMenuCtrl);
@@ -393,11 +393,11 @@ LRESULT CMenu::OnCreate (UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled
 	return 0;
 }
 
-LRESULT CMenu::OnDestroy (UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) {
+LRESULT CMenu::OnDestroy (UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/) {
 	return 0;
 }
 
-LRESULT CMenu::OnSize (UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) {
+LRESULT CMenu::OnSize (UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/) {
 	CRect rc;
 	GetClientRect(rc);
 	assert(m_ctrlMain != NULL);
