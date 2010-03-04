@@ -1,0 +1,75 @@
+menu has two files:
+libxl/include/ui/Menu.h and libxl/src/ui/Menu.cpp
+
+This menu is a emulation of the windows embeded menu, it behaviors is somewhat
+different, such as, when the mouse cursor move out, in about 0.25 second, the
+menu will destroy itself.
+
+
+1. usage:
+In one of your function, such as onLButtonUp() :
+
+#include "libxl/include/ui/Menu.h"
+// ...
+virtual onLButtonUp (CPoint pt, uint key) {
+	CPoint ptScreen = pt;
+	assert(_GetMainCtrl() && _GetMainCtrl()->getWindow());
+	_GetMainCtrl()->getWindow()->ClientToScreen(&ptScreen);
+	xl::ui::CMenu menu(_GetMainCtrl()->getHWND());
+	menu.addItem(1, _T("Copy"));
+	menu.addItem(2, _T("Paste"), true);
+	menu.addItem(3, _T("Cut"));
+	menu.addSeperate();
+	menu.addImageItem(4, _T("Exit"), IDB_BITMAP1); // display an image on the left
+	xl::uint id = menu.show(ptScreen);
+	if (id != 0) {
+		// now id is what the user clicked
+		switch (id) {
+		case 1:
+			// copy
+			break;
+		// ...
+		case 4:
+			// exit
+			break;
+		}
+	}
+}
+
+
+2. Customize
+You can customize the menu by implement you own class which derived
+from xl::ui::CMenuCustomizer().
+
+xl::ui::CMenuCustomizer has 3 methods which can be overridded by you:
+ - setMenuControlStyle (xl::ui::CControl *)
+ 	set the style (such as padding, background color) of the menu
+	control itself.
+ - getItemSize (HDC, xl::ui::CMenuItem item)
+ 	you use this function to return the size of the menu item, which
+	should be calculated by the HDC and CMenuItem.
+ - drawItem (HDC, CRect rcItem, xl::ui::CMenuItem &, bool hover)
+ 	this is the function for you to render the menu item.
+
+3. CMenuItem
+class CMenuItem contain the content of a menu item:
+- m_type:
+	the type of the item, currently, it could be:
+	- TYPE_TEXT normal item
+	- TYPE_SEPERATE a seperater
+- m_disable:
+	whether the item is disabled?
+- m_id:
+	which will be returned if the user click this item.
+- m_text:
+	a string will be shown in the menu.
+- m_imgId:
+	the ID in the resource(exe, not any dll), if m_imgId is 0, no 
+	image will be shown.
+- m_clrKey:
+	the color key of the image, the default value is RGB(255,0,255),
+	if you want to change, call CMenuItem::getColorKey().
+
+Note that if the type is TYPE_SEPERATE, only m_disable is used, all
+other fields are ignored.
+
