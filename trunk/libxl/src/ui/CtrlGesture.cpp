@@ -60,7 +60,7 @@ void CCtrlGesture::onLostCapture() {
  	m_gesture.clear();
 }
 
-void CCtrlGesture::onRButtonDown (CPoint pt, uint key) {
+void CCtrlGesture::onRButtonDown (CPoint pt, uint /*key*/) {
 	m_pCtrlMain->insertChild(shared_from_this());
 	assert (m_pCtrlMain->getControlByID(m_id) == shared_from_this());
 	_Capture(true);
@@ -103,7 +103,7 @@ void CCtrlGesture::onRButtonUp (CPoint pt, uint key) {
 	}
 }
 
-void CCtrlGesture::onMouseMove (CPoint pt, uint key) {
+void CCtrlGesture::onMouseMove (CPoint pt, uint /*key*/) {
 	if (m_points.size() == 0) {
 		return; // when called by CCtrlMain::_CheckMouseMove(), this could happen
 	}
@@ -144,6 +144,7 @@ void CCtrlGesture::onMouseMove (CPoint pt, uint key) {
 }
 
 void CCtrlGesture::onTimer (uint id) {
+	XL_PARAMETER_NOT_USED(id);
 	assert(id == (uint)this);
 	m_isTimeout = true;
 	invalidate();

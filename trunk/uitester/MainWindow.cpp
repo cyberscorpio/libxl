@@ -221,6 +221,10 @@ public:
 		menu.addImageItem(4, _T("Exit"), IDB_BMP5);
 		xl::uint id = menu.show(ptScreen);
 		if (id != 0) {
+			if (id == 4) {
+				_GetMainCtrl()->exit();
+				return;
+			}
 			xl::tchar buf[128];
 			_stprintf_s(buf, 128, _T("you select menu: %d"), id);
 			::MessageBox(_GetMainCtrl()->getHWND(), buf, _T(""), 0);

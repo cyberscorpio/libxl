@@ -11,7 +11,7 @@
  * 1. derived class should be:
 class CObj : public xl::dp::CObserableT<CObj> {
 public:
-	enum EVENT : xl::dp::CObserableT<CObj>::EVT {
+	enum EVENT {
 		EVT_1,
 		EVT_2,
 		// ...

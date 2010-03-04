@@ -234,6 +234,7 @@ bool CResizeEngine::verticalFilter(CDIBSection *src, CDIBSection *dst, ILongTime
 	uint dst_width = dst->getWidth();
 	uint dst_height = dst->getHeight();
 	assert(src_width == dst_width);
+	src_width = src_width;
 	if (src_height == dst_height) {
 
 		unsigned char *src_bits = (unsigned char *)src->getData();
@@ -244,7 +245,6 @@ bool CResizeEngine::verticalFilter(CDIBSection *src, CDIBSection *dst, ILongTime
 
 	} else if (!m_pFilter) { // fast (COLOR ON COLOR)
 
-		double ratio_w = (double)src_width / (double)dst_width;
 		double ratio_h = (double)src_height / (double)dst_height;
 
 		uint bytespp = bitcount / 8;

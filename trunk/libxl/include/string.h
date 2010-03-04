@@ -49,7 +49,8 @@ protected:
 			end = p - s;
 			assert (end >= start);
 		}
-		std::swap(*this, substr(start, end - start));
+		MyType tmp = substr(start, end - start);
+		std::swap(*this, tmp);
 	}
 
 	void _TrimMulti (const CharT *charlist) {
@@ -101,7 +102,8 @@ protected:
 			end = p - s;
 			assert (end > start);
 		}
-		std::swap(*this, substr(start, end - start));
+		MyType tmp = substr(start, end - start);
+		std::swap(*this, tmp);
 	}
 
 public:

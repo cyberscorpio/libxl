@@ -279,6 +279,13 @@ void CControl::setStyle (const tstring &style) {
 	}
 }
 
+void CControl::setOpacity (int opacity) {
+	assert(opacity >= 0 && opacity <= 100);
+	tchar buf[32];
+	_stprintf_s(buf, 32, _T("opacity:%d"), opacity);
+	setStyle(buf);
+}
+
 
 void CControl::draw (HDC hdc, CRect rcClip) {
 
@@ -320,14 +327,14 @@ void CControl::draw (HDC hdc, CRect rcClip) {
 	if (opacity != 100) {
 		mdc->m_paintWhenDestroy = false;
 		CDCHandle dc(hdc);
-		BLENDFUNCTION bf = {AC_SRC_OVER, 0, 255 * opacity / 100, 0};
+		BLENDFUNCTION bf = {AC_SRC_OVER, 0, (uint8)(255 * opacity / 100), 0};
 		dc.AlphaBlend(rc.left, rc.top, rc.Width(), rc.Height(), hdcPaint, rc.left, rc.top, rc.Width(), rc.Height(), bf);
 	}
 }
 
 CRect CControl::layout (CRect rc) {
 	CControlPtr parent = m_parent.lock();
-	int x, y, width, height;
+	int x = 0, y = 0, width, height;
 	CRect rcRemain = rc;
 	CRect rcOld = m_rect;
 
@@ -446,7 +453,7 @@ bool CControl::isPointIn (CPoint pt) const {
 	return m_rect.PtInRect(pt) ? true : false;
 }
 
-void CControl::drawMe (HDC hdc) {
+void CControl::drawMe (HDC /*hdc*/) {
 }
 
 
