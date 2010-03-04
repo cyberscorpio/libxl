@@ -211,14 +211,20 @@ public:
 	}
 
 	virtual void onRButtonUp (CPoint pt, xl::uint) {
-		// ::MessageBox(_GetMainCtrl()->getHWND(), _T("RButton up!"), _T(""), 0);
 		CPoint ptScreen = pt;
 		_GetMainCtrl()->getWindow()->ClientToScreen(&ptScreen);
 		xl::ui::CMenu menu(_GetMainCtrl()->getHWND());
+		menu.addItem(1, _T("Copy"));
+		menu.addImageItem(2, _T("Paste"), IDB_BMP5, true);
+		menu.addItem(3, _T("Cut"));
+		menu.addSeperate();
+		menu.addImageItem(4, _T("Exit"), IDB_BMP5);
 		xl::uint id = menu.show(ptScreen);
-		xl::tchar buf[128];
-		_stprintf_s(buf, 128, _T("you select menu: %d"), id);
-		// ::MessageBox(_GetMainCtrl()->getHWND(), buf, _T(""), 0);
+		if (id != 0) {
+			xl::tchar buf[128];
+			_stprintf_s(buf, 128, _T("you select menu: %d"), id);
+			::MessageBox(_GetMainCtrl()->getHWND(), buf, _T(""), 0);
+		}
 	}
 
 	virtual void onLostCapture () {

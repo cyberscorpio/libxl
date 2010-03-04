@@ -132,6 +132,9 @@ uint CControl::_SetTimer (uint elapse, uint id) {
 		return 0;
 	}
 
+	if (id == 0) {
+		id = (uint)this;
+	}
 	return pCtrlMain->_SetTimer(shared_from_this(), elapse, id);
 }
 

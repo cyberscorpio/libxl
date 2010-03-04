@@ -104,14 +104,14 @@ public:
 	virtual void onMouseInChild (CPoint pt) {} // called when mouse moved in some child
 	virtual void onMouseOut (CPoint pt) {} // called when mouse moved out (note maybe in its children)
 	virtual void onMouseOutChild (CPoint pt) {} // called when mouse moved out its child
-	virtual void onMouseMove (CPoint pt, uint key) {} // called when mouse moved (in or has capture)
-	virtual void onLButtonDown (CPoint pt, uint key) {}
-	virtual void onLButtonUp (CPoint pt, uint key) {}
-	virtual void onRButtonDown (CPoint pt, uint key) {}
-	virtual void onRButtonUp (CPoint pt, uint key) {}
-	virtual void onMouseWheel (CPoint pt, int delta, uint key) {}
+	virtual void onMouseMove (CPoint pt, xl::uint key) {} // called when mouse moved (in or has capture)
+	virtual void onLButtonDown (CPoint pt, xl::uint key) {}
+	virtual void onLButtonUp (CPoint pt, xl::uint key) {}
+	virtual void onRButtonDown (CPoint pt, xl::uint key) {}
+	virtual void onRButtonUp (CPoint pt, xl::uint key) {}
+	virtual void onMouseWheel (CPoint pt, int delta, xl::uint key) {}
 	virtual void onLostCapture () {} // called only when lost capture CAUSED BY SYSTEM
-	virtual void onTimer (uint id) {}
+	virtual void onTimer (xl::uint id) {}
 };
 
 UI_END
