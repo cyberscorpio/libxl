@@ -21,12 +21,27 @@ void CUserLock::lock () const {
 }
 
 void CUserLock::unlock () const {
+	assert(m_level > 0);
 	-- m_level;
 	::LeaveCriticalSection(&m_cs);
 }
 
 bool CUserLock::tryLock () const {
-	return !!::TryEnterCriticalSection(&m_cs);
+	if (::TryEnterCriticalSection(&m_cs)) {
+		++ m_level;
+		return true;
+	} else {
+		return false;
+	}
+}
+
+int CUserLock::getLockLevel () const {
+	if (m_cs.OwningThread != (HANDLE)::GetCurrentThreadId()) {
+		return 0;
+	} else {
+		assert(m_cs.RecursionCount == m_level);
+		return m_cs.RecursionCount;
+	}
 }
 
 

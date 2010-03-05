@@ -17,7 +17,7 @@ class CUserLock : public ILockable
 {
 protected:
 	mutable CRITICAL_SECTION                       m_cs;
-	mutable uint       m_level;
+	mutable int                                    m_level;
 
 public:
 	CUserLock ();
@@ -27,9 +27,7 @@ public:
 	virtual void unlock () const;
 	virtual bool tryLock () const;
 
-	uint getLockLevel () const {
-		return m_level;
-	}
+	int getLockLevel () const;
 };
 
 
