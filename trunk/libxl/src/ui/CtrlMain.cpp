@@ -374,6 +374,16 @@ LRESULT CCtrlMain::OnMouseWheel (UINT /*uMsg*/, WPARAM wParam, LPARAM lParam, BO
 	return 0;
 }
 
+LRESULT CCtrlMain::OnKeyDown (UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& bHandled) {
+	bHandled = false;
+
+	if (m_captured) {
+		::ReleaseCapture(); // all works left to do in OnCaptureChanged()
+	}
+
+	return 0;
+}
+
 LRESULT CCtrlMain::OnWMRemoveControl (UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& /*bHandled*/) {
 
 	removeChild((uint)wParam);
