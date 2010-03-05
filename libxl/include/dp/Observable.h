@@ -100,7 +100,7 @@ public:
 	bool subscribe (IObserver *subscriber, bool asTail = true) {
 		assert(subscriber != NULL);
 		if (m_dispatching) {
-			assert(true); // when dispatching event, subscribe / unsubscribe is forbidden.
+			assert(false); // when dispatching event, subscribe / unsubscribe is forbidden.
 			return false;
 		}
 
@@ -114,7 +114,7 @@ public:
 	bool unsubscribe (IObserver *observer) {
 		assert(observer != NULL);
 		if (m_dispatching) {
-			assert(true); // when dispatching event, subscribe / unsubscribe is forbidden.
+			assert(false); // when dispatching event, subscribe / unsubscribe is forbidden.
 			return false;
 		}
 
