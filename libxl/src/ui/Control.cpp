@@ -453,6 +453,17 @@ bool CControl::isPointIn (CPoint pt) const {
 	return m_rect.PtInRect(pt) ? true : false;
 }
 
+bool CControl::isCursorIn () {
+	CCtrlMain *pCtrlMain = _GetMainCtrl();
+	assert(pCtrlMain != NULL);
+	ATL::CWindow *pHostWindow = pCtrlMain->getWindow();
+	assert(pHostWindow != NULL);
+	CPoint pt;
+	::GetCursorPos(&pt);
+	pHostWindow->ScreenToClient(&pt);
+	return isPointIn(pt);
+}
+
 void CControl::drawMe (HDC /*hdc*/) {
 }
 

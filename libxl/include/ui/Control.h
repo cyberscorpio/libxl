@@ -94,6 +94,7 @@ public:
 	// virtual
 	virtual CRect layout (CRect rc);
 	virtual bool isPointIn (CPoint pt) const;
+	virtual bool isCursorIn ();
 	virtual void draw (HDC hdc, CRect rcClip);
 	virtual void drawMe (HDC hdc);
 
