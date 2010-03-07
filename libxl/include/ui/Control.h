@@ -83,6 +83,7 @@ public:
 	CControlPtr removeChild (uint id);
 	CControlPtr getControlByID (uint id);
 	CControlPtr getControlByPoint (CPoint pt);
+	void invalidate ();
 
 	void resetStyle ();
 	void setStyle (const tstring &style);
@@ -96,7 +97,6 @@ public:
 	virtual bool isCursorIn ();
 	virtual void draw (HDC hdc, CRect rcClip);
 	virtual void drawMe (HDC hdc);
-	virtual void invalidate ();
 
 	virtual void onAttach () {} // called only when attached to CCtrlMain (no matter directly or not)
 	virtual void onDetach () {} // called only when detached from CCtrlMain (no matter directly or not)
