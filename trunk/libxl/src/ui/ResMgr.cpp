@@ -72,6 +72,11 @@ void CResMgr::reset () {
 		::DeleteObject(it->second);
 	}
 	m_sysFonts.clear();
+
+	for (_PenMapType::iterator it = m_pens.begin(); it != m_pens.end(); ++ it) {
+		::DeleteObject(it->second);
+	}
+	m_pens.clear();
 }
 
 HFONT CResMgr::getSysFont (int height, uint style) {
@@ -95,6 +100,27 @@ HFONT CResMgr::getSysFont (int height, uint style) {
 	}
 	_Unlock();
 	return font;
+}
+
+HPEN CResMgr::getPen (ushort style, ushort width, COLORREF color) {
+	uint64 key = (uint64)style;
+	key <<= 16;
+	key |= (uint64)width;
+	key <<= 32;
+	key |= (uint)color;
+
+	_PenMapType::iterator it = m_pens.find(key);
+	if (it != m_pens.end()) {
+		return it->second;
+	} else {
+		HPEN pen = ::CreatePen(style, width, color);
+		if (pen != NULL) {
+			m_pens[key] = pen;
+			return pen;
+		}
+	}
+
+	return NULL;
 }
 
 CBitmapPtr CResMgr::getBitmap (ushort bmpid, bool grayscale) {
