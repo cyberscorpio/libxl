@@ -51,9 +51,10 @@ public:
 		return ret;
 	}
 
-	void drawRectangle (LPRECT lpRect, int width, COLORREF color, int style = PS_SOLID | PS_INSIDEFRAME) {
+	void drawRectangle (LPRECT lpRect, ushort width, COLORREF color, ushort style = PS_SOLID | PS_INSIDEFRAME) {
 		assert(lpRect != NULL && width > 0);
-		HPEN pen = ::CreatePen(style, width, color);
+		CResMgr *pResMgr = CResMgr::getInstance();
+		HPEN pen = pResMgr->getPen(style, width, color);
 		HPEN oldPen = SelectPen(pen);
 
 		HBRUSH emptyBrush = (HBRUSH)::GetStockObject(NULL_BRUSH);
@@ -65,7 +66,6 @@ public:
 		::DeleteObject(emptyBrush);
 
 		SelectPen(oldPen);
-		::DeleteObject(pen);
 	}
 };
 

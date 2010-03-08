@@ -25,9 +25,11 @@ private:
 	CResMgr ();
 	~CResMgr ();
 	typedef std::map<uint, HFONT>                  _FontMapType;
+	typedef std::map<uint64, HPEN>                 _PenMapType;
 	typedef std::map<uint64, CBitmapPtr>           _BitmapBigMapType;
 
 	_FontMapType                                   m_sysFonts;
+	_PenMapType                                    m_pens;
 	_BitmapBigMapType                              m_bitmaps;
 	_BitmapBigMapType                              m_transBitmaps;
 
@@ -52,6 +54,8 @@ public:
 	 * @param height The height of the font
 	 */
 	HFONT getSysFont (int height = 0, uint style = 0);
+
+	HPEN getPen (ushort style, ushort width, COLORREF color);
 
 	CBitmapPtr getBitmap (ushort id, bool grayscale = false);
 	CBitmapPtr getTransBitmap (ushort id, COLORREF colorKey, bool grayscale = false);
