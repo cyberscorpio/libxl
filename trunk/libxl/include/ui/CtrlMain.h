@@ -72,6 +72,7 @@ public:
 	virtual CRect layout (CRect rc);
 	virtual void draw (HDC hdc, CRect rcClip);
 
+	CPoint getCursorPos ();
 	HWND getHWND ();
 	ATL::CWindow* getWindow ();
 	void exit ();
