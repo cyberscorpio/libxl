@@ -206,6 +206,14 @@ void CCtrlMain::draw (HDC hdc, CRect rcClip) {
 	CControl::draw(hdc, rcClip);
 }
 
+CPoint CCtrlMain::getCursorPos () {
+	CPoint pt;
+	::GetCursorPos(&pt);
+	assert(m_pWindow);
+	m_pWindow->ScreenToClient(&pt);
+	return pt;
+}
+
 HWND CCtrlMain::getHWND () {
 	if (m_pWindow) {
 		return m_pWindow->m_hWnd;
