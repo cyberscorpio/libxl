@@ -80,6 +80,7 @@ public:
 	CRect getClientRect () const; // exclude the border and padding
 
 	bool insertChild (CControlPtr child);
+	bool isChild (CControlPtr control);
 	CControlPtr removeChild (uint id);
 	CControlPtr getControlByID (uint id);
 	CControlPtr getControlByPoint (CPoint pt);
