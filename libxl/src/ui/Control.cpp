@@ -190,6 +190,22 @@ bool CControl::insertChild (CControlPtr child) {
 	return true;
 }
 
+bool CControl::isChild (CControlPtr control) {
+	if (control == NULL) {
+		return false;
+	} else {
+		CControlPtr parent = control->m_parent.lock();
+		while (parent != NULL) {
+			if (parent.get() == this) {
+				return true;
+			}
+			parent = parent->m_parent.lock();
+		}
+	}
+
+	return false;
+}
+
 CControlPtr CControl::removeChild (uint id) {
 	CControlPtr ctrl = getControlByID(id);
 	if (ctrl != NULL) {
