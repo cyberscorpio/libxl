@@ -3,8 +3,12 @@
  * (Filters.h, Resize.h, Resize.cpp and Rescale.cpp)
  */
 #include <math.h>
+#include <emmintrin.h>
 #include "../../include/utilities.h"
 #include "../../include/ui/DIBResizer.h"
+
+#define USE_SSE
+// #define USE_SSE2
 
 XL_BEGIN
 UI_BEGIN
@@ -20,6 +24,7 @@ template <class T> T MIN(T a, T b) {
 //////////////////////////////////////////////////////////////////////////
 // Weight Table
 CWeightsTable::CWeightsTable(CGenericFilter *pFilter, uint uDstSize, uint uSrcSize) {
+	// xl::CTimerLogger logger(_T("--- construct weight table (%d - %d) cost: "), uDstSize, uSrcSize);
 	uint u;
 	double dWidth;
 	double dFScale = 1.0;
@@ -187,6 +192,13 @@ bool CResizeEngine::horizontalFilter(CDIBSection *src, uint src_height,
 	} else { // use m_pFilter
 		uint index; // pixel index
 		CWeightsTable weightsTable(m_pFilter, dst_width, src_width);
+#ifdef USE_SSE
+		__m128i value, t;
+		__m128 a, b, c, v05 = {0.5, 0.5, 0.5, 0.5};
+#elif (defined(USE_SSE2))
+		__m128i value, t;
+		__m128d a, b, c, v05 = {0.5, 0.5};
+#endif
 
 		uint bytespp = src->getBitCounts() / 8;
 		assert(bytespp == 3 || bytespp == 4);
@@ -202,22 +214,81 @@ bool CResizeEngine::horizontalFilter(CDIBSection *src, uint src_height,
 			unsigned char *dst_bits = (unsigned char *)dst->_GetLineNoLock(dsty);
 
 			for(uint x = 0; x < dst_width; ++ x) {
+#ifdef USE_SSE
+				__m128 v = _mm_set_ps1(0.0);
+#elif defined(USE_SSE2)
+				__m128d v = {0.0, 0.0}, v2 = {0.0, 0.0};
+#else
 				double value[4] = {0, 0, 0, 0}; // 4 = 32bpp max
+#endif
 				int iLeft = weightsTable.getLeftBoundary(x);
 				int iRight = weightsTable.getRightBoundary(x);
 
 				for(int i = iLeft; i <= iRight; ++ i) {
+					index = i * bytespp;
+#ifdef USE_SSE
+					float weight = (float)weightsTable.getWeight(x, i - iLeft);
+
+					a = _mm_set_ps1(weight);
+					if (bytespp == 3) {
+						t = _mm_set_epi32(0, src_bits[index + 2], src_bits[index + 1], src_bits[index]);
+					} else {
+						t = _mm_set_epi32(src_bits[index + 3], src_bits[index + 2], src_bits[index + 1], src_bits[index]);
+					}
+					index += bytespp;
+					b = _mm_cvtepi32_ps(t);
+					c = _mm_mul_ps(a, b);
+					v = _mm_add_ps(v, c);
+#elif defined(USE_SSE2)
 					double weight = weightsTable.getWeight(x, i-iLeft);
 
-					index = i * bytespp;
+					a.m128d_f64[0] = weight;
+					a.m128d_f64[1] = weight;
+					t.m128i_u32[0] = src_bits[index ++];
+					t.m128i_u32[1] = src_bits[index ++];
+					b = _mm_cvtepi32_pd(t);
+					c = _mm_mul_pd(a, b);
+					v = _mm_add_pd(v, c);
+
+					t.m128i_u32[0] = src_bits[index ++];
+					t.m128i_u32[1] = bytespp == 3 ? 0 : src_bits[index ++];
+					b = _mm_cvtepi32_pd(t);
+					c = _mm_mul_pd(a, b);
+					v2 = _mm_add_pd(v2, c);
+#else
+					double weight = weightsTable.getWeight(x, i-iLeft);
+
 					for (uint j = 0; j < bytespp; ++ j) {
 						value[j] += (weight * (double)src_bits[index++]); 
 					}
+#endif
 				} 
 
+#ifdef USE_SSE
+				v = _mm_add_ps(v, v05);
+				value = _mm_cvtps_epi32(v);
+				dst_bits[0] = (unsigned char)MIN(MAX((int)0, value.m128i_i32[0]), (int)255);
+				dst_bits[1] = (unsigned char)MIN(MAX((int)0, value.m128i_i32[1]), (int)255);
+				dst_bits[2] = (unsigned char)MIN(MAX((int)0, value.m128i_i32[2]), (int)255);
+				if (bytespp == 4) {
+					dst_bits[3] = (unsigned char)MIN(MAX((int)0, value.m128i_i32[3]), (int)255);
+				}
+#elif defined (USE_SSE2)
+				v = _mm_add_pd(v, v05);
+				v2 = _mm_add_pd(v2, v05);
+				value = _mm_cvtpd_epi32(v);
+				dst_bits[0] = (unsigned char)MIN(MAX((int)0, value.m128i_i32[0]), (int)255);
+				dst_bits[1] = (unsigned char)MIN(MAX((int)0, value.m128i_i32[1]), (int)255);
+				value = _mm_cvtpd_epi32(v2);
+				dst_bits[2] = (unsigned char)MIN(MAX((int)0, value.m128i_i32[0]), (int)255);
+				if (bytespp == 4) {
+					dst_bits[3] = (unsigned char)MIN(MAX((int)0, value.m128i_i32[1]), (int)255);
+				}
+#else
 				for (uint j = 0; j < bytespp; ++ j) {
 					dst_bits[j] = (unsigned char)MIN(MAX((int)0, (int)(value[j] + 0.5)), (int)255);
 				}
+#endif
 
 				dst_bits += bytespp;
 			}
@@ -265,6 +336,10 @@ bool CResizeEngine::verticalFilter(CDIBSection *src, CDIBSection *dst, ILongTime
 		}
 
 	} else {
+#ifdef USE_SSE
+		__m128i value, t;
+		__m128 a, b, c, v05 = {0.5, 0.5, 0.5, 0.5};
+#endif
 		uint index; // pixel index
 		CWeightsTable weightsTable(m_pFilter, dst_height, src_height);
 
@@ -287,7 +362,11 @@ bool CResizeEngine::verticalFilter(CDIBSection *src, CDIBSection *dst, ILongTime
 			dst_bits += index;
 
 			for(uint y = 0; y < dst_height; ++ y) {
+#ifdef USE_SSE
+				__m128 v = _mm_set_ps1(0.0);
+#else
 				double value[4] = {0, 0, 0, 0}; // 4 = 32bpp max
+#endif
 				int iLeft = weightsTable.getLeftBoundary(y);
 				int iRight = weightsTable.getRightBoundary(y);
 
@@ -295,18 +374,43 @@ bool CResizeEngine::verticalFilter(CDIBSection *src, CDIBSection *dst, ILongTime
 				src_bits += index;
 
 				for(int i = iLeft; i <= iRight; ++ i) {
+#ifdef USE_SSE
+					float weight = (float)weightsTable.getWeight(y, i - iLeft);
+					a = _mm_set_ps1(weight);
+					if (bytespp == 3) {
+						t = _mm_set_epi32(0, src_bits[2], src_bits[1], src_bits[0]);
+					} else {
+						t = _mm_set_epi32(src_bits[3], src_bits[2], src_bits[1], src_bits[0]);
+					}
+
+					b = _mm_cvtepi32_ps(t);
+					c = _mm_mul_ps(a, b);
+					v = _mm_add_ps(v, c);
+#else
 					double weight = weightsTable.getWeight(y, i - iLeft);							
 					for (uint j = 0; j < bytespp; ++ j) {
 						value[j] += (weight * (double)src_bits[j]);
 					}
+#endif
 
 					src_bits += src_pitch;
 				}
 
 				// clamp and place result in destination pixel
+#ifdef USE_SSE
+				v = _mm_add_ps(v, v05);
+				value = _mm_cvtps_epi32(v);
+				dst_bits[0] = (unsigned char)MIN(MAX((int)0, value.m128i_i32[0]), (int)255);
+				dst_bits[1] = (unsigned char)MIN(MAX((int)0, value.m128i_i32[1]), (int)255);
+				dst_bits[2] = (unsigned char)MIN(MAX((int)0, value.m128i_i32[2]), (int)255);
+				if (bytespp == 4) {
+					dst_bits[3] = (unsigned char)MIN(MAX((int)0, value.m128i_i32[3]), (int)255);
+				}
+#else
 				for (unsigned j = 0; j < bytespp; ++ j) {
 					dst_bits[j] = (unsigned char)MIN(MAX((int)0, (int)(value[j] + 0.5)), (int)255);
 				}
+#endif
 
 				dst_bits += dst_pitch;
 			}
