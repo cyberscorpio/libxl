@@ -9,6 +9,7 @@
 
 #define USE_SSE
 // #define USE_SSE2
+// #define USE_FLOAT
 
 XL_BEGIN
 UI_BEGIN
@@ -194,10 +195,10 @@ bool CResizeEngine::horizontalFilter(CDIBSection *src, uint src_height,
 		CWeightsTable weightsTable(m_pFilter, dst_width, src_width);
 #ifdef USE_SSE
 		__m128i value, t;
-		__m128 a, b, c, v05 = {0.5, 0.5, 0.5, 0.5};
+		__m128 a, b, c, v05 = _mm_set_ps1(0.5);
 #elif (defined(USE_SSE2))
 		__m128i value, t;
-		__m128d a, b, c, v05 = {0.5, 0.5};
+		__m128d a, b, c, v05 = _mm_set1_pd(0.5);
 #endif
 
 		uint bytespp = src->getBitCounts() / 8;
@@ -214,18 +215,21 @@ bool CResizeEngine::horizontalFilter(CDIBSection *src, uint src_height,
 			unsigned char *dst_bits = (unsigned char *)dst->_GetLineNoLock(dsty);
 
 			for(uint x = 0; x < dst_width; ++ x) {
+				int iLeft = weightsTable.getLeftBoundary(x);
+				int iRight = weightsTable.getRightBoundary(x);
+				index = iLeft * bytespp;
 #ifdef USE_SSE
 				__m128 v = _mm_set_ps1(0.0);
+				_mm_prefetch((const char *)src_bits + index,  _MM_HINT_T0);
 #elif defined(USE_SSE2)
-				__m128d v = {0.0, 0.0}, v2 = {0.0, 0.0};
+				__m128d v1 = _mm_set1_pd(0.0);
+				__m128d v2 = _mm_set1_pd(0.0);
+#elif defined(USE_FLOAT)
+				float value[4] = {0, 0, 0, 0};
 #else
 				double value[4] = {0, 0, 0, 0}; // 4 = 32bpp max
 #endif
-				int iLeft = weightsTable.getLeftBoundary(x);
-				int iRight = weightsTable.getRightBoundary(x);
-
 				for(int i = iLeft; i <= iRight; ++ i) {
-					index = i * bytespp;
 #ifdef USE_SSE
 					float weight = (float)weightsTable.getWeight(x, i - iLeft);
 
@@ -235,31 +239,35 @@ bool CResizeEngine::horizontalFilter(CDIBSection *src, uint src_height,
 					} else {
 						t = _mm_set_epi32(src_bits[index + 3], src_bits[index + 2], src_bits[index + 1], src_bits[index]);
 					}
-					index += bytespp;
 					b = _mm_cvtepi32_ps(t);
 					c = _mm_mul_ps(a, b);
 					v = _mm_add_ps(v, c);
+					index += bytespp;
 #elif defined(USE_SSE2)
 					double weight = weightsTable.getWeight(x, i-iLeft);
 
-					a.m128d_f64[0] = weight;
-					a.m128d_f64[1] = weight;
-					t.m128i_u32[0] = src_bits[index ++];
-					t.m128i_u32[1] = src_bits[index ++];
+					a = _mm_set1_pd(weight);
+					t = _mm_set_epi32(0, 0, src_bits[index + 1], src_bits[index]);
 					b = _mm_cvtepi32_pd(t);
 					c = _mm_mul_pd(a, b);
-					v = _mm_add_pd(v, c);
+					v1 = _mm_add_pd(v1, c);
 
-					t.m128i_u32[0] = src_bits[index ++];
-					t.m128i_u32[1] = bytespp == 3 ? 0 : src_bits[index ++];
+					t = _mm_set_epi32(0, 0, bytespp == 3 ? 0 : src_bits[index + 3], src_bits[index + 2]);
 					b = _mm_cvtepi32_pd(t);
 					c = _mm_mul_pd(a, b);
 					v2 = _mm_add_pd(v2, c);
+					index += bytespp;
+#elif defined(USE_FLOAT)
+					float weight = (float)weightsTable.getWeight(x, i-iLeft);
+
+					for (uint j = 0; j < bytespp; ++ j) {
+						value[j] += (weight * (float)src_bits[index ++]); 
+					}
 #else
 					double weight = weightsTable.getWeight(x, i-iLeft);
 
 					for (uint j = 0; j < bytespp; ++ j) {
-						value[j] += (weight * (double)src_bits[index++]); 
+						value[j] += (weight * (double)src_bits[index ++]); 
 					}
 #endif
 				} 
@@ -274,9 +282,9 @@ bool CResizeEngine::horizontalFilter(CDIBSection *src, uint src_height,
 					dst_bits[3] = (unsigned char)MIN(MAX((int)0, value.m128i_i32[3]), (int)255);
 				}
 #elif defined (USE_SSE2)
-				v = _mm_add_pd(v, v05);
+				v1 = _mm_add_pd(v1, v05);
 				v2 = _mm_add_pd(v2, v05);
-				value = _mm_cvtpd_epi32(v);
+				value = _mm_cvtpd_epi32(v1);
 				dst_bits[0] = (unsigned char)MIN(MAX((int)0, value.m128i_i32[0]), (int)255);
 				dst_bits[1] = (unsigned char)MIN(MAX((int)0, value.m128i_i32[1]), (int)255);
 				value = _mm_cvtpd_epi32(v2);
@@ -338,7 +346,10 @@ bool CResizeEngine::verticalFilter(CDIBSection *src, CDIBSection *dst, ILongTime
 	} else {
 #ifdef USE_SSE
 		__m128i value, t;
-		__m128 a, b, c, v05 = {0.5, 0.5, 0.5, 0.5};
+		__m128 a, b, c, v05 = _mm_set_ps1(0.5);
+#elif (defined(USE_SSE2))
+		__m128i value, t;
+		__m128d a, b, c, v05 = _mm_set1_pd(0.5);
 #endif
 		uint index; // pixel index
 		CWeightsTable weightsTable(m_pFilter, dst_height, src_height);
@@ -364,6 +375,11 @@ bool CResizeEngine::verticalFilter(CDIBSection *src, CDIBSection *dst, ILongTime
 			for(uint y = 0; y < dst_height; ++ y) {
 #ifdef USE_SSE
 				__m128 v = _mm_set_ps1(0.0);
+#elif defined (USE_SSE2)
+				__m128d v1 = _mm_set1_pd(0.0);
+				__m128d v2 = _mm_set1_pd(0.0);
+#elif defined (USE_FLOAT)
+				float value[4] = {0, 0, 0, 0};
 #else
 				double value[4] = {0, 0, 0, 0}; // 4 = 32bpp max
 #endif
@@ -386,6 +402,24 @@ bool CResizeEngine::verticalFilter(CDIBSection *src, CDIBSection *dst, ILongTime
 					b = _mm_cvtepi32_ps(t);
 					c = _mm_mul_ps(a, b);
 					v = _mm_add_ps(v, c);
+#elif defined(USE_SSE2)
+					double weight = weightsTable.getWeight(y, i - iLeft);
+
+					a = _mm_set1_pd(weight);
+					t = _mm_set_epi32(0, 0, src_bits[1], src_bits[0]);
+					b = _mm_cvtepi32_pd(t);
+					c = _mm_mul_pd(a, b);
+					v1 = _mm_add_pd(v1, c);
+
+					t = _mm_set_epi32(0, 0, bytespp == 3 ? 0 : src_bits[3], src_bits[2]);
+					b = _mm_cvtepi32_pd(t);
+					c = _mm_mul_pd(a, b);
+					v2 = _mm_add_pd(v2, c);
+#elif defined (USE_FLOAT)
+					float weight = (float)weightsTable.getWeight(y, i - iLeft);							
+					for (uint j = 0; j < bytespp; ++ j) {
+						value[j] += (weight * (float)src_bits[j]);
+					}
 #else
 					double weight = weightsTable.getWeight(y, i - iLeft);							
 					for (uint j = 0; j < bytespp; ++ j) {
@@ -400,11 +434,30 @@ bool CResizeEngine::verticalFilter(CDIBSection *src, CDIBSection *dst, ILongTime
 #ifdef USE_SSE
 				v = _mm_add_ps(v, v05);
 				value = _mm_cvtps_epi32(v);
+// 				__m128i flag = _mm_cmpgt_epi32(value, _mm_set1_epi32(0));
+// 				value = _mm_and_si128(value, flag);
+// 				dst_bits[0] = (unsigned char)MIN(255, value.m128i_i32[0]);
+// 				dst_bits[1] = (unsigned char)MIN(255, value.m128i_i32[1]);
+// 				dst_bits[2] = (unsigned char)MIN(255, value.m128i_i32[2]);
+// 				if (bytespp == 4) {
+// 					dst_bits[3] = (unsigned char)MIN(255, value.m128i_i32[3]);
+// 				}
 				dst_bits[0] = (unsigned char)MIN(MAX((int)0, value.m128i_i32[0]), (int)255);
 				dst_bits[1] = (unsigned char)MIN(MAX((int)0, value.m128i_i32[1]), (int)255);
 				dst_bits[2] = (unsigned char)MIN(MAX((int)0, value.m128i_i32[2]), (int)255);
 				if (bytespp == 4) {
 					dst_bits[3] = (unsigned char)MIN(MAX((int)0, value.m128i_i32[3]), (int)255);
+				}
+#elif defined (USE_SSE2)
+				v1 = _mm_add_pd(v1, v05);
+				v2 = _mm_add_pd(v2, v05);
+				value = _mm_cvtpd_epi32(v1);
+ 				dst_bits[0] = (unsigned char)MIN(MAX((int)0, value.m128i_i32[0]), (int)255);
+				dst_bits[1] = (unsigned char)MIN(MAX((int)0, value.m128i_i32[1]), (int)255);
+				value = _mm_cvtpd_epi32(v2);
+				dst_bits[2] = (unsigned char)MIN(MAX((int)0, value.m128i_i32[0]), (int)255);
+				if (bytespp == 4) {
+					dst_bits[3] = (unsigned char)MIN(MAX((int)0, value.m128i_i32[1]), (int)255);
 				}
 #else
 				for (unsigned j = 0; j < bytespp; ++ j) {
