@@ -8,7 +8,7 @@
 
 
 #ifdef IN_IDE
-int test_fs(int argc, char **argv) {
+int test_fs(int argc, xl::tchar **argv) {
 #else
 int main(int argc, char **argv) {
 #endif
@@ -17,7 +17,7 @@ int main(int argc, char **argv) {
 		return -1;
 	}
 
-	char *filename = argv[1];
+	xl::tchar *filename = argv[1];
 	if (!xl::file_exists(filename)) {
 		std::cout << filename << " doesn't exists" << std::endl;
 		return -1;
@@ -30,7 +30,7 @@ int main(int argc, char **argv) {
 	xl::file_get_contents(filename, data);
 
 	xl::tstring tempname = filename;
-	tempname += ".temp";
+	tempname += _T(".temp");
 	xl::file_put_contents(tempname, data);
 
 	std::string temp;

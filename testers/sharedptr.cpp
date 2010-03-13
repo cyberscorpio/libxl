@@ -2,6 +2,8 @@
 #include <iostream>
 #include <memory>
 #include <Windows.h>
+#include "../libxl/include/tsptr.h"
+#include "../libxl/include/utilities.h"
 
 
 //////////////////////////////////////////////////////////////////////////
@@ -11,8 +13,12 @@
 
 struct Data {
 	unsigned char buf[100];
+	void foo () {
+		printf ("hi!!!\n");
+	}
 };
-typedef std::tr1::shared_ptr<Data>     DataPtr;
+// typedef std::tr1::shared_ptr<Data>     DataPtr;
+typedef xl::ts_shared_ptr<Data>        DataPtr;
 
 CRITICAL_SECTION cs;
 
@@ -25,6 +31,7 @@ static unsigned int __stdcall thread_proc (void *) {
 		data.reset();
 		DataPtr d(new Data());
 		data = d;
+		// data->foo();
 		// ::LeaveCriticalSection(&cs);
 	}
 	return 0;
@@ -37,11 +44,14 @@ int main(int argc, char **argv) {
 #endif
 
 	::InitializeCriticalSection(&cs);
+
+	xl::CTimerLogger logger(_T("cost:"));
 	for (int i = 0; i < THREAD_COUNT; ++ i) {
 		threads[i] = (HANDLE)_beginthreadex(NULL, 0, thread_proc, NULL, 0, NULL);
 	}
-
 	::WaitForMultipleObjects(THREAD_COUNT, threads, TRUE, INFINITE);
+	logger.log();
+
 	::DeleteCriticalSection(&cs);
 
 	return 0;
