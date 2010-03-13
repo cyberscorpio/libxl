@@ -20,7 +20,7 @@ protected:
 	mutable int                                    m_level;
 
 public:
-	CUserLock ();
+	CUserLock (uint spinCount = 0);
 	virtual ~CUserLock ();
 
 	virtual void lock () const;

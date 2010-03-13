@@ -6,8 +6,12 @@ XL_BEGIN
 //////////////////////////////////////////////////////////////////////////
 /// user lock
 
-CUserLock::CUserLock () : m_level(0) {
-	::InitializeCriticalSection(&m_cs);
+CUserLock::CUserLock (uint spinCount) : m_level(0) {
+	if (spinCount == 0) {
+		::InitializeCriticalSection(&m_cs);
+	} else {
+		::InitializeCriticalSectionAndSpinCount(&m_cs, spinCount);
+	}
 }
 
 CUserLock::~CUserLock () {

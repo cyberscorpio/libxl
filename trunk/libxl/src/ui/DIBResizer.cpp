@@ -220,7 +220,7 @@ bool CResizeEngine::horizontalFilter(CDIBSection *src, uint src_height,
 				index = iLeft * bytespp;
 #ifdef USE_SSE
 				__m128 v = _mm_set_ps1(0.0);
-				_mm_prefetch((const char *)src_bits + index,  _MM_HINT_T0);
+				_mm_prefetch((const char *)src_bits + index, _MM_HINT_T0);
 #elif defined(USE_SSE2)
 				__m128d v1 = _mm_set1_pd(0.0);
 				__m128d v2 = _mm_set1_pd(0.0);
