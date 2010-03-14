@@ -29,8 +29,10 @@ static unsigned int __stdcall thread_proc (void *) {
 	for (int i = 0; i < 0x7ffff; ++ i) {
 		// ::EnterCriticalSection(&cs);
 		data.reset();
-		DataPtr d(new Data());
-		data = d;
+		DataPtr d1(new Data());
+		DataPtr d2(d1);
+		data = d2;
+		DataPtr d3 = d2;
 		// data->foo();
 		// ::LeaveCriticalSection(&cs);
 	}
