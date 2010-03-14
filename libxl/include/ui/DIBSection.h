@@ -15,8 +15,7 @@ class CDIBSection;
 typedef std::tr1::shared_ptr<CDIBSection>    CDIBSectionPtr;
 
 class CDIBSection
-	: public CUserLock
-	, public std::tr1::enable_shared_from_this<CDIBSection>
+	: public std::tr1::enable_shared_from_this<CDIBSection>
 {
 	friend class CResizeEngine;
 protected:
@@ -26,14 +25,6 @@ protected:
 	HBITMAP                                               m_hOldBitmap;
 
 protected:
-	void _ClearNoLock ();
-	int _GetWidthNoLock () const;
-	int _GetHeightNoLock () const;
-	int _GetBitCountsNoLock () const;
-	int _GetStrideNoLock () const;
-	uint8* _GetLineNoLock (int line);
-	uint8* _GetDataNoLock ();
-
 	void _Clear ();
 
 public:
@@ -62,9 +53,6 @@ public:
 	void attachToDC (HDC hdc);
 	bool tryAttachToDC (HDC hdc);
 	void detachFromDC (HDC hdc);
-	// attach & detach no lock version, use them with your own risk
-	void attachToDCNoLock (HDC hdc);
-	void detachFromDCNoLock (HDC hdc);
 	void stretchBlt (HDC hdc, int xDest, int yDest, int nDestWidth, int nDestHeight,
 		int xSrc, int ySrc, int nSrcWidth, int nSrcHeight, DWORD dwRop,
 		bool highQuality = true);
