@@ -26,7 +26,7 @@ UI_BEGIN
 //////////////////////////////////////////////////////////////////////////
 // protected methods
 
-void CDIBSection::_ClearNoLock () {
+void CDIBSection::_Clear () {
 	assert(m_hOldBitmap == INVALID_HANDLE_VALUE);
 	if (m_hBitmap) {
 		::DeleteObject(m_hBitmap);
@@ -34,19 +34,19 @@ void CDIBSection::_ClearNoLock () {
 	}
 }
 
-int CDIBSection::_GetWidthNoLock () const {
+int CDIBSection::getWidth () const {
 	return m_hBitmap == NULL ? -1 : m_section.dsBm.bmWidth;
 }
 
-int CDIBSection::_GetHeightNoLock () const {
+int CDIBSection::getHeight () const {
 	return m_hBitmap == NULL ? -1 : m_section.dsBm.bmHeight;
 }
 
-int CDIBSection::_GetBitCountsNoLock () const {
+int CDIBSection::getBitCounts () const {
 	return m_hBitmap == NULL ? -1 : m_section.dsBm.bmBitsPixel;
 }
 
-int CDIBSection::_GetStrideNoLock () const {
+int CDIBSection::getStride () const {
 	if (m_hBitmap == NULL) {
 		return -1;
 	} else {
@@ -59,8 +59,7 @@ int CDIBSection::_GetStrideNoLock () const {
 	}
 }
 
-uint8* CDIBSection::_GetLineNoLock (int line) {
-	CScopeLock lock(this);
+uint8* CDIBSection::getLine (int line) {
 	// assert(m_hOldBitmap == INVALID_HANDLE_VALUE);
 	if (m_hBitmap == NULL) {
 		return NULL;
@@ -73,8 +72,7 @@ uint8* CDIBSection::_GetLineNoLock (int line) {
 	}
 }
 
-uint8* CDIBSection::_GetDataNoLock () {
-	CScopeLock lock(this);
+uint8* CDIBSection::getData () {
 	// assert(m_hOldBitmap == INVALID_HANDLE_VALUE);
 	if (m_hBitmap == NULL) {
 		assert(false);
@@ -85,11 +83,6 @@ uint8* CDIBSection::_GetDataNoLock () {
 	return m_hBitmap == NULL ? NULL : (uint8 *)m_section.dsBm.bmBits;
 }
 
-
-void CDIBSection::_Clear () {
-	CScopeLock lock(this);
-	_ClearNoLock();
-}
 
 //////////////////////////////////////////////////////////////////////////
 // public methods
@@ -109,9 +102,8 @@ CDIBSection::~CDIBSection () {
 
 bool CDIBSection::create (int w, int h, int bitcount /* = 24 */, bool usefilemap /* = false */) {
 	XL_PARAMETER_NOT_USED(usefilemap);
-	CScopeLock lock(this);
 	GdiFlush();
-	_ClearNoLock();
+	_Clear();
 
 	assert(w > 0 && h > 0);
 	assert(bitcount == 24 || bitcount == 32);
@@ -143,63 +135,17 @@ bool CDIBSection::create (int w, int h, int bitcount /* = 24 */, bool usefilemap
 	}
 }
 
-int CDIBSection::getWidth () const {
-	CScopeLock lock(this);
-	return _GetWidthNoLock();
-}
 
-int CDIBSection::getHeight () const {
-	CScopeLock lock(this);
-	return _GetHeightNoLock();
-}
-
-int CDIBSection::getBitCounts () const {
-	CScopeLock lock(this);
-	return _GetBitCountsNoLock();
-}
-
-int CDIBSection::getStride () const {
-	CScopeLock lock(this);
-	return _GetStrideNoLock();
-}
-
-uint8* CDIBSection::getLine (int line) {
-	CScopeLock lock(this);
-	return _GetLineNoLock(line);
-}
-
-uint8* CDIBSection::getData () {
-	CScopeLock lock(this);
-	return _GetDataNoLock();
-}
 
 void CDIBSection::attachToDC (HDC hdc) {
-	lock();
-	attachToDCNoLock(hdc);
-}
-
-bool CDIBSection::tryAttachToDC (HDC hdc) {
-	if (!tryLock()) {
-		return false;
-	}
-	attachToDC(hdc);
-	unlock();
-	return true;
-}
-
-void CDIBSection::detachFromDC (HDC hdc) {
-	detachFromDCNoLock(hdc);
-	unlock();
-}
-
-void CDIBSection::attachToDCNoLock (HDC hdc) {
 	assert(m_hBitmap != NULL);
+//	InterlockedCompareExchange(&m_hOldBitmap, 1, INVALID_HANDLE_VALUE) != INVALID_HANDLE_VALUE);
 	assert(INVALID_HANDLE_VALUE == m_hOldBitmap);
 	m_hOldBitmap = (HBITMAP)::SelectObject(hdc, m_hBitmap);
 	assert(INVALID_HANDLE_VALUE != m_hOldBitmap);
 }
 
-void CDIBSection::detachFromDCNoLock (HDC hdc) {
+void CDIBSection::detachFromDC (HDC hdc) {
 	assert(m_hBitmap != NULL);
 	assert(INVALID_HANDLE_VALUE != m_hOldBitmap);
 	HBITMAP bitmap = (HBITMAP)::SelectObject(hdc, m_hOldBitmap);
@@ -217,20 +163,19 @@ void CDIBSection::stretchBlt (HDC hdc, int xDest, int yDest, int nDestWidth, int
 	assert(getBitCounts() >= 16);
 
 	xl::ui::CDCHandle dc(hdc);
-	CScopeLock lock(this);
 
 	BITMAPINFO info;
 	memset(&info, 0, sizeof(info));
 	BITMAPINFOHEADER &bih = info.bmiHeader;
 	bih.biSize = sizeof(BITMAPINFOHEADER);
-	bih.biWidth = _GetWidthNoLock();
-	bih.biHeight = -_GetHeightNoLock();
+	bih.biWidth = getWidth();
+	bih.biHeight = -getHeight();
 	bih.biPlanes = 1;
-	bih.biBitCount = (WORD)_GetBitCountsNoLock();
+	bih.biBitCount = (WORD)getBitCounts();
 	bih.biCompression = BI_RGB;
 	bih.biSizeImage = 0;
 
-	void *data = _GetDataNoLock();
+	void *data = getData();
 	assert(data != NULL);
 
 	int mode = highQuality ? HALFTONE : COLORONCOLOR;
@@ -253,15 +198,15 @@ CDIBSectionPtr CDIBSection::clone () {
 	}
 
 	assert(m_section.dshSection == NULL);
-	assert(_GetWidthNoLock() > 0 && _GetHeightNoLock() > 0);
+	assert(getWidth() > 0 && getHeight() > 0);
 	CDIBSectionPtr dib = createDIBSection(getWidth(), getHeight(), getBitCounts());
 	if (dib) {
-		assert(_GetWidthNoLock() == dib->getWidth());
-		assert(_GetHeightNoLock() == dib->getHeight());
-		assert(_GetStrideNoLock() == dib->getStride());
-		void *src = _GetDataNoLock();
+		assert(getWidth() == dib->getWidth());
+		assert(getHeight() == dib->getHeight());
+		assert(getStride() == dib->getStride());
+		void *src = getData();
 		void *dst = dib->getData();
-		memcpy(dst, src, _GetStrideNoLock() * _GetHeightNoLock());
+		memcpy(dst, src, getStride() * getHeight());
 	}
 	return CDIBSectionPtr(dib);
 }
