@@ -76,6 +76,13 @@ public:
 		}
 	}
 
+	ts_shared_ptr (const MyType &tsp)
+		: m_obj(NULL)
+		, m_ref(NULL)
+	{
+		*this = tsp;
+	}
+
 	~ts_shared_ptr () {
 		_Destroy();
 	}
