@@ -180,11 +180,15 @@ CRect CControl::getClientRect () const {
 
 
 bool CControl::insertChild (CControlPtr child) {
+	CCtrlMain *pCtrlMain = _GetMainCtrl();
+	if (pCtrlMain) {
+		pCtrlMain->lock();
+	}
 	m_controls.push_back(child);
 	child->_SetParent(shared_from_this());
 
-	CCtrlMain *pCtrlMain = _GetMainCtrl();
 	if (pCtrlMain) {
+		pCtrlMain->unlock();
 		pCtrlMain->reLayout();
 	}
 	return true;
