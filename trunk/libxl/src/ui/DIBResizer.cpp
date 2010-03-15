@@ -153,17 +153,17 @@ bool CResizeEngine::horizontalFilter(CDIBSection *src, uint src_height,
                                      ILongTimeRunCallback *pCallback) {
 	assert(src->getBitCounts() == dst->getBitCounts());
 	int bitcount = src->getBitCounts();
-	assert((int)src_height <= src->_GetHeightNoLock());
+	assert((int)src_height <= src->getHeight());
 	assert(src_height >= dst_height);
 	uint dst_ymax = dst_yoffset + dst_height;
 	assert((int)dst_ymax <= dst->getHeight());
-	uint src_width = src->_GetWidthNoLock();
+	uint src_width = src->getWidth();
 	uint dst_width = dst->getWidth();
 
 	if (dst_width == src_width) {
 
-		unsigned char *src_bits = (unsigned char *)src->_GetDataNoLock();
-		unsigned char *dst_bits = (unsigned char *)dst->getLine(dst_yoffset);
+		uint8 *src_bits = src->getData();
+		uint8 *dst_bits = dst->getLine(dst_yoffset);
 		assert(src_bits && dst_bits);
 
 		uint height = min(dst_height, src_height);
@@ -211,8 +211,8 @@ bool CResizeEngine::horizontalFilter(CDIBSection *src, uint src_height,
 				}
 			}
 
-			unsigned char *src_bits = (unsigned char *)src->_GetLineNoLock(srcy);
-			unsigned char *dst_bits = (unsigned char *)dst->_GetLineNoLock(dsty);
+			uint8 *src_bits = src->getLine(srcy);
+			uint8 *dst_bits = dst->getLine(dsty);
 
 			for(uint x = 0; x < dst_width; ++ x) {
 				int iLeft = weightsTable.getLeftBoundary(x);
@@ -386,7 +386,7 @@ bool CResizeEngine::verticalFilter(CDIBSection *src, CDIBSection *dst, ILongTime
 				int iLeft = weightsTable.getLeftBoundary(y);
 				int iRight = weightsTable.getRightBoundary(y);
 
-				unsigned char *src_bits = (unsigned char *)src->_GetLineNoLock(iLeft);
+				uint8 *src_bits = src->getLine(iLeft);
 				src_bits += index;
 
 				for(int i = iLeft; i <= iRight; ++ i) {

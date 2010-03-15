@@ -190,11 +190,10 @@ void CDIBSection::stretchBlt (HDC hdc, int xDest, int yDest, int nDestWidth, int
 
 
 CDIBSectionPtr CDIBSection::clone () {
-	CScopeLock lock(this);
 	GdiFlush();
-	assert(INVALID_HANDLE_VALUE == m_hOldBitmap);
+	assert(m_hBitmap != NULL);
 	if (m_hBitmap == NULL) {
-		return CDIBSectionPtr(new CDIBSection());
+		return CDIBSectionPtr();
 	}
 
 	assert(m_section.dshSection == NULL);
@@ -215,7 +214,6 @@ CDIBSectionPtr CDIBSection::clone () {
 CDIBSectionPtr CDIBSection::cloneAndResize (int w, int h, RESIZE_TYPE rt,
                                             ILongTimeRunCallback *pCallback, bool usefilemap
                                            ) {
-	CScopeLock lock(this);
 	GdiFlush();
 	assert(m_hBitmap != NULL);
 	assert(w > 0 && h > 0);
