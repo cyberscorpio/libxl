@@ -137,12 +137,20 @@ bool CDIBSection::create (int w, int h, int bitcount /* = 24 */, bool usefilemap
 
 
 
-void CDIBSection::attachToDC (HDC hdc) {
+bool CDIBSection::attachToDC (HDC hdc) {
 	assert(m_hBitmap != NULL);
-//	InterlockedCompareExchange(&m_hOldBitmap, 1, INVALID_HANDLE_VALUE) != INVALID_HANDLE_VALUE);
-	assert(INVALID_HANDLE_VALUE == m_hOldBitmap);
+#ifndef _WIN64
+	long v = InterlockedCompareExchange((long *)&m_hOldBitmap, 1, (long)INVALID_HANDLE_VALUE);
+#else
+	LONGLONG v = InterlockedCompareExchange64((LONGLONG *)&m_hOldBitmap, 1, (LONGLONG)INVALID_HANDLE_VALUE);
+#endif
+	if ((HANDLE)v != INVALID_HANDLE_VALUE) {
+		return false;
+	}
+
 	m_hOldBitmap = (HBITMAP)::SelectObject(hdc, m_hBitmap);
 	assert(INVALID_HANDLE_VALUE != m_hOldBitmap);
+	return true;
 }
 
 void CDIBSection::detachFromDC (HDC hdc) {

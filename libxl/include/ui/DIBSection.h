@@ -50,7 +50,7 @@ public:
 	uint8* getLine (int line);
 	uint8* getData ();
 
-	void attachToDC (HDC hdc);
+	bool attachToDC (HDC hdc);
 	bool tryAttachToDC (HDC hdc);
 	void detachFromDC (HDC hdc);
 	void stretchBlt (HDC hdc, int xDest, int yDest, int nDestWidth, int nDestHeight,

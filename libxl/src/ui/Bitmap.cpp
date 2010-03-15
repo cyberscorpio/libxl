@@ -27,7 +27,7 @@ void CBitmap::clearColorKey () {
 
 void CBitmap::gray () {
 	assert(m_hBitmap != NULL);
-	assert(_GetBitCountsNoLock() >= 24);
+	assert(getBitCounts() >= 24);
 
 	int bitcount = getBitCounts();
 	int bytespp = bitcount / 8;
@@ -74,7 +74,7 @@ bool CBitmap::load (HBITMAP hSrc) {
 		if (!create(w, h, bitcount)) {
 			return false;
 		}
-		assert(stride == _GetStrideNoLock());
+		assert(stride == getStride());
 		stride = stride;
 
 		// use GetDIBits() to get the data
