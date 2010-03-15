@@ -29,14 +29,14 @@ void CBitmap::gray () {
 	assert(m_hBitmap != NULL);
 	assert(_GetBitCountsNoLock() >= 24);
 
-	int bitcount = _GetBitCountsNoLock();
+	int bitcount = getBitCounts();
 	int bytespp = bitcount / 8;
 	assert(bytespp > 2); // 3, 4
-	int w = _GetWidthNoLock();
-	int h = _GetHeightNoLock();
+	int w = getWidth();
+	int h = getHeight();
 	bool trans = m_pTransColor != NULL;
 	for (int y = 0; y < h; ++ y) {
-		uint8 *data_line = _GetLineNoLock(y);
+		uint8 *data_line = getLine(y);
 		if (trans) {
 			COLORREF rgb = m_rgbTrans;
 			uint8 rr = GetRValue(rgb), gg = GetGValue(rgb), bb = GetBValue(rgb);
@@ -88,7 +88,7 @@ bool CBitmap::load (HBITMAP hSrc) {
 		header.biBitCount = (WORD)bitcount;
 		header.biCompression = BI_RGB;
 
-		uint8 *data = (uint8 *)_GetDataNoLock();
+		uint8 *data = getData();
 		HDC hDC = ::GetDC(NULL);
 		::GetDIBits(hDC, hSrc, 0, h, data, &info, DIB_RGB_COLORS);
 		::ReleaseDC(NULL, hDC);
@@ -112,7 +112,7 @@ void CBitmap::draw (HDC hdc, int toX, int toY, int toW, int toH, int fromX, int 
 	if (!m_hBitmap) {
 		return;
 	}
-	draw(hdc, toX, toY, toW, toH, fromX, fromY, _GetWidthNoLock() - fromX, _GetHeightNoLock() - fromY, op);
+	draw(hdc, toX, toY, toW, toH, fromX, fromY, getWidth() - fromX, getHeight() - fromY, op);
 }
 
 void CBitmap::draw (
@@ -122,9 +122,9 @@ void CBitmap::draw (
                     uint op
                    ) {
 	assert(m_hBitmap != NULL);
-	assert(fromX >= 0 && fromX < _GetWidthNoLock());
-	assert(fromY >= 0 && fromY < _GetHeightNoLock());
-	assert(fromW + fromX <= _GetWidthNoLock() && fromH + fromY <= _GetHeightNoLock());
+	assert(fromX >= 0 && fromX < getWidth());
+	assert(fromY >= 0 && fromY < getHeight());
+	assert(fromW + fromX <= getWidth() && fromH + fromY <= getHeight());
 	if (!m_hBitmap) {
 		return;
 	}
