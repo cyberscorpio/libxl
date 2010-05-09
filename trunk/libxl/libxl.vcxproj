@@ -1,0 +1,136 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{709DBE58-BB97-492F-B33E-16D84B356E59}</ProjectGuid>
+    <RootNamespace>libxl</RootNamespace>
+    <Keyword>Win32Proj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\</IntDir>
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level4</WarningLevel>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level4</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="src\fs.cpp" />
+    <ClCompile Include="src\Language.cpp" />
+    <ClCompile Include="src\lockable.cpp" />
+    <ClCompile Include="src\placeholder.cpp" />
+    <ClCompile Include="src\Registry.cpp" />
+    <ClCompile Include="src\utilities.cpp" />
+    <ClCompile Include="src\ui\Bitmap.cpp" />
+    <ClCompile Include="src\ui\Control.cpp" />
+    <ClCompile Include="src\ui\CtrlButton.cpp" />
+    <ClCompile Include="src\ui\CtrlGesture.cpp" />
+    <ClCompile Include="src\ui\CtrlMain.cpp" />
+    <ClCompile Include="src\ui\CtrlSlider.cpp" />
+    <ClCompile Include="src\ui\DIBResizer.cpp">
+      <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Disabled</Optimization>
+      <IntrinsicFunctions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</IntrinsicFunctions>
+      <FavorSizeOrSpeed Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Speed</FavorSizeOrSpeed>
+      <BasicRuntimeChecks Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Default</BasicRuntimeChecks>
+      <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Full</Optimization>
+    </ClCompile>
+    <ClCompile Include="src\ui\DIBSection.cpp" />
+    <ClCompile Include="src\ui\Menu.cpp" />
+    <ClCompile Include="src\ui\ResMgr.cpp" />
+    <ClCompile Include="src\ui\WinStyle.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\common.h" />
+    <ClInclude Include="include\fs.h" />
+    <ClInclude Include="include\interfaces.h" />
+    <ClInclude Include="include\Language.h" />
+    <ClInclude Include="include\lockable.h" />
+    <ClInclude Include="include\Registry.h" />
+    <ClInclude Include="include\string.h" />
+    <ClInclude Include="include\tsptr.h" />
+    <ClInclude Include="include\utilities.h" />
+    <ClInclude Include="include\dp\Observable.h" />
+    <ClInclude Include="include\ui\Application.h" />
+    <ClInclude Include="include\ui\Bitmap.h" />
+    <ClInclude Include="include\ui\Control.h" />
+    <ClInclude Include="include\ui\CtrlButton.h" />
+    <ClInclude Include="include\ui\CtrlGesture.h" />
+    <ClInclude Include="include\ui\CtrlMain.h" />
+    <ClInclude Include="include\ui\CtrlSlider.h" />
+    <ClInclude Include="include\ui\CtrlTarget.h" />
+    <ClInclude Include="include\ui\DIBResizer.h" />
+    <ClInclude Include="include\ui\DIBResizerFilter.h" />
+    <ClInclude Include="include\ui\DIBSection.h" />
+    <ClInclude Include="include\ui\Gdi.h" />
+    <ClInclude Include="include\ui\MainWindow.h" />
+    <ClInclude Include="include\ui\Menu.h" />
+    <ClInclude Include="include\ui\ResMgr.h" />
+    <ClInclude Include="include\ui\WinStyle.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ReadMe.txt" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

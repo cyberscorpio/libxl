@@ -38,6 +38,13 @@ public:
 	virtual void onProgress (uint /*progress*/) {}
 };
 
+//////////////////////////////////////////////////////////////////////////
+// IExecutable
+class IExecutable {
+public:
+	virtual bool operator() () = 0;
+};
+
 
 XL_END
 #endif

@@ -1,17 +1,11 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 10.00
-# Visual Studio 2008
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libxl", "libxl\libxl.vcproj", "{709DBE58-BB97-492F-B33E-16D84B356E59}"
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libxl", "libxl\libxl.vcxproj", "{709DBE58-BB97-492F-B33E-16D84B356E59}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "testers", "testers\testers.vcproj", "{6BB6669C-494E-4DCB-B5A0-197B2D853F67}"
-	ProjectSection(ProjectDependencies) = postProject
-		{709DBE58-BB97-492F-B33E-16D84B356E59} = {709DBE58-BB97-492F-B33E-16D84B356E59}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "testers", "testers\testers.vcxproj", "{6BB6669C-494E-4DCB-B5A0-197B2D853F67}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "uitester", "uitester\uitester.vcproj", "{09701064-7432-4587-9D86-943CF5E90262}"
-	ProjectSection(ProjectDependencies) = postProject
-		{709DBE58-BB97-492F-B33E-16D84B356E59} = {709DBE58-BB97-492F-B33E-16D84B356E59}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "uitester", "uitester\uitester.vcxproj", "{09701064-7432-4587-9D86-943CF5E90262}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
