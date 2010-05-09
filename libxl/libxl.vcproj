@@ -165,6 +165,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\src\Registry.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\src\utilities.cpp"
 				>
 			</File>
@@ -259,6 +263,10 @@
 			</File>
 			<File
 				RelativePath=".\include\lockable.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\Registry.h"
 				>
 			</File>
 			<File
