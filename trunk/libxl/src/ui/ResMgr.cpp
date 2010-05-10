@@ -77,6 +77,11 @@ void CResMgr::reset () {
 		::DeleteObject(it->second);
 	}
 	m_pens.clear();
+
+	for (_IconMapType::iterator it = m_icons.begin(); it != m_icons.end(); ++ it) {
+		::DestroyIcon(it->second);
+	}
+	m_icons.clear();
 }
 
 HFONT CResMgr::getSysFont (int height, uint style) {
@@ -117,6 +122,22 @@ HPEN CResMgr::getPen (ushort style, ushort width, COLORREF color) {
 		if (pen != NULL) {
 			m_pens[key] = pen;
 			return pen;
+		}
+	}
+
+	return NULL;
+}
+
+HICON CResMgr::getIcon (ushort id) {
+	uint key = id;
+	_IconMapType::iterator it = m_icons.find(key);
+	if (it != m_icons.end()) {
+		return it->second;
+	} else {
+		HICON icon = ::LoadIcon(::GetModuleHandle(NULL), MAKEINTRESOURCE(id));
+		if (icon != NULL) {
+			m_icons[key] = icon;
+			return icon;
 		}
 	}
 

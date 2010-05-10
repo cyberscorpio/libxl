@@ -26,10 +26,12 @@ private:
 	~CResMgr ();
 	typedef std::map<uint, HFONT>                  _FontMapType;
 	typedef std::map<uint64, HPEN>                 _PenMapType;
+	typedef std::map<uint, HICON>                  _IconMapType;
 	typedef std::map<uint64, CBitmapPtr>           _BitmapBigMapType;
 
 	_FontMapType                                   m_sysFonts;
 	_PenMapType                                    m_pens;
+	_IconMapType                                   m_icons;
 	_BitmapBigMapType                              m_bitmaps;
 	_BitmapBigMapType                              m_transBitmaps;
 
@@ -56,6 +58,8 @@ public:
 	HFONT getSysFont (int height = 0, uint style = 0);
 
 	HPEN getPen (ushort style, ushort width, COLORREF color);
+
+	HICON getIcon (ushort id);
 
 	CBitmapPtr getBitmap (ushort id, bool grayscale = false);
 	CBitmapPtr getTransBitmap (ushort id, COLORREF colorKey, bool grayscale = false);
