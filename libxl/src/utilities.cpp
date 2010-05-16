@@ -127,5 +127,21 @@ void CScopeLock::unlock () {
 }
 
 
+//////////////////////////////////////////////////////////////////////////
+// OS Version
+#ifdef WIN32
+bool osv_is_xp () {
+	OSVERSIONINFO osv;
+	::GetVersionEx(&osv);
+	return osv.dwMajorVersion == 5;
+}
+
+bool osv_is_vista_or_later () {
+	OSVERSIONINFO osv;
+	::GetVersionEx(&osv);
+	return osv.dwMajorVersion >= 6;
+}
+#endif
+
 
 XL_END
