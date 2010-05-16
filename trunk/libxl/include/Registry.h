@@ -27,5 +27,9 @@ public:
  */
 bool registerProgid (const tstring &progid, const tstring &verb);
 
+
+///////////////////////////////////////////////////////////////////////
+
+
 XL_END
 #endif

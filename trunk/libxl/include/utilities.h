@@ -51,5 +51,13 @@ public:
 };
 
 
+//////////////////////////////////////////////////////////////////////////
+// OS Version
+#ifdef WIN32
+bool osv_is_xp ();
+bool osv_is_vista_or_later ();
+#endif
+
+
 XL_END
 #endif
