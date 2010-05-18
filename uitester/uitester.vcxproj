@@ -11,18 +11,18 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{709DBE58-BB97-492F-B33E-16D84B356E59}</ProjectGuid>
-    <RootNamespace>libxl</RootNamespace>
+    <ProjectGuid>{09701064-7432-4587-9D86-943CF5E90262}</ProjectGuid>
+    <RootNamespace>uitester</RootNamespace>
     <Keyword>Win32Proj</Keyword>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <CharacterSet>Unicode</CharacterSet>
     <WholeProgramOptimization>true</WholeProgramOptimization>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
@@ -39,98 +39,71 @@
     <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)$(Configuration)\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</LinkIncremental>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)$(Configuration)\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkIncremental>
     <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
     <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
     <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
     <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
     <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
     <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
-    <IncludePath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\wtl;$(IncludePath)</IncludePath>
-    <IncludePath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">..\..\wtl;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <PrecompiledHeader>
       </PrecompiledHeader>
-      <WarningLevel>Level4</WarningLevel>
+      <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
     </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <Optimization>MaxSpeed</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <PrecompiledHeader>
       </PrecompiledHeader>
-      <WarningLevel>Level4</WarningLevel>
+      <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\fs.cpp" />
-    <ClCompile Include="src\Language.cpp" />
-    <ClCompile Include="src\lockable.cpp" />
-    <ClCompile Include="src\placeholder.cpp" />
-    <ClCompile Include="src\Registry.cpp" />
-    <ClCompile Include="src\utilities.cpp" />
-    <ClCompile Include="src\ui\Bitmap.cpp" />
-    <ClCompile Include="src\ui\Control.cpp" />
-    <ClCompile Include="src\ui\CtrlButton.cpp" />
-    <ClCompile Include="src\ui\CtrlGesture.cpp" />
-    <ClCompile Include="src\ui\CtrlMain.cpp" />
-    <ClCompile Include="src\ui\CtrlSlider.cpp" />
-    <ClCompile Include="src\ui\DIBResizer.cpp">
-      <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Disabled</Optimization>
-      <IntrinsicFunctions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</IntrinsicFunctions>
-      <FavorSizeOrSpeed Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Speed</FavorSizeOrSpeed>
-      <BasicRuntimeChecks Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Default</BasicRuntimeChecks>
-      <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Full</Optimization>
-    </ClCompile>
-    <ClCompile Include="src\ui\DIBSection.cpp" />
-    <ClCompile Include="src\ui\Menu.cpp" />
-    <ClCompile Include="src\ui\ResMgr.cpp" />
-    <ClCompile Include="src\ui\WinStyle.cpp" />
+    <ClCompile Include="app.cpp" />
+    <ClCompile Include="MainWindow.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\common.h" />
-    <ClInclude Include="include\fs.h" />
-    <ClInclude Include="include\interfaces.h" />
-    <ClInclude Include="include\Language.h" />
-    <ClInclude Include="include\lockable.h" />
-    <ClInclude Include="include\Registry.h" />
-    <ClInclude Include="include\string.h" />
-    <ClInclude Include="include\tsptr.h" />
-    <ClInclude Include="include\utilities.h" />
-    <ClInclude Include="include\dp\Observable.h" />
-    <ClInclude Include="include\ui\Application.h" />
-    <ClInclude Include="include\ui\Bitmap.h" />
-    <ClInclude Include="include\ui\Control.h" />
-    <ClInclude Include="include\ui\CtrlButton.h" />
-    <ClInclude Include="include\ui\CtrlGesture.h" />
-    <ClInclude Include="include\ui\CtrlMain.h" />
-    <ClInclude Include="include\ui\CtrlSlider.h" />
-    <ClInclude Include="include\ui\CtrlTarget.h" />
-    <ClInclude Include="include\ui\DIBResizer.h" />
-    <ClInclude Include="include\ui\DIBResizerFilter.h" />
-    <ClInclude Include="include\ui\DIBSection.h" />
-    <ClInclude Include="include\ui\Gdi.h" />
-    <ClInclude Include="include\ui\MainWindow.h" />
-    <ClInclude Include="include\ui\Menu.h" />
-    <ClInclude Include="include\ui\ResMgr.h" />
-    <ClInclude Include="include\ui\WinStyle.h" />
+    <ClInclude Include="MainWindow.h" />
+    <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="ReadMe.txt" />
+    <ResourceCompile Include="uitester.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\libxl\libxl.vcxproj">
+      <Project>{709dbe58-bb97-492f-b33e-16d84b356e59}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
