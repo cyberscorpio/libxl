@@ -99,7 +99,7 @@ bool CBitmap::load (HBITMAP hSrc) {
 
 bool CBitmap::load (int id) {
 	_Clear();
-	HBITMAP hSrc = ::LoadBitmap(::GetModuleHandle(NULL), MAKEINTRESOURCE(id));
+	HBITMAP hSrc = (HBITMAP)::LoadImage(::GetModuleHandle(NULL), MAKEINTRESOURCE(id), IMAGE_BITMAP, 0, 0, 0);
 	if (hSrc) {
 		load (hSrc);
 		::DeleteObject(hSrc);
