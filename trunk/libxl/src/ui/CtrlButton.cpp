@@ -20,9 +20,11 @@ XL_BEGIN
 UI_BEGIN
 
 void CCtrlButton::_DrawImageAndText (HDC hdc) {
+	/*
 	if (m_text.length() == 0) {
 		return;
 	}
+	*/
 
 	CDCHandle dc(hdc);
 	CRect rc = getClientRect();
@@ -34,7 +36,9 @@ void CCtrlButton::_DrawImageAndText (HDC hdc) {
 	HFONT font = _GetFont();
 	HFONT oldFont = dc.SelectFont(font);
 	if (m_imgId == 0) {
-		dc.drawTransparentText(m_text, m_text.length(), rc, format);
+		if (m_text.length() > 0) {
+			dc.drawTransparentText(m_text, m_text.length(), rc, format);
+		}
 	} else {
 		CRect rcTmp = rc;
 		int textWidth = rcTmp.Width();
@@ -63,7 +67,9 @@ void CCtrlButton::_DrawImageAndText (HDC hdc) {
 		if (rcTmp.right > rc.right) {
 			rcTmp.right = rc.right;
 		}
-		dc.drawTransparentText(m_text, m_text.length(), rcTmp, format);
+		if (m_text.length() > 0) {
+			dc.drawTransparentText(m_text, m_text.length(), rcTmp, format);
+		}
 	}
 	dc.SelectFont(oldFont);
 	dc.SetTextColor(rgbOld);
