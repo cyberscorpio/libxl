@@ -54,8 +54,8 @@ public:
 //////////////////////////////////////////////////////////////////////////
 // OS Version
 #ifdef WIN32
-bool osv_is_xp ();
-bool osv_is_vista_or_later ();
+bool os_is_xp ();
+bool os_is_vista_or_later ();
 #endif
 
 
