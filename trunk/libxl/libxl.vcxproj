@@ -80,6 +80,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\fs.cpp" />
+    <ClCompile Include="src\ini.cpp" />
     <ClCompile Include="src\Language.cpp" />
     <ClCompile Include="src\lockable.cpp" />
     <ClCompile Include="src\placeholder.cpp" />
@@ -106,6 +107,7 @@
   <ItemGroup>
     <ClInclude Include="include\common.h" />
     <ClInclude Include="include\fs.h" />
+    <ClInclude Include="include\ini.h" />
     <ClInclude Include="include\interfaces.h" />
     <ClInclude Include="include\Language.h" />
     <ClInclude Include="include\lockable.h" />

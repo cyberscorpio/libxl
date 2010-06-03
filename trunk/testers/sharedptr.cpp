@@ -1,3 +1,7 @@
+#ifndef IN_IDE
+#define UNICODE
+#define _UNICODE
+#endif
 #include <process.h>
 #include <iostream>
 #include <memory>

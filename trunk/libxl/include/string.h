@@ -274,8 +274,7 @@ explode (const CharT *delimiter,
 
 //////////////////////////////////////////////////////////////////////////
 // !!!! BELOW HAVE NOT BEEN TESTED !!!!!
-#if 0
-wstring s2ws (const string &s) {
+inline wstring s2ws (const string &s) {
 	const char *p = s.c_str();
 	int wlen = MultiByteToWideChar(CP_ACP, 0, p, s.length(), NULL, 0);
 	std::auto_ptr<wchar_t> wp(new wchar_t[wlen + 1]);
@@ -285,14 +284,47 @@ wstring s2ws (const string &s) {
 	return ws;
 }
 
-tstring s2ts (const string &s) {
+inline tstring s2ts (const string &s) {
 #ifndef UNICODE
 	return s;
 #else
 	return s2ws(s);
 #endif
 }
+
+inline string ws2s (const wstring &ws) {
+	const wchar_t *wp = ws.c_str();
+	int len = WideCharToMultiByte(CP_ACP, 0, wp, ws.length(), NULL, 0, NULL, NULL);
+	std::auto_ptr<char> p(new char[len + 1]);
+	WideCharToMultiByte(CP_ACP, 0, wp, ws.length(), p.get(), len, NULL, NULL);
+	string s;
+	s.append(p.get(), len);
+	return s;
+}
+
+inline tstring ws2ts (const wstring &ws) {
+#ifdef UNICODE
+	return ws;
+#else
+	return ws2s(ws);
 #endif
+}
+
+inline wstring ts2ws (const tstring &ts) {
+#ifdef UNICODE
+	return ts;
+#else
+	return s2ws(ts);
+#endif
+}
+
+inline string ts2s (const tstring &ts) {
+#ifdef UNICODE
+	return ws2s(ts);
+#else
+	return ts;
+#endif
+}
 
 XL_END
 
