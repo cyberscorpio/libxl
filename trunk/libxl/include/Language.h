@@ -9,7 +9,7 @@
  *	- 0404		Traditional Chinese
  *
  * The ini file MUST be placed in the SAME directory with the executable, unless you
- * set 
+ * set the base directory via .setBaseDir()
  */
 #include <memory>
 #include "common.h"
