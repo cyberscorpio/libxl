@@ -28,9 +28,9 @@ void CLanguage::_SetDefaultLcid () {
 
 void CLanguage::_LoadStrings () {
 
-	tstring ini = m_baseDir + _T("\\lang") + m_lcid + _T(".ini");
+	tstring ini = m_baseDir + _T("\\lang-") + m_lcid + _T(".ini");
 	if (!file_exists(ini)) {
-		ini = m_baseDir + _T("\\lang") + ::sDefLcid + _T(".ini");
+		ini = m_baseDir + _T("\\lang-") + ::sDefLcid + _T(".ini");
 		if (!file_exists(ini)) {
 			return;
 		}
