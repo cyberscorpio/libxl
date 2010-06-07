@@ -178,5 +178,10 @@ void CIni::write (tstring fileName) {
 	file_put_contents(fileName, data);
 }
 
+void CIni::reload () {
+	m_ini.clear();
+	_Load();
+}
+
 
 XL_END
