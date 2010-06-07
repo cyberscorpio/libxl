@@ -30,6 +30,7 @@ public:
 	void set (const tstring &section, const tstring &key, const tstring &value);
 
 	void write (tstring fileName = _T(""));
+	void reload ();
 };
 
 XL_END
