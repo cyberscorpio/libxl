@@ -93,8 +93,12 @@ void CIni::_Load () {
 		// key=value ?
 		ExplodeT<tchar>::ValueT kv = explode(_T("="), line);
 		if (kv.size() < 2) {
-			assert(false);
-			continue; // parse error
+			if (line.at(line.length() - 1) != _T('=')) {
+				assert(false);
+				continue; // parse error
+			} else {
+				kv.push_back(_T(""));
+			}
 		}
 
 		tstring key = kv[0];
