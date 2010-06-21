@@ -5,6 +5,46 @@
 #include "string.h"
 XL_BEGIN
 
+
+class CRegistry
+{
+public:
+	/**
+	 * @param keyName
+	 *  The full registry path of the key, beginning with a valid registry root, 
+	 *  such as "HKEY_CURRENT_USER". The full list is:
+	 *  "HKEY_CURRENT_USER", "HKEY_LOCAL_MACHINE", "HKEY_USERS" and "HKEY_PERFORMANCE_DATA" or
+	 *  "HKCU", "HKLM"
+	 * @param valueName
+	 *  The name of the name/value pair, "" for default.
+	 */
+	static bool setValue (
+		const xl::tstring &keyName,
+		const xl::tstring &valueName,
+		const xl::tstring &value
+		);
+
+	static bool setValue (
+		const xl::tstring &keyName,
+		const xl::tstring &valueName,
+		DWORD value
+		);
+
+	static bool getStringValue (
+		const xl::tstring &keyName,
+		const xl::tstring &valueName,
+		xl::tstring &value
+		);
+
+	static bool getDwordValue (
+		const xl::tstring &keyName,
+		const xl::tstring &valueName,
+		DWORD &value
+		);
+};
+
+
+#if 0
 class CRegistry {
 	HKEY m_key;
 public:
@@ -26,6 +66,7 @@ public:
  *			Command: "path to the EXE" "%1"
  */
 bool registerProgid (const tstring &progid, const tstring &verb);
+#endif
 
 
 ///////////////////////////////////////////////////////////////////////

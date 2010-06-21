@@ -94,6 +94,7 @@
     <ClCompile Include="ini.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="observable.cpp" />
+    <ClCompile Include="Registry.cpp" />
     <ClCompile Include="sharedptr.cpp" />
     <ClCompile Include="string.cpp" />
   </ItemGroup>

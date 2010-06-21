@@ -1,3 +1,10 @@
+#ifndef UNICODE
+#define UNICODE
+#endif
+#ifndef _UNICODE
+#define _UNICODE
+#endif
+
 #include <iostream>
 #include "../libxl/include/Registry.h"
 
@@ -8,14 +15,26 @@
 
 
 #ifdef IN_IDE
-int test_registry(int argc, xl::tchar **argv) {
+int test_registry(int argc, char **argv) {
 #else
 int main(int argc, char **argv) {
 #endif
-	if (!xl::registerProgid(_T("test_registry.1.0"), _T("open"))) {
-		std::cout << "register failed!" << std::endl;
+	xl::tstring keyName = _T("HKEY_LOCAL_MACHINE\\SOFTWARE\\foobar2000\\capabilities");
+	// xl::tstring keyName = _T("HKCU\\SOFTWARE\\foobar2000");
+	xl::tstring valueName = _T("applicationDescription");
+	xl::tstring value;
+	if (xl::CRegistry::getStringValue(keyName, valueName, value)) {
+		xl::string s = xl::ts2s(value);
+		std::cout << s << std::endl;
 	} else {
-		std::cout << "register succeed!" << std::endl;
+		std::cout << "read registry error\n";
+	}
+
+	valueName = _T("xxx");
+	if (xl::CRegistry::setValue(keyName, valueName, _T("keep it simple and stupid"))) {
+		std::cout << "set value success\n";
+	} else {
+		std::cout << "set value error\n";
 	}
 	return 0;
 }
