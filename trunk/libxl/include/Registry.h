@@ -1,5 +1,6 @@
 #ifndef XL_REGISTRY_H
 #define XL_REGISTRY_H
+#include <stdexcept>
 #include <Windows.h>
 #include "common.h"
 #include "string.h"
@@ -13,8 +14,9 @@ public:
 	 * @param keyName
 	 *  The full registry path of the key, beginning with a valid registry root, 
 	 *  such as "HKEY_CURRENT_USER". The full list is:
-	 *  "HKEY_CURRENT_USER", "HKEY_LOCAL_MACHINE", "HKEY_USERS" and "HKEY_PERFORMANCE_DATA" or
-	 *  "HKCU", "HKLM"
+	 *  "HKEY_CLASSES_ROOT", "HKEY_CURRENT_USER", "HKEY_LOCAL_MACHINE", "HKEY_USERS" 
+	 *  and "HKEY_PERFORMANCE_DATA" or
+	 *  "HKCR", "HKCU", "HKLM"
 	 * @param valueName
 	 *  The name of the name/value pair, "" for default.
 	 */
@@ -40,6 +42,17 @@ public:
 		const xl::tstring &keyName,
 		const xl::tstring &valueName,
 		DWORD &value
+		);
+
+	static bool deleteValue (
+		const xl::tstring &keyName,
+		const xl::tstring &valueName,
+		bool throwOnMissing = false // throw std::out_of_range if not found, whether the key or value
+		);
+
+	static bool deleteKey (
+		const xl::tstring &keyName,
+		bool throwOnMissing = false // throw std::out_of_range if not found
 		);
 };
 
