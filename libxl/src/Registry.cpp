@@ -1,9 +1,11 @@
 #include <assert.h>
 #include <algorithm>
 #include <utility>
+#include <Shlwapi.h>
 #include "../include/Registry.h"
 
 #pragma comment (lib, "Advapi32.lib")
+#pragma comment (lib, "Shlwapi.lib")
 
 
 static std::pair<const xl::tchar *, HKEY> sRootMap[] = {
@@ -39,7 +41,7 @@ static bool sCheckKeyName (const xl::tstring &keyName) {
 	return true;
 }
 
-static HKEY sOpenKey (const xl::tstring &keyName, bool createWhenNonexists) {
+static HKEY sOpenKey (const xl::tstring &keyName, bool readOnly, bool createWhenNonexists) {
 	HKEY root = NULL;
 	xl::tstring subKey;
 	for (size_t i = 0; i < COUNT_OF(sRootMap); ++ i ) {
@@ -55,9 +57,7 @@ static HKEY sOpenKey (const xl::tstring &keyName, bool createWhenNonexists) {
 	assert(subKey.length() > 0 &&
 		(root != HKEY_CLASSES_ROOT || std::count(subKey.begin(), subKey.end(), _T('\\')) > 0));
 
-	DWORD dwSam = createWhenNonexists ? 
-		/* KEY_WRITE | */KEY_SET_VALUE | KEY_QUERY_VALUE : KEY_QUERY_VALUE;
-		// KEY_ALL_ACCESS : KEY_QUERY_VALUE;
+	DWORD dwSam = readOnly ? KEY_READ : KEY_READ | KEY_WRITE | DELETE;
 	HKEY key = NULL;
 	if (::RegOpenKeyEx(root, subKey.c_str(), 0, dwSam, &key) == ERROR_SUCCESS) {
 		assert(key != NULL);
@@ -93,7 +93,7 @@ bool CRegistry::setValue (
 	}
 
 	assert(std::count(keyName.begin(), keyName.end(), _T('\\')) > 1);
-	HKEY key = sOpenKey(keyName, true);
+	HKEY key = sOpenKey(keyName, false, true);
 	if (!key) {
 		return false;
 	}
@@ -116,7 +116,7 @@ bool CRegistry::setValue (
 	}
 
 	assert(std::count(keyName.begin(), keyName.end(), _T('\\')) > 1);
-	HKEY key = sOpenKey(keyName, true);
+	HKEY key = sOpenKey(keyName, false, true);
 	if (!key) {
 		return false;
 	}
@@ -138,7 +138,7 @@ bool CRegistry::getStringValue (
 	}
 
 	assert(std::count(keyName.begin(), keyName.end(), _T('\\')) > 1);
-	HKEY key = sOpenKey(keyName, false);
+	HKEY key = sOpenKey(keyName, true, false);
 	if (!key) {
 		return false;
 	}
@@ -175,7 +175,7 @@ bool CRegistry::getDwordValue (
 	}
 
 	assert(std::count(keyName.begin(), keyName.end(), _T('\\')) > 1);
-	HKEY key = sOpenKey(keyName, false);
+	HKEY key = sOpenKey(keyName, true, false);
 	if (!key) {
 		return false;
 	}
@@ -195,6 +195,140 @@ bool CRegistry::getDwordValue (
 	::RegCloseKey(key);
 	return result == ERROR_SUCCESS && dwType == REG_DWORD;
 }
+
+bool CRegistry::deleteValue (
+                             const xl::tstring &keyName,
+                             const xl::tstring &valueName,
+                             bool throwOnMissing
+                            ) {
+	if (!sCheckKeyName(keyName)) {
+		return false;
+	}
+
+	assert(std::count(keyName.begin(), keyName.end(), _T('\\')) > 1);
+	HKEY key = sOpenKey(keyName, false, false);
+	if (!key) {
+		if (throwOnMissing) {
+			key = sOpenKey(keyName, true, false);
+			::RegCloseKey(key);
+			if (key != NULL) {
+				throw new std::out_of_range("Nonexist key");
+			}
+		}
+		return false;
+	}
+
+	LONG result = RegDeleteValue(key, valueName.c_str());
+	::RegCloseKey(key);
+	if (result != ERROR_SUCCESS && throwOnMissing) {
+		throw new std::out_of_range("Nonexist value");
+	}
+
+	return result == ERROR_SUCCESS;
+}
+
+bool CRegistry::deleteKey (
+                             const xl::tstring &keyName,
+                             bool throwOnMissing
+                            ) {
+	if (!sCheckKeyName(keyName)) {
+		return false;
+	}
+
+	// split keyName into parentKey and the subKey
+	size_t pos = keyName.rfind(_T('\\'));
+	if (pos == keyName.npos) {
+		assert(false);
+		return false;
+	}
+	xl::tstring parentKey = keyName.substr(0, pos);
+	xl::tstring subKey = keyName.substr(pos + 1);
+
+	// check for safty
+	static const xl::tchar *allowedParents[] = {
+		_T("HKCR"),
+		_T("HKEY_CLASSES_ROOT"),
+		_T("HKCU\\SOFTWARE"),
+		_T("HKEY_CURRENT_USER\\SOFTWARE"),
+		_T("HKLM\\SOFTWARE"),
+		_T("HKEY_LOCAL_MACHINE\\SOFTWARE"),
+	};
+	static const xl::tchar *forbiddenParents[] = {
+		_T("HKCU\\SOFTWARE\\MICROSOFT"),
+		_T("HKEY_CURRENT_USER\\SOFTWARE\\MICROSOFT"),
+		_T("HKLM\\SOFTWARE\\MICROSOFT"),
+		_T("HKEY_LOCAL_MACHINE\\SOFTWARE\\MICROSOFT"),
+	};
+	static const xl::tchar *forbiddenSubKeys[] = {
+		_T("Classes"),
+		_T("Policies"),
+		_T("RegisteredApplications"),
+	};
+
+	// parent allowed ?
+	bool allowed = false;
+	std::transform(parentKey.begin(), parentKey.end(), parentKey.begin(), [](xl::tchar c) {
+		return _totupper(c);
+	});
+	const xl::tchar *szParentKey = parentKey.c_str();
+	for (size_t i = 0; i < COUNT_OF(allowedParents); ++ i) {
+		if (_tcsstr(szParentKey, allowedParents[i]) == szParentKey) {
+			allowed = true;
+			break;
+		}
+	}
+	assert(allowed);
+	if (!allowed) {
+		return false;
+	}
+
+	// parent forbidden ?
+	for (size_t i = 0; i < COUNT_OF(forbiddenParents); ++ i) {
+		if (_tcsstr(szParentKey, forbiddenParents[i]) == szParentKey) {
+			allowed = false;
+			break;
+		}
+	}
+	assert(allowed);
+	if (!allowed) {
+		return false;
+	}
+
+	// subkey forbidden ?
+	const xl::tchar *szSubKey = subKey.c_str();
+	for (size_t i = 0; i < COUNT_OF(forbiddenSubKeys); ++ i) {
+		if (_tcsicmp(szSubKey, forbiddenSubKeys[i]) == 0) {
+			allowed = false;
+			break;
+		}
+	}
+	assert(allowed);
+	if (!allowed) {
+		return false;
+	}
+
+	// now we assume safe.....
+	HKEY key = sOpenKey(parentKey, false, false);
+	if (!key) {
+		if (throwOnMissing) {
+			key = sOpenKey(parentKey, true, false);
+			::RegCloseKey(key);
+			if (key != NULL) {
+				throw new std::out_of_range("Parent key is nonexists");
+			}
+		}
+		return false;
+	}
+
+	LSTATUS  result = ::SHDeleteKey(key, subKey.c_str());
+	::RegCloseKey(key);
+	if (result != ERROR_SUCCESS && throwOnMissing) {
+		throw new std::out_of_range("Key is nonexists");
+	}
+
+	return result == ERROR_SUCCESS;
+}
+
 
 
 #if 0
