@@ -476,7 +476,16 @@ bool CControl::isPointIn (CPoint pt) const {
 bool CControl::isCursorIn () {
 	CCtrlMain *pCtrlMain = _GetMainCtrl();
 	assert(pCtrlMain != NULL);
-	return isPointIn(pCtrlMain->getCursorPos());
+	if (!isPointIn(pCtrlMain->getCursorPos())) {
+		return false;
+	} else {
+		CControlPtr ctrlHover = pCtrlMain->getHoverCtrl();
+		if (ctrlHover.get() == this || isChild(ctrlHover)) {
+			return true;
+		} else {
+			return false;
+		}
+	}
 }
 
 void CControl::drawMe (HDC /*hdc*/) {
