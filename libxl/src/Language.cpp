@@ -20,9 +20,19 @@ CLanguage::~CLanguage () {
 }
 
 void CLanguage::_SetDefaultLcid () {
-	LCID lcid = GetSystemDefaultLCID();
 	tchar code[10];
-	_stprintf_s(code, 10, _T("%04x"), (lcid & 0xffff)); // use it 0-15 bits
+#if 0
+	LCID lcid = GetSystemDefaultLCID();
+	_stprintf_s(code, 10, _T("%04x"), (lcid & 0xffff)); // use its 0-15 bits
+#else
+	LANGID langid = GetUserDefaultUILanguage();
+	if (langid == LOCALE_CUSTOM_DEFAULT || langid == LOCALE_CUSTOM_UI_DEFAULT || langid == LOCALE_CUSTOM_UNSPECIFIED) {
+		LCID lcid = GetSystemDefaultLCID();
+		_stprintf_s(code, 10, _T("%04x"), (lcid & 0xffff)); // use its 0-15 bits
+	} else {
+		_stprintf_s(code, 10, _T("%04x"), langid);
+	}
+#endif
 	setLcid (code);
 }
 
