@@ -155,17 +155,19 @@ void CCtrlGesture::drawMe (HDC hdc) {
 		return;
 	}
 
+	CResMgr *pResMgr = CResMgr::getInstance();
 	CRect rc = getClientRect();
 
 	CDCHandle dc(hdc);
 	if (m_gestureLineWidth > 0) {
-		HPEN pen = ::CreatePen(PS_SOLID, m_gestureLineWidth, _GetColor());
+		// HPEN pen = ::CreatePen(PS_SOLID, m_gestureLineWidth, _GetColor());
+		HPEN pen = pResMgr->getPen(PS_SOLID, (xl::ushort)m_gestureLineWidth, _GetColor());
 		HPEN oldPen = dc.SelectPen(pen);
 
 		dc.Polyline(&m_points[0], m_points.size());
 
 		dc.SelectPen(oldPen);
-		::DeleteObject(pen);
+		// ::DeleteObject(pen);
 	}
 
 	assert(_GetTarget() != NULL);
@@ -174,9 +176,11 @@ void CCtrlGesture::drawMe (HDC hdc) {
 	text += _GetTarget()->onGesture(m_isTimeout ? _T("canceled") : m_gesture, m_points[0], false);
 	text += _T(")");
 
-	rc.top = rc.bottom - 20;
+	// rc.top = rc.bottom - 20;
 	COLORREF oldColor = dc.SetTextColor(_GetColor());
-	dc.drawTransparentTextWithDefaultFont(text, text.length(), rc, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+	HFONT oldFont = dc.SelectFont(_GetFont());
+	dc.drawTransparentText(text, text.length(), rc, DT_CENTER | DT_BOTTOM | DT_SINGLELINE);
+	dc.SelectFont(oldFont);
 	dc.SetTextColor(oldColor);
 }
 
